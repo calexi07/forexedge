@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForexEdge — Professional Forex Intelligence</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;padding:120px 48px 80px;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-200px;right:-100px;width:700px;height:700px;background:radial-gradient(ellipse at center,rgba(201,168,76,0.06) 0%,transparent 70%);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(201,168,76,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,0.04) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 0%,transparent 100%)}
+.hero-content{position:relative;max-width:680px;z-index:2;animation:fadeUp 0.9s ease both}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:24px;padding:5px 12px;border:1px solid var(--border);background:var(--gold-dim);border-radius:var(--radius)}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);animation:blink 2s ease-in-out infinite}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(52px,7vw,88px);font-weight:300;line-height:1.0;letter-spacing:-0.01em;color:var(--text);margin-bottom:20px}
+.hero h1 em{font-style:italic;color:var(--gold)}
+.hero h1 .line2{display:block;font-weight:600}
+.hero-sub{font-size:16px;font-weight:300;line-height:1.7;color:var(--text2);max-width:500px;margin-bottom:40px}
+.hero-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.hero-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:0.05em}
+.hero-ticker{position:absolute;right:48px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px;z-index:2;animation:fadeUp 0.9s 0.3s ease both}
+.ticker-card{background:var(--bg3);border:1px solid var(--border2);padding:14px 18px;width:190px;position:relative;overflow:hidden;transition:border-color 0.2s}
+.ticker-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%}
+.ticker-card.bull::before{background:var(--bull)}
+.ticker-card.bear::before{background:var(--bear)}
+.ticker-card.neutral::before{background:var(--gold)}
+.ticker-pair{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--text);letter-spacing:0.05em;margin-bottom:4px}
+.ticker-price{font-family:'DM Mono',monospace;font-size:17px;font-weight:500;color:var(--text);margin-bottom:4px}
+.ticker-bias{font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;padding:2px 7px;border-radius:1px;display:inline-block}
+.ticker-bias.bull{background:var(--bull-bg);color:var(--bull)}
+.ticker-bias.bear{background:var(--bear-bg);color:var(--bear)}
+.ticker-bias.neutral{background:var(--gold-dim);color:var(--gold)}
+.marquee-wrap{border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);background:var(--bg2);padding:9px 0;overflow:hidden;white-space:nowrap}
+.marquee-track{display:inline-flex;gap:40px;animation:marquee 35s linear infinite}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.marquee-item{display:inline-flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text2)}
+.marquee-item .pair{color:var(--text);font-weight:500}
+.marquee-item .chg.up{color:var(--bull)}
+.marquee-item .chg.down{color:var(--bear)}
+.marquee-sep{color:var(--text3)}
+.stats-bar{background:var(--bg2);padding:28px 48px;display:grid;grid-template-columns:repeat(4,1fr)}
+.stat-item{padding:0 36px;border-right:1px solid var(--border2)}
+.stat-item:first-child{padding-left:0}
+.stat-item:last-child{border-right:none}
+.stat-number{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;color:var(--gold2);line-height:1;margin-bottom:5px}
+.stat-label{font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3)}
+.features-section{padding:100px 48px}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border2);border:1px solid var(--border2)}
+.feature-card{background:var(--bg);padding:36px 32px;position:relative;overflow:hidden;transition:background 0.3s}
+.feature-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity 0.3s}
+.feature-card:hover{background:var(--bg3)}
+.feature-card:hover::after{opacity:1}
+.feature-icon{width:40px;height:40px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:18px;background:var(--gold-dim)}
+.feature-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.feature-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.2}
+.feature-desc{font-size:13px;color:var(--text2);line-height:1.7}
+.feature-lock{display:inline-flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-top:14px;letter-spacing:0.05em}
+.pricing-section{padding:100px 48px;background:var(--bg2);position:relative;overflow:hidden}
+.pricing-section::before{content:'';position:absolute;top:-300px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(ellipse,rgba(201,168,76,0.04) 0%,transparent 70%);pointer-events:none}
+.pricing-header{text-align:center;margin-bottom:56px}
+.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:1100px;margin:0 auto}
+.plan-card{background:var(--bg);border:1px solid var(--border2);padding:32px 24px;position:relative;transition:all 0.3s;display:flex;flex-direction:column}
+.plan-card:hover{border-color:var(--border);transform:translateY(-3px)}
+.plan-card.featured{border-color:var(--gold);background:linear-gradient(160deg,rgba(201,168,76,0.05) 0%,var(--bg) 50%)}
+.plan-card.featured::before{content:'MOST POPULAR';position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--gold);color:#080808;font-family:'DM Mono',monospace;font-size:8px;font-weight:500;letter-spacing:0.15em;padding:3px 12px;white-space:nowrap}
+.plan-name{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.plan-card.featured .plan-name{color:var(--gold)}
+.plan-price .amount{font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:600;color:var(--text);line-height:1}
+.plan-price .currency{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;color:var(--text2);vertical-align:super}
+.plan-price .period{font-size:12px;color:var(--text3)}
+.plan-desc{font-size:12px;color:var(--text2);line-height:1.6;margin:10px 0 20px;padding-bottom:18px;border-bottom:1px solid var(--border2)}
+.plan-features{list-style:none;flex:1;margin-bottom:24px}
+.plan-features li{font-size:12px;color:var(--text2);padding:6px 0;display:flex;align-items:flex-start;gap:8px;border-bottom:1px solid var(--border2)}
+.plan-features li:last-child{border-bottom:none}
+.plan-features li::before{content:'—';color:var(--gold);font-family:'DM Mono',monospace;font-size:10px;flex-shrink:0;margin-top:1px}
+.plan-features li.locked{color:var(--text3);text-decoration:line-through}
+.plan-features li.locked::before{color:var(--text3)}
+.plan-btn{width:100%;padding:11px;background:transparent;border:1px solid var(--border);color:var(--text2);font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:var(--radius);transition:all 0.2s;text-align:center;text-decoration:none;display:block}
+.plan-btn:hover{border-color:var(--gold);color:var(--gold)}
+.plan-card.featured .plan-btn{background:var(--gold);border-color:var(--gold);color:#080808;font-weight:600}
+.plan-card.featured .plan-btn:hover{background:var(--gold2);transform:translateY(-1px);box-shadow:0 6px 20px rgba(201,168,76,0.3)}
+.testimonials-section{padding:100px 48px}
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+.testimonial-card{background:var(--bg2);border:1px solid var(--border2);padding:28px 24px;transition:border-color 0.2s}
+.testimonial-card:hover{border-color:var(--border)}
+.tquote{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:300;font-style:italic;color:var(--text);line-height:1.6;margin-bottom:20px}
+.tquote::before{content:'"';font-size:44px;color:var(--gold);line-height:0;vertical-align:-18px;margin-right:3px;font-style:normal}
+.tauthor{display:flex;align-items:center;gap:10px}
+.tavatar{width:34px;height:34px;background:var(--gold-dim);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);flex-shrink:0}
+.tname{font-size:13px;font-weight:500;color:var(--text)}
+.trole{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:0.08em;margin-top:1px}
+.tbadge{margin-left:auto;font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;background:var(--gold-dim);border:1px solid var(--border);color:var(--gold);letter-spacing:0.1em;text-transform:uppercase}
+.cta-section{padding:100px 48px;background:var(--bg2);text-align:center;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;bottom:-200px;left:50%;transform:translateX(-50%);width:500px;height:500px;background:radial-gradient(ellipse,rgba(201,168,76,0.07) 0%,transparent 70%);pointer-events:none}
+.cta-actions{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:36px}
+@media(max-width:1024px){.hero-ticker{display:none}.pricing-grid{grid-template-columns:repeat(2,1fr)}.testimonials-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.hero{padding:100px 20px 60px}.features-section,.testimonials-section,.cta-section{padding:60px 20px}.stats-bar{grid-template-columns:repeat(2,1fr);padding:20px;gap:16px}.stat-item{border-right:none;padding:0}.features-grid{grid-template-columns:1fr}.pricing-section{padding:60px 20px}.pricing-grid{grid-template-columns:1fr}.testimonials-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="navMount"></div>
+
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow"><div class="live-dot"></div>AI-Powered Fundamental Analysis</div>
+    <h1>Trade with<br><em>intelligence,</em><span class="line2">not instinct.</span></h1>
+    <p class="hero-sub">ForexEdge delivers real-time fundamental analysis, economic calendar insights, and AI-generated market bias for every major forex pair — so you always know the <em>why</em> behind the move.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-gold-lg" onclick="openModal('register');return false;">Start Free Today →</a>
+      <a href="#pricing" class="btn-ghost-lg">View Plans</a>
+    </div>
+    <p class="hero-note">No credit card required · Free plan available · Cancel anytime</p>
+  </div>
+  <div class="hero-ticker">
+    <div class="ticker-card bull"><div class="ticker-pair">EUR/USD</div><div class="ticker-price" id="t1">1.1532</div><span class="ticker-bias bull">● Bullish</span></div>
+    <div class="ticker-card bear"><div class="ticker-pair">GBP/USD</div><div class="ticker-price" id="t2">1.2941</div><span class="ticker-bias bear">● Bearish</span></div>
+    <div class="ticker-card neutral"><div class="ticker-pair">USD/JPY</div><div class="ticker-price" id="t3">148.72</div><span class="ticker-bias neutral">● Neutral</span></div>
+    <div class="ticker-card bull"><div class="ticker-pair">AUD/USD</div><div class="ticker-price" id="t4">0.6384</div><span class="ticker-bias bull">● Bullish</span></div>
+  </div>
+</section>
+
+<div class="marquee-wrap"><div class="marquee-track">
+  <span class="marquee-item"><span class="pair">EUR/USD</span><span class="chg up">1.1532 ▲+0.29%</span></span><span class="marquee-sep">·</span>
+  <span class="marquee-item"><span class="pair">GBP/USD</span><span class="chg down">1.2941 ▼−0.16%</span></span><span class="marquee-sep">·</span>
+  <span class="marquee-item"><span class="pair">USD/JPY</span><span class="chg up">148.72 ▲+0.12%</span></span><span class="marquee-sep">·</span>
+  <span class="marquee-item"><span class="pair">AUD/USD</span><span class="chg up">0.6384 ▲+0.19%</span></span><span class="marquee-sep">·</span>
+  <span class="marquee-item"><span class="pair">USD/CAD</span><span class="chg down">1.3842 ▼−0.08%</span></span><span class="marquee-sep">·</span>
+  <span class="marquee-item"><span class="pair">NZD/USD</span><span class="chg up">0.5921 ▲+0.22%</span></span><span class="marquee-sep">·</span>
+  <span class="marquee-item"><span class="pair">USD/CHF</span><span class="chg down">0.8874 ▼−0.11%</span></span><span class="marquee-sep">·</span>
+  <span class="marquee-item"><span class="pair">EUR/JPY</span><span class="chg up">171.44 ▲+0.41%</span></span><span class="marquee-sep">·</span>
+  <span class="marquee-item"><span class="pair">XAU/USD</span><span class="chg up">3,142.80 ▲+0.54%</span></span><span class="marquee-sep">·</span>
+  <span class="marquee-item"><span class="pair">EUR/USD</span><span class="chg up">1.1532 ▲+0.29%</span></span><span class="marquee-sep">·</span>
+  <span class="marquee-item"><span class="pair">GBP/USD</span><span class="chg down">1.2941 ▼−0.16%</span></span><span class="marquee-sep">·</span>
+  <span class="marquee-item"><span class="pair">USD/JPY</span><span class="chg up">148.72 ▲+0.12%</span></span><span class="marquee-sep">·</span>
+  <span class="marquee-item"><span class="pair">XAU/USD</span><span class="chg up">3,142.80 ▲+0.54%</span></span>
+</div></div>
+
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-number">28+</div><div class="stat-label">Forex Pairs Covered</div></div>
+  <div class="stat-item"><div class="stat-number">6</div><div class="stat-label">Major Central Banks</div></div>
+  <div class="stat-item"><div class="stat-number">24/7</div><div class="stat-label">Live Data Updates</div></div>
+  <div class="stat-item"><div class="stat-number">AI</div><div class="stat-label">Bias Engine Powered</div></div>
+</div>
+
+<section class="features-section">
+  <div class="page-wrap" style="padding-top:0;padding-bottom:0">
+    <div class="section-label">// What's Inside</div>
+    <h2 class="section-title">Everything you need to trade<br><strong>with conviction.</strong></h2>
+    <p style="font-size:15px;color:var(--text2);max-width:460px;line-height:1.7;margin-bottom:48px">From live economic events to AI-generated market bias — all in one professional platform.</p>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon">📰</div><div class="feature-tag">Free</div><h3 class="feature-title">AI News Sentiment</h3><p class="feature-desc">Real-time forex news with automatic AI analysis — Bullish, Bearish or Neutral verdict per currency per story.</p><a href="news.html" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);text-decoration:none;letter-spacing:0.08em">View News →</a></div>
+      <div class="feature-card"><div class="feature-icon">📅</div><div class="feature-tag">Pro+</div><h3 class="feature-title">Economic Calendar</h3><p class="feature-desc">Track NFP, CPI, GDP, interest rate decisions and 50+ high-impact events with expected vs actual data.</p><span class="feature-lock">🔒 Pro plan & above</span></div>
+      <div class="feature-card"><div class="feature-icon">🏦</div><div class="feature-tag">Pro+</div><h3 class="feature-title">Central Bank Monitor</h3><p class="feature-desc">Real-time policy tracking for Fed, ECB, BOE, BOJ, RBA, RBNZ with hawkish/dovish scoring.</p><span class="feature-lock">🔒 Pro plan & above</span></div>
+      <div class="feature-card"><div class="feature-icon">🤖</div><div class="feature-tag">Pro+</div><h3 class="feature-title">AI Bias Engine</h3><p class="feature-desc">Bullish, Bearish, or Neutral bias for every major pair — updated after each major event with full AI reasoning.</p><span class="feature-lock">🔒 Pro plan & above</span></div>
+      <div class="feature-card"><div class="feature-icon">📒</div><div class="feature-tag">Journal Plan</div><h3 class="feature-title">Trading Journal</h3><p class="feature-desc">Log trades manually or import from MT4/MT5. Equity curve, win rate, psychology tags, AI coach feedback.</p><a href="journal.html" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);text-decoration:none;letter-spacing:0.08em">View Journal →</a></div>
+      <div class="feature-card"><div class="feature-icon">🎓</div><div class="feature-tag">Basic+</div><h3 class="feature-title">Forex Academy</h3><p class="feature-desc">Structured learning from zero to advanced. Modules, quizzes and progress tracking included.</p><a href="academy.html" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);text-decoration:none;letter-spacing:0.08em">View Academy →</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing-section" id="pricing">
+  <div class="pricing-header">
+    <div class="section-label" style="text-align:center">// Pricing</div>
+    <h2 class="section-title" style="text-align:center">Choose your <strong>edge.</strong></h2>
+    <p style="font-size:14px;color:var(--text2);text-align:center;margin-top:8px">Start free. Upgrade when you're ready.</p>
+  </div>
+  <div class="pricing-grid">
+    <div class="plan-card">
+      <div class="plan-name">Free</div>
+      <div class="plan-price"><span class="amount">0</span><span class="period"> /forever</span></div>
+      <p class="plan-desc">Get started with the basics.</p>
+      <ul class="plan-features"><li>AI News feed (3/day)</li><li>Economic calendar</li><li>2 demo lessons</li><li>Discord read-only</li><li class="locked">AI Bias Engine</li><li class="locked">Central Bank Monitor</li><li class="locked">Trading Journal</li></ul>
+      <a href="#" class="plan-btn" onclick="openModal('register');return false;">Get Started Free</a>
+    </div>
+    <div class="plan-card">
+      <div class="plan-name">Basic</div>
+      <div class="plan-price"><span class="currency">$</span><span class="amount">19</span><span class="period"> /mo</span></div>
+      <p class="plan-desc">Full educational access.</p>
+      <ul class="plan-features"><li>Everything in Free</li><li>Full Forex Academy</li><li>Quizzes & progress</li><li>Discord Basic channels</li><li>Weekly market summary</li><li class="locked">AI Bias Engine</li><li class="locked">Trading Journal</li></ul>
+      <a href="#" class="plan-btn" onclick="openModal('register');return false;">Start Basic</a>
+    </div>
+    <div class="plan-card featured">
+      <div class="plan-name">Pro</div>
+      <div class="plan-price"><span class="currency">$</span><span class="amount">49</span><span class="period"> /mo</span></div>
+      <p class="plan-desc">Full fundamental analysis suite.</p>
+      <ul class="plan-features"><li>Everything in Basic</li><li>AI Bias Engine (all pairs)</li><li>Central Bank Monitor</li><li>Full news AI analysis</li><li>Discord Pro channels</li><li>Weekly live analysis</li><li class="locked">Trading Journal</li></ul>
+      <a href="#" class="plan-btn" onclick="openModal('register');return false;">Start Pro →</a>
+    </div>
+    <div class="plan-card">
+      <div class="plan-name">Elite</div>
+      <div class="plan-price"><span class="currency">$</span><span class="amount">99</span><span class="period"> /mo</span></div>
+      <p class="plan-desc">The complete edge.</p>
+      <ul class="plan-features"><li>Everything in Pro</li><li>COT & Sentiment data</li><li>Custom alerts</li><li>Monthly 1-on-1 session</li><li>Discord Elite channel</li><li>Verified Track Record</li><li>Priority support</li></ul>
+      <a href="#" class="plan-btn" onclick="openModal('register');return false;">Start Elite</a>
+    </div>
+  </div>
+  <p style="text-align:center;margin-top:24px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)">Trading Journal add-on: <span style="color:var(--gold)">+$29/mo</span> · Pro+Journal bundle: <span style="color:var(--gold)">$69/mo</span></p>
+</section>
+
+<section class="testimonials-section">
+  <div class="page-wrap" style="padding-top:0;padding-bottom:0">
+    <div class="section-label">// Community</div>
+    <h2 class="section-title">Trusted by <strong>traders.</strong></h2>
+    <div class="testimonials-grid">
+      <div class="testimonial-card"><p class="tquote">The AI bias engine completely changed how I approach my week. I open ForexEdge every Sunday to plan my trades ahead.</p><div class="tauthor"><div class="tavatar">MR</div><div><div class="tname">Marcus R.</div><div class="trole">Swing Trader · 4 years</div></div><span class="tbadge">Pro</span></div></div>
+      <div class="testimonial-card"><p class="tquote">Finally a platform that explains the <em>why</em>. The Central Bank Monitor alone is worth the subscription.</p><div class="tauthor"><div class="tavatar">SA</div><div><div class="tname">Sofia A.</div><div class="trole">Forex Student · 1 year</div></div><span class="tbadge">Basic</span></div></div>
+      <div class="testimonial-card"><p class="tquote">The Journal AI coach told me I was losing every Friday. I fixed that one habit and my PnL jumped 30%.</p><div class="tauthor"><div class="tavatar">JK</div><div><div class="tname">James K.</div><div class="trole">Full-time Trader · 7 years</div></div><span class="tbadge">Elite</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="section-label">// Get Started</div>
+  <h2 class="section-title">Your edge starts<br><strong>today.</strong></h2>
+  <p style="font-size:15px;color:var(--text2);max-width:440px;margin:12px auto 0;line-height:1.7">Join thousands of traders who use ForexEdge to make smarter, more informed decisions.</p>
+  <div class="cta-actions">
+    <a href="#" class="btn-gold-lg" onclick="openModal('register');return false;">Create Free Account →</a>
+    <a href="#pricing" class="btn-ghost-lg">View All Plans</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">Forex<span>Edge</span></div>
+  <ul class="footer-links">
+    <li><a href="news.html">News</a></li><li><a href="journal.html">Journal</a></li>
+    <li><a href="academy.html">Academy</a></li><li><a href="tools.html">Tools</a></li>
+    <li><a href="#">Privacy Policy</a></li><li><a href="#">Terms</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 ForexEdge. All rights reserved.</div>
+</footer>
+
+<div id="modalMount"></div>
+<script src="nav.js"></script>
+<script>
+renderNav('index');
+renderModal();
+const prices=[{id:'t1',val:1.1532,pip:0.0001},{id:'t2',val:1.2941,pip:0.0001},{id:'t3',val:148.72,pip:0.01},{id:'t4',val:0.6384,pip:0.0001}];
+setInterval(()=>{prices.forEach(p=>{p.val+=(Math.random()-0.48)*p.pip*3;const el=document.getElementById(p.id);if(el){el.textContent=p.val.toFixed(p.pip===0.01?2:4)}})},2000);
+const obs=new IntersectionObserver((e)=>{e.forEach(en=>{if(en.isIntersecting){en.target.style.opacity='1';en.target.style.transform='translateY(0)'}})},{threshold:0.1});
+document.querySelectorAll('.feature-card,.plan-card,.testimonial-card').forEach(el=>{el.style.opacity='0';el.style.transform='translateY(16px)';el.style.transition='opacity 0.5s ease,transform 0.5s ease';obs.observe(el)});
+</script>
+</body>
+</html>
