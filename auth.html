@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForexEdge — Sign In</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+body{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.auth-wrap{width:100%;max-width:440px;position:relative;z-index:1}
+.auth-logo{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;letter-spacing:0.08em;color:var(--text);margin-bottom:32px;display:flex;align-items:center;gap:10px;text-decoration:none}
+.auth-logo .logo-mark{width:30px;height:30px;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;color:var(--gold)}
+.auth-logo span{color:var(--gold)}
+.auth-card{background:var(--bg2);border:1px solid var(--border);padding:48px;border-radius:3px}
+.auth-tabs{display:flex;gap:0;border-bottom:1px solid var(--border2);margin-bottom:32px}
+.auth-tab{flex:1;padding:10px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text3);font-family:'Outfit',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;margin-bottom:-1px}
+.auth-tab.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:500}
+.auth-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--text);margin-bottom:6px}
+.auth-sub{font-size:13px;color:var(--text2);margin-bottom:28px;line-height:1.6}
+.form-error{background:var(--bear-bg);border:1px solid rgba(224,92,92,0.3);color:var(--bear);font-size:12px;padding:10px 14px;border-radius:3px;margin-bottom:16px;display:none}
+.form-success{background:var(--bull-bg);border:1px solid rgba(76,175,125,0.3);color:var(--bull);font-size:12px;padding:10px 14px;border-radius:3px;margin-bottom:16px;display:none;line-height:1.5}
+.form-divider{display:flex;align-items:center;gap:12px;margin:20px 0}
+.form-divider::before,.form-divider::after{content:'';flex:1;height:1px;background:var(--border2)}
+.form-divider span{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:0.1em}
+.btn-discord{width:100%;padding:12px;background:rgba(88,101,242,0.1);border:1px solid rgba(88,101,242,0.3);color:#8891f2;font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;border-radius:3px;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-discord:hover{background:rgba(88,101,242,0.18)}
+.auth-switch{text-align:center;margin-top:20px;font-size:13px;color:var(--text2)}
+.auth-switch a{color:var(--gold);text-decoration:none;cursor:pointer}
+.hero-bg{position:fixed;inset:0;background:radial-gradient(ellipse at 70% 30%,rgba(201,168,76,0.05) 0%,transparent 60%);pointer-events:none}
+.hero-grid-bg{position:fixed;inset:0;background-image:linear-gradient(rgba(201,168,76,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);text-decoration:none;letter-spacing:0.08em;margin-bottom:24px;transition:color 0.2s}
+.back-link:hover{color:var(--gold)}
+.forgot-link{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);cursor:pointer;letter-spacing:0.05em;transition:color 0.2s;background:none;border:none;padding:0}
+.forgot-link:hover{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="hero-bg"></div>
+<div class="hero-grid-bg"></div>
+
+<div class="auth-wrap">
+  <a href="index.html" class="back-link">← Back to ForexEdge</a>
+  <a href="index.html" class="auth-logo">
+    <div class="logo-mark">FX</div>
+    Forex<span>Edge</span>
+  </a>
+
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabSI" onclick="switchTab('signin')">Sign In</button>
+      <button class="auth-tab" id="tabSU" onclick="switchTab('signup')">Create Account</button>
+    </div>
+
+    <!-- SIGN IN -->
+    <div id="signinView">
+      <h2 class="auth-title">Welcome back.</h2>
+      <p class="auth-sub">Sign in to access your journal, analysis tools and academy.</p>
+      <div class="form-error" id="siErr"></div>
+      <div class="form-success" id="siOk"></div>
+      <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-input" id="siEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doSignIn()"></div>
+      <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="siPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doSignIn()"></div>
+      <div style="text-align:right;margin:-8px 0 16px"><button class="forgot-link" onclick="switchTab('forgot')">Forgot password?</button></div>
+      <button class="form-submit" id="siBtn" onclick="doSignIn()">Sign In →</button>
+      <div class="form-divider"><span>or</span></div>
+      <button class="btn-discord" onclick="doDiscord()">
+        <svg width="16" height="13" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.6 58.6 0 0 0 45.5.4a.2.2 0 0 0-.2.1 40.8 40.8 0 0 0-1.8 3.7 54.1 54.1 0 0 0-16.3 0 37.6 37.6 0 0 0-1.8-3.7.2.2 0 0 0-.2-.1A58.4 58.4 0 0 0 10.6 4.9a.2.2 0 0 0-.1.1C1.6 18.1-.9 31 .3 43.6a.2.2 0 0 0 .1.2 58.8 58.8 0 0 0 17.7 9 .2.2 0 0 0 .2-.1 42 42 0 0 0 3.6-5.9.2.2 0 0 0-.1-.3 38.7 38.7 0 0 1-5.5-2.6.2.2 0 0 1 0-.4c.4-.3.7-.6 1.1-.9a.2.2 0 0 1 .2 0c11.5 5.3 24 5.3 35.4 0a.2.2 0 0 1 .2 0c.4.3.7.6 1.1.9a.2.2 0 0 1 0 .4 36.1 36.1 0 0 1-5.5 2.6.2.2 0 0 0-.1.3 47.1 47.1 0 0 0 3.6 5.9.2.2 0 0 0 .2.1 58.6 58.6 0 0 0 17.8-9 .2.2 0 0 0 .1-.2c1.4-14.6-2.4-27.3-10.1-38.6a.2.2 0 0 0-.1-.1zM23.7 36.2c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2c3.6 0 6.5 3.3 6.4 7.2 0 4-2.8 7.2-6.4 7.2zm23.6 0c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2c3.6 0 6.5 3.3 6.4 7.2 0 4-2.8 7.2-6.4 7.2z"/></svg>
+        Continue with Discord
+      </button>
+      <p class="auth-switch">No account? <a onclick="switchTab('signup')">Create one free →</a></p>
+    </div>
+
+    <!-- SIGN UP -->
+    <div id="signupView" style="display:none">
+      <h2 class="auth-title">Create account.</h2>
+      <p class="auth-sub">Start free — no credit card required. Upgrade anytime.</p>
+      <div class="form-error" id="suErr"></div>
+      <div class="form-success" id="suOk"></div>
+      <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" id="suName" placeholder="Your full name"></div>
+      <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-input" id="suEmail" placeholder="you@example.com"></div>
+      <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="suPass" placeholder="Min. 8 characters"></div>
+      <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" class="form-input" id="suPass2" placeholder="Repeat password" onkeydown="if(event.key==='Enter')doSignUp()"></div>
+      <p style="font-size:11px;color:var(--text3);margin-bottom:16px;line-height:1.6">By creating an account you agree to our <a href="#" style="color:var(--gold);text-decoration:none">Terms</a> and <a href="#" style="color:var(--gold);text-decoration:none">Privacy Policy</a>.</p>
+      <button class="form-submit" id="suBtn" onclick="doSignUp()">Create Free Account →</button>
+      <div class="form-divider"><span>or</span></div>
+      <button class="btn-discord" onclick="doDiscord()">
+        <svg width="16" height="13" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.6 58.6 0 0 0 45.5.4a.2.2 0 0 0-.2.1 40.8 40.8 0 0 0-1.8 3.7 54.1 54.1 0 0 0-16.3 0 37.6 37.6 0 0 0-1.8-3.7.2.2 0 0 0-.2-.1A58.4 58.4 0 0 0 10.6 4.9a.2.2 0 0 0-.1.1C1.6 18.1-.9 31 .3 43.6a.2.2 0 0 0 .1.2 58.8 58.8 0 0 0 17.7 9 .2.2 0 0 0 .2-.1 42 42 0 0 0 3.6-5.9.2.2 0 0 0-.1-.3 38.7 38.7 0 0 1-5.5-2.6.2.2 0 0 1 0-.4c.4-.3.7-.6 1.1-.9a.2.2 0 0 1 .2 0c11.5 5.3 24 5.3 35.4 0a.2.2 0 0 1 .2 0c.4.3.7.6 1.1.9a.2.2 0 0 1 0 .4 36.1 36.1 0 0 1-5.5 2.6.2.2 0 0 0-.1.3 47.1 47.1 0 0 0 3.6 5.9.2.2 0 0 0 .2.1 58.6 58.6 0 0 0 17.8-9 .2.2 0 0 0 .1-.2c1.4-14.6-2.4-27.3-10.1-38.6a.2.2 0 0 0-.1-.1zM23.7 36.2c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2c3.6 0 6.5 3.3 6.4 7.2 0 4-2.8 7.2-6.4 7.2zm23.6 0c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2c3.6 0 6.5 3.3 6.4 7.2 0 4-2.8 7.2-6.4 7.2z"/></svg>
+        Sign up with Discord
+      </button>
+      <p class="auth-switch">Already have an account? <a onclick="switchTab('signin')">Sign in</a></p>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <div id="forgotView" style="display:none">
+      <h2 class="auth-title">Reset password.</h2>
+      <p class="auth-sub">Enter your email and we'll send you a reset link.</p>
+      <div class="form-error" id="fpErr"></div>
+      <div class="form-success" id="fpOk"></div>
+      <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-input" id="fpEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doForgot()"></div>
+      <button class="form-submit" id="fpBtn" onclick="doForgot()">Send Reset Link →</button>
+      <p class="auth-switch"><a onclick="switchTab('signin')">← Back to Sign In</a></p>
+    </div>
+  </div>
+</div>
+
+<script src="supabase.js"></script>
+<script>
+if(window.location.hash==='#register')switchTab('signup');
+
+function switchTab(t){
+  document.getElementById('signinView').style.display=t==='signin'?'':'none';
+  document.getElementById('signupView').style.display=t==='signup'?'':'none';
+  document.getElementById('forgotView').style.display=t==='forgot'?'':'none';
+  document.getElementById('tabSI').classList.toggle('active',t==='signin');
+  document.getElementById('tabSU').classList.toggle('active',t==='signup');
+  clearMsgs();
+}
+
+function clearMsgs(){['siErr','siOk','suErr','suOk','fpErr','fpOk'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none'})}
+function showErr(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block'}
+function showOk(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block'}
+
+async function doSignIn(){
+  clearMsgs();
+  const email=document.getElementById('siEmail').value.trim();
+  const pass=document.getElementById('siPass').value;
+  if(!email||!pass){showErr('siErr','Please fill in all fields.');return;}
+  const btn=document.getElementById('siBtn');
+  btnLoading(btn,true);
+  const{error}=await authSignIn(email,pass);
+  btnLoading(btn,false);
+  if(error){showErr('siErr',error.message);return;}
+  toast('Welcome back!','success');
+  setTimeout(()=>window.location.href='journal.html',800);
+}
+
+async function doSignUp(){
+  clearMsgs();
+  const name=document.getElementById('suName').value.trim();
+  const email=document.getElementById('suEmail').value.trim();
+  const pass=document.getElementById('suPass').value;
+  const pass2=document.getElementById('suPass2').value;
+  if(!name||!email||!pass){showErr('suErr','Please fill in all fields.');return;}
+  if(pass.length<8){showErr('suErr','Password must be at least 8 characters.');return;}
+  if(pass!==pass2){showErr('suErr','Passwords do not match.');return;}
+  const btn=document.getElementById('suBtn');
+  btnLoading(btn,true);
+  const{error}=await authSignUp(email,pass,name);
+  btnLoading(btn,false);
+  if(error){showErr('suErr',error.message);return;}
+  showOk('suOk','✓ Account created! Check your email to confirm your account, then sign in.');
+  document.getElementById('suName').value='';
+  document.getElementById('suEmail').value='';
+  document.getElementById('suPass').value='';
+  document.getElementById('suPass2').value='';
+}
+
+async function doForgot(){
+  clearMsgs();
+  const email=document.getElementById('fpEmail').value.trim();
+  if(!email){showErr('fpErr','Please enter your email.');return;}
+  const btn=document.getElementById('fpBtn');
+  btnLoading(btn,true);
+  const{error}=await authResetPassword(email);
+  btnLoading(btn,false);
+  if(error){showErr('fpErr',error.message);return;}
+  showOk('fpOk','✓ Reset link sent! Check your inbox.');
+}
+
+async function doDiscord(){
+  const sb=await getSB();
+  await sb.auth.signInWithOAuth({provider:'discord',options:{redirectTo:window.location.origin+'/journal.html'}});
+}
+
+// Redirect if already logged in
+(async()=>{
+  const user=await authGetUser();
+  if(user)window.location.href='journal.html';
+})();
+</script>
+</body>
+</html>
