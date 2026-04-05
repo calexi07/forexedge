@@ -14,6 +14,8 @@ body{display:flex;align-items:center;justify-content:center;min-height:100vh}
 .title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--text);margin-bottom:8px}
 .sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:24px}
 .spinner-lg{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 20px}
+.btn-back{display:inline-flex;padding:12px 28px;background:var(--gold);color:#080808;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border-radius:var(--radius);transition:all 0.2s;border:none;cursor:pointer}
+.btn-back:hover{background:var(--gold2)}
 </style>
 </head>
 <body>
@@ -27,89 +29,68 @@ body{display:flex;align-items:center;justify-content:center;min-height:100vh}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
 <script>
-async function handleCallback() {
-  const hash = window.location.hash;
-  const params = new URLSearchParams(hash.replace('#', '?'));
-  const type = params.get('type');
-  const accessToken = params.get('access_token');
-  const refreshToken = params.get('refresh_token');
-  const error = params.get('error_description');
+const SUPABASE_URL = 'https://vaimxhgqcdhjhdiaampa.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
+const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const content = document.getElementById('content');
-
-  if (error) {
-    content.innerHTML = `
-      <div class="icon">❌</div>
-      <div class="title">Link expired</div>
-      <div class="sub">${decodeURIComponent(error)}. Please request a new confirmation email.</div>
-      <a href="auth.html" style="display:inline-flex;padding:12px 28px;background:var(--gold);color:#080808;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border-radius:var(--radius);transition:all 0.2s">Back to Sign In</a>
-    `;
-    return;
-  }
-
-  if (accessToken) {
-    try {
-      const { data, error: sessionError } = await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken
-      });
-
-      if (sessionError) throw sessionError;
-
-      if (type === 'signup') {
-        content.innerHTML = `
-          <div class="icon">✅</div>
-          <div class="title">Email confirmed!</div>
-          <div class="sub">Your account is ready. Redirecting to your journal...</div>
-        `;
-        setTimeout(() => window.location.href = 'journal.html', 1500);
-      } else if (type === 'recovery') {
-        content.innerHTML = `
-          <div class="icon">🔑</div>
-          <div class="title">Reset your password</div>
-          <div class="sub">Enter your new password below.</div>
-          <div style="margin-top:20px;text-align:left">
-            <div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-input" id="newPass" placeholder="Min. 8 characters"></div>
-            <button onclick="resetPass()" style="width:100%;padding:12px;background:var(--gold);border:none;color:#080808;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:var(--radius);margin-top:8px">Update Password →</button>
-          </div>
-        `;
-      } else {
-        setTimeout(() => window.location.href = 'journal.html', 1000);
-      }
-    } catch (err) {
-      content.innerHTML = `
-        <div class="icon">❌</div>
-        <div class="title">Something went wrong</div>
-        <div class="sub">${err.message}</div>
-        <a href="auth.html" style="display:inline-flex;padding:12px 28px;background:var(--gold);color:#080808;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border-radius:var(--radius)">Back to Sign In</a>
-      `;
-    }
-  } else {
-    content.innerHTML = `
-      <div class="icon">❌</div>
-      <div class="title">Invalid link</div>
-      <div class="sub">This confirmation link is invalid or has expired.</div>
-      <a href="auth.html" style="display:inline-flex;padding:12px 28px;background:var(--gold);color:#080808;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border-radius:var(--radius)">Back to Sign In</a>
-    `;
-  }
+function showError(msg){
+  document.getElementById('content').innerHTML=`
+    <div class="icon">❌</div>
+    <div class="title">Something went wrong</div>
+    <div class="sub">${msg}</div>
+    <a href="auth.html" class="btn-back">Back to Sign In</a>`;
 }
 
-async function resetPass() {
-  const pass = document.getElementById('newPass').value;
-  if (pass.length < 8) { alert('Password must be at least 8 characters.'); return; }
-  const { error } = await supabase.auth.updateUser({ password: pass });
-  if (error) { alert(error.message); return; }
-  document.getElementById('content').innerHTML = `
+function showSuccess(msg,redirect){
+  document.getElementById('content').innerHTML=`
     <div class="icon">✅</div>
-    <div class="title">Password updated!</div>
-    <div class="sub">Redirecting to sign in...</div>
-  `;
-  setTimeout(() => window.location.href = 'auth.html', 1500);
+    <div class="title">Email confirmed!</div>
+    <div class="sub">${msg}</div>`;
+  setTimeout(()=>window.location.href=redirect,1800);
 }
 
-handleCallback();
+async function handleCallback(){
+  const hash=window.location.hash.substring(1);
+  const params=new URLSearchParams(hash);
+  const accessToken=params.get('access_token');
+  const refreshToken=params.get('refresh_token')||'';
+  const type=params.get('type');
+  const errDesc=params.get('error_description');
+
+  if(errDesc){showError(decodeURIComponent(errDesc));return;}
+  if(!accessToken){showError('Invalid or expired link. Please sign up again.');return;}
+
+  try{
+    const{error}=await _sb.auth.setSession({access_token:accessToken,refresh_token:refreshToken});
+    if(error){showError(error.message);return;}
+    if(type==='recovery'){
+      document.getElementById('content').innerHTML=`
+        <div class="icon">🔑</div>
+        <div class="title">Reset your password</div>
+        <div class="sub">Enter your new password below.</div>
+        <div style="margin-top:20px;text-align:left">
+          <div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-input" id="newPass" placeholder="Min. 8 characters"></div>
+          <button onclick="resetPass()" class="btn-back" style="width:100%;justify-content:center;margin-top:10px">Update Password →</button>
+        </div>`;
+    }else{
+      showSuccess('Your account is ready. Redirecting to your journal...','journal.html');
+    }
+  }catch(err){
+    showError(err.message||'Unexpected error. Please try again.');
+  }
+}
+
+async function resetPass(){
+  const pass=document.getElementById('newPass')?.value;
+  if(!pass||pass.length<8){alert('Password must be at least 8 characters.');return;}
+  const{error}=await _sb.auth.updateUser({password:pass});
+  if(error){alert(error.message);return;}
+  document.getElementById('content').innerHTML=`<div class="icon">✅</div><div class="title">Password updated!</div><div class="sub">Redirecting to sign in...</div>`;
+  setTimeout(()=>window.location.href='auth.html',1500);
+}
+
+document.addEventListener('DOMContentLoaded',handleCallback);
 </script>
 </body>
 </html>
