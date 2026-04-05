@@ -1,8 +1,10 @@
 // ══════════════════════════════════════
 // FOREXEDGE — Shared Navigation
 // ══════════════════════════════════════
-const SUPABASE_URL = 'https://vaimxhgqcdhjhdiaampa.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
+
+// Use existing config if already declared (e.g. supabase.js loaded first)
+const _NAV_URL = (typeof SUPABASE_URL !== 'undefined') ? SUPABASE_URL : 'https://vaimxhgqcdhjhdiaampa.supabase.co';
+const _NAV_KEY = (typeof SUPABASE_KEY !== 'undefined') ? SUPABASE_KEY : 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
 
 function renderNav(activePage) {
   const pages = [
@@ -44,7 +46,10 @@ function toggleMobileNav() {
 async function checkNavAuthState() {
   try {
     if (!window.supabase) return;
-    const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Use existing client if available, otherwise create one
+    const _sb = (typeof supabase !== 'undefined' && supabase.auth)
+      ? supabase
+      : window.supabase.createClient(_NAV_URL, _NAV_KEY);
     const { data: { session } } = await _sb.auth.getSession();
     if (!session?.user) return;
     const user = session.user;
@@ -66,13 +71,17 @@ async function checkNavAuthState() {
     }
     const ml = document.getElementById('mobileAuthLink');
     if (ml) { ml.href='hub.html'; ml.textContent='My Hub →'; }
-  } catch(e) {}
+  } catch(e) {
+    console.warn('Nav auth check failed:', e);
+  }
 }
 
 async function navSignOut() {
   try {
     if (!window.supabase) return;
-    const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const _sb = (typeof supabase !== 'undefined' && supabase.auth)
+      ? supabase
+      : window.supabase.createClient(_NAV_URL, _NAV_KEY);
     await _sb.auth.signOut();
   } catch(e) {}
   window.location.href = 'index.html';
