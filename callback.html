@@ -28,16 +28,11 @@ body{display:flex;align-items:center;justify-content:center;min-height:100vh}
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="initAndHandle()"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = 'https://vaimxhgqcdhjhdiaampa.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
-let _sb;
-
-function initAndHandle() {
-  _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  handleCallback();
-}
+const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 function showError(msg){
   document.getElementById('content').innerHTML=`
@@ -62,8 +57,10 @@ async function handleCallback(){
   const refreshToken=params.get('refresh_token')||'';
   const type=params.get('type');
   const errDesc=params.get('error_description');
+
   if(errDesc){showError(decodeURIComponent(errDesc));return;}
   if(!accessToken){showError('Invalid or expired link. Please sign up again.');return;}
+
   try{
     const{error}=await _sb.auth.setSession({access_token:accessToken,refresh_token:refreshToken});
     if(error){showError(error.message);return;}
@@ -77,7 +74,7 @@ async function handleCallback(){
           <button onclick="resetPass()" class="btn-back" style="width:100%;justify-content:center;margin-top:10px">Update Password →</button>
         </div>`;
     }else{
-      showSuccess('Your account is ready. Redirecting to your journal...','journal.html');
+      showSuccess('Your account is ready. Redirecting to your journal...','hub.html');
     }
   }catch(err){
     showError(err.message||'Unexpected error. Please try again.');
@@ -92,6 +89,8 @@ async function resetPass(){
   document.getElementById('content').innerHTML=`<div class="icon">✅</div><div class="title">Password updated!</div><div class="sub">Redirecting to sign in...</div>`;
   setTimeout(()=>window.location.href='auth.html',1500);
 }
+
+document.addEventListener('DOMContentLoaded',handleCallback);
 </script>
 </body>
 </html>

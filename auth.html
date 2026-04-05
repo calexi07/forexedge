@@ -130,7 +130,7 @@ async function doSignIn(){
   btnLoading(btn,false);
   if(error){showErr('siErr',error.message);return;}
   toast('Welcome back!','success');
-  setTimeout(()=>window.location.href='journal.html',800);
+  setTimeout(()=>window.location.href='hub.html',800);
 }
 
 async function doSignUp(){
@@ -174,7 +174,7 @@ async function doDiscord(){
 // Redirect if already logged in
 (async()=>{
   const user=await authGetUser();
-  if(user)window.location.href='journal.html';
+  if(user)window.location.href='hub.html';
 })();
 </script>
 </body>
