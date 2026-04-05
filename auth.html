@@ -168,7 +168,7 @@ async function doForgot(){
 
 async function doDiscord(){
   const sb=await getSB();
-  await sb.auth.signInWithOAuth({provider:'discord',options:{redirectTo:window.location.origin+'/journal.html'}});
+  await sb.auth.signInWithOAuth({provider:'discord',options:{redirectTo:window.location.origin+'/forexedge/hub.html'}});
 }
 
 // Redirect if already logged in
