@@ -4,239 +4,152 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ForexEdge — Forex Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <style>
-.academy-layout{display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:start}
-.sidebar-nav{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;position:sticky;top:80px}
-.sidebar-nav-header{padding:16px 18px;border-bottom:1px solid var(--border2);background:var(--bg3)}
-.sidebar-nav-title{font-size:13px;font-weight:500;color:var(--text)}
-.sidebar-nav-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);margin-top:3px}
+.feature-hero{padding:80px 48px 60px;text-align:center;position:relative;overflow:hidden}
+.feature-hero::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(201,168,76,0.06) 0%,transparent 70%);pointer-events:none}
+.mock-wrap{max-width:960px;margin:0 auto;padding:0 48px 60px}
+.mock-layout{display:grid;grid-template-columns:260px 1fr;gap:16px;background:var(--bg2);border:1px solid var(--border2);border-radius:2px;overflow:hidden}
+.mock-sidebar-nav{border-right:1px solid var(--border2)}
+.msn-header{padding:14px 16px;border-bottom:1px solid var(--border2);background:var(--bg3)}
+.msn-title{font-size:12px;font-weight:500;color:var(--text)}
+.msn-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-top:2px}
 .module{border-bottom:1px solid var(--border2)}
-.module:last-child{border-bottom:none}
-.module-header{padding:12px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background 0.15s}
-.module-header:hover{background:var(--bg3)}
+.module-header{padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
 .module-header.active{background:var(--gold-dim)}
-.module-name{font-size:12px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:8px}
-.module-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);background:var(--bg3);padding:1px 6px;border-radius:2px}
+.module-name{font-size:11px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:6px}
+.module-num{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);background:var(--bg3);padding:1px 5px}
 .module-progress{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3)}
-.module-lessons{display:none;background:var(--bg)}
-.module-lessons.open{display:block}
-.lesson-item{padding:9px 18px 9px 36px;cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border2);transition:background 0.15s;font-size:12px;color:var(--text3);text-decoration:none}
-.lesson-item:hover{background:var(--bg3);color:var(--text2)}
+.lesson-item{padding:7px 16px 7px 32px;font-size:11px;color:var(--text3);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:6px}
+.lesson-item.done{color:var(--bull)}
 .lesson-item.active{color:var(--gold)}
-.lesson-item.done::before{content:'✓';color:var(--bull);font-size:10px;width:14px;flex-shrink:0}
-.lesson-item.active::before{content:'▶';color:var(--gold);font-size:10px;width:14px;flex-shrink:0}
-.lesson-item:not(.done):not(.active)::before{content:'○';color:var(--text3);font-size:10px;width:14px;flex-shrink:0}
-.lesson-item.locked{color:var(--text3);cursor:default}
-.lesson-item.locked::before{content:'🔒';font-size:9px;width:14px;flex-shrink:0}
-/* CONTENT */
-.lesson-content{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden}
-.lesson-header{padding:24px 28px;border-bottom:1px solid var(--border2);background:var(--bg3)}
-.lesson-breadcrumb{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
-.lesson-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--text);margin-bottom:8px}
-.lesson-meta{display:flex;align-items:center;gap:16px}
-.lesson-meta span{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);display:flex;align-items:center;gap:4px}
-.lesson-body{padding:28px}
-.lesson-body h2{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);margin:24px 0 12px}
-.lesson-body h2:first-child{margin-top:0}
-.lesson-body p{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:16px}
-.lesson-body ul{margin:0 0 16px 20px}
-.lesson-body ul li{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:6px}
-.callout{background:var(--gold-dim);border:1px solid var(--border);border-left:3px solid var(--gold);padding:16px 18px;border-radius:var(--radius);margin:20px 0}
-.callout-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px}
-.callout p{font-size:13px;color:var(--text2);line-height:1.7;margin:0}
-.key-terms{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
-.key-term{background:var(--bg3);border:1px solid var(--border2);padding:14px 16px;border-radius:var(--radius)}
-.key-term-name{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--gold);margin-bottom:4px;letter-spacing:0.05em}
-.key-term-def{font-size:12px;color:var(--text2);line-height:1.6}
-.lesson-nav{padding:20px 28px;border-top:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;background:var(--bg3)}
-.btn-lesson-nav{padding:9px 20px;background:transparent;border:1px solid var(--border);color:var(--text2);font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer;border-radius:var(--radius);transition:all 0.2s}
-.btn-lesson-nav:hover{border-color:var(--gold);color:var(--gold)}
-.btn-lesson-next{padding:9px 20px;background:var(--gold);border:1px solid var(--gold);color:#080808;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:var(--radius);transition:all 0.2s}
-.btn-lesson-next:hover{background:var(--gold2)}
-.progress-bar-wrap{height:4px;background:var(--bg3);border-radius:2px;margin-bottom:24px;overflow:hidden}
-.progress-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;transition:width 0.5s}
-.coming-soon-banner{background:var(--gold-dim);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:14px}
-.coming-soon-banner .icon{font-size:24px;flex-shrink:0}
-.coming-soon-banner p{font-size:13px;color:var(--text2);line-height:1.6}
-.coming-soon-banner strong{color:var(--gold)}
-@media(max-width:1024px){.academy-layout{grid-template-columns:1fr}.sidebar-nav{position:static}}
+.lesson-item.locked{color:var(--text3)}
+.lesson-content{padding:24px}
+.lc-breadcrumb{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+.lc-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--text);margin-bottom:6px}
+.lc-meta{display:flex;gap:14px;margin-bottom:20px}
+.lc-meta span{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3)}
+.lc-body h2{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);margin:0 0 10px}
+.lc-body p{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:14px}
+.callout{background:var(--gold-dim);border:1px solid var(--border);border-left:3px solid var(--gold);padding:12px 14px;border-radius:2px;margin:14px 0}
+.callout-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:5px}
+.callout p{font-size:12px;color:var(--text2);line-height:1.6;margin:0}
+.key-terms{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.kt{background:var(--bg3);border:1px solid var(--border2);padding:12px}
+.kt-name{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;color:var(--gold);margin-bottom:3px;letter-spacing:0.05em}
+.kt-def{font-size:11px;color:var(--text2);line-height:1.5}
+.modules-overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:20px}
+.mo-card{background:var(--bg2);border:1px solid var(--border2);padding:18px}
+.mo-num{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:0.1em;margin-bottom:8px}
+.mo-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px}
+.mo-lessons{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3)}
+.mo-card.locked{opacity:0.5}
+.cta-bar{background:var(--bg2);border-top:1px solid var(--border2);padding:40px 48px;text-align:center}
+@media(max-width:768px){.feature-hero,.mock-wrap{padding-left:20px;padding-right:20px}.mock-layout{grid-template-columns:1fr}.mock-sidebar-nav{border-right:none;border-bottom:1px solid var(--border2)}.cta-bar{padding:40px 20px}}
 </style>
 </head>
 <body>
 <div id="navMount"></div>
 
-<div class="page-wrap">
-  <div style="margin-bottom:32px">
-    <div class="page-label">// Education</div>
-    <h1 class="page-title">Forex <strong>Academy</strong></h1>
-    <p class="page-sub">Structured learning from zero to advanced. Master fundamental analysis, central bank policy, and macro trading.</p>
-  </div>
+<div class="feature-hero">
+  <div class="page-label">// Feature</div>
+  <h1 class="page-title" style="margin-bottom:12px">Forex <strong>Academy</strong></h1>
+  <p style="font-size:16px;color:var(--text2);max-width:520px;margin:0 auto 28px;line-height:1.7">Structured learning from zero to advanced. Master fundamental analysis, central bank policy, and macro trading — the way institutional traders do it.</p>
+  <a href="auth.html?tab=register" class="btn-gold-lg">Start Learning Free →</a>
+</div>
 
-  <div class="coming-soon-banner">
-    <div class="icon">🚧</div>
-    <p>The Academy is currently being built. Lessons are being added progressively — <strong>inspired by BabyPips</strong> but focused entirely on fundamental analysis and macro trading. Check back soon!</p>
-  </div>
-
-  <div class="progress-bar-wrap"><div class="progress-bar" style="width:8%"></div></div>
-
-  <div class="academy-layout">
-    <!-- SIDEBAR -->
-    <div class="sidebar-nav">
-      <div class="sidebar-nav-header">
-        <div class="sidebar-nav-title">Course Curriculum</div>
-        <div class="sidebar-nav-sub">1 / 12 modules · 8% complete</div>
+<div class="mock-wrap">
+  <div class="mock-layout">
+    <!-- Sidebar nav -->
+    <div class="mock-sidebar-nav">
+      <div class="msn-header">
+        <div class="msn-title">Course Curriculum</div>
+        <div class="msn-sub">7 modules · 8% complete</div>
       </div>
-
       <div class="module">
-        <div class="module-header active" onclick="toggleModule(this)">
+        <div class="module-header active">
           <span class="module-name"><span class="module-num">01</span>Forex Fundamentals</span>
           <span class="module-progress">2/5</span>
         </div>
-        <div class="module-lessons open">
-          <a class="lesson-item done" onclick="loadLesson('what-is-forex')">What is Forex?</a>
-          <a class="lesson-item done" onclick="loadLesson('market-participants')">Market Participants</a>
-          <a class="lesson-item active" onclick="loadLesson('currency-pairs')">Currency Pairs Explained</a>
-          <a class="lesson-item" onclick="loadLesson('pips-lots')">Pips, Lots & Leverage</a>
-          <a class="lesson-item" onclick="loadLesson('sessions')">Trading Sessions</a>
-        </div>
+        <div class="lesson-item done">✓ What is Forex?</div>
+        <div class="lesson-item done">✓ Market Participants</div>
+        <div class="lesson-item active">▶ Currency Pairs Explained</div>
+        <div class="lesson-item">○ Pips, Lots & Leverage</div>
+        <div class="lesson-item">○ Trading Sessions</div>
       </div>
       <div class="module">
-        <div class="module-header" onclick="toggleModule(this)">
+        <div class="module-header">
           <span class="module-name"><span class="module-num">02</span>Macroeconomics 101</span>
           <span class="module-progress">0/6</span>
         </div>
-        <div class="module-lessons">
-          <a class="lesson-item locked">GDP & Economic Growth</a>
-          <a class="lesson-item locked">Inflation & CPI</a>
-          <a class="lesson-item locked">Employment Data (NFP)</a>
-          <a class="lesson-item locked">Interest Rates</a>
-          <a class="lesson-item locked">Trade Balance</a>
-          <a class="lesson-item locked">PMI Indicators</a>
-        </div>
       </div>
       <div class="module">
-        <div class="module-header" onclick="toggleModule(this)">
+        <div class="module-header">
           <span class="module-name"><span class="module-num">03</span>Central Banks</span>
           <span class="module-progress">0/7</span>
         </div>
-        <div class="module-lessons">
-          <a class="lesson-item locked">How Central Banks Work</a>
-          <a class="lesson-item locked">Fed — US Monetary Policy</a>
-          <a class="lesson-item locked">ECB — European Policy</a>
-          <a class="lesson-item locked">BOE, BOJ, RBA & More</a>
-          <a class="lesson-item locked">Hawkish vs Dovish</a>
-          <a class="lesson-item locked">Rate Differentials</a>
-          <a class="lesson-item locked">Forward Guidance</a>
-        </div>
       </div>
       <div class="module">
-        <div class="module-header" onclick="toggleModule(this)">
+        <div class="module-header">
           <span class="module-name"><span class="module-num">04</span>Reading the Calendar</span>
           <span class="module-progress">0/5</span>
         </div>
-        <div class="module-lessons">
-          <a class="lesson-item locked">Economic Calendar Basics</a>
-          <a class="lesson-item locked">High Impact Events</a>
-          <a class="lesson-item locked">Forecast vs Actual</a>
-          <a class="lesson-item locked">Trading News Events</a>
-          <a class="lesson-item locked">Avoiding News Traps</a>
-        </div>
       </div>
       <div class="module">
-        <div class="module-header" onclick="toggleModule(this)">
+        <div class="module-header">
           <span class="module-name"><span class="module-num">05</span>Currency Correlations</span>
           <span class="module-progress">0/4</span>
         </div>
-        <div class="module-lessons">
-          <a class="lesson-item locked">What Are Correlations?</a>
-          <a class="lesson-item locked">Positive Correlations</a>
-          <a class="lesson-item locked">Negative Correlations</a>
-          <a class="lesson-item locked">Using Correlations in Trading</a>
-        </div>
-      </div>
-      <div class="module">
-        <div class="module-header" onclick="toggleModule(this)">
-          <span class="module-name"><span class="module-num">06</span>COT & Positioning</span>
-          <span class="module-progress">0/4</span>
-        </div>
-        <div class="module-lessons">
-          <a class="lesson-item locked">What is COT Data?</a>
-          <a class="lesson-item locked">Reading COT Reports</a>
-          <a class="lesson-item locked">Institutional Positioning</a>
-          <a class="lesson-item locked">COT Trading Strategies</a>
-        </div>
-      </div>
-      <div class="module">
-        <div class="module-header" onclick="toggleModule(this)">
-          <span class="module-name"><span class="module-num">07</span>Risk Management</span>
-          <span class="module-progress">0/5</span>
-        </div>
-        <div class="module-lessons">
-          <a class="lesson-item locked">Position Sizing</a>
-          <a class="lesson-item locked">Risk:Reward Ratios</a>
-          <a class="lesson-item locked">Drawdown Management</a>
-          <a class="lesson-item locked">Portfolio Exposure</a>
-          <a class="lesson-item locked">Psychology of Loss</a>
-        </div>
       </div>
     </div>
 
-    <!-- LESSON CONTENT -->
-    <div class="lesson-content" id="lessonContent">
-      <div class="lesson-header">
-        <div class="lesson-breadcrumb">Module 01 — Forex Fundamentals</div>
-        <h2 class="lesson-title">Currency Pairs Explained</h2>
-        <div class="lesson-meta">
-          <span>⏱ 8 min read</span>
-          <span>📊 Beginner</span>
-          <span>✓ Lesson 3 of 5</span>
-        </div>
+    <!-- Lesson content -->
+    <div class="lesson-content">
+      <div class="lc-breadcrumb">Module 01 — Forex Fundamentals</div>
+      <h2 class="lc-title">Currency Pairs Explained</h2>
+      <div class="lc-meta">
+        <span>⏱ 8 min read</span>
+        <span>📊 Beginner</span>
+        <span>✓ Lesson 3 of 5</span>
       </div>
-      <div class="lesson-body">
+      <div class="lc-body">
         <h2>What is a Currency Pair?</h2>
-        <p>In forex trading, currencies are always quoted in pairs. When you trade EUR/USD, you're simultaneously buying the Euro and selling the US Dollar — or vice versa. The price of a currency pair tells you how much of the quote currency (the second one) you need to buy one unit of the base currency (the first one).</p>
-        <p>For example, if EUR/USD = 1.1532, it means 1 Euro buys 1.1532 US Dollars. If you believe the Euro will strengthen against the Dollar, you buy EUR/USD. If you think it will weaken, you sell it.</p>
-
+        <p>In forex trading, currencies are always quoted in pairs. When you trade EUR/USD, you're simultaneously buying the Euro and selling the US Dollar. The price tells you how much of the quote currency you need to buy one unit of the base currency.</p>
+        <p>For example, if EUR/USD = 1.1532, it means 1 Euro buys 1.1532 US Dollars.</p>
         <div class="callout">
           <div class="callout-label">💡 Key Insight</div>
-          <p>You never trade a single currency in isolation. Every forex trade involves two currencies, which is why understanding the <strong>relative strength</strong> between two economies is the foundation of fundamental analysis.</p>
+          <p>Every forex trade involves two currencies — which is why understanding the <strong>relative strength</strong> between two economies is the foundation of fundamental analysis.</p>
         </div>
-
-        <h2>Major, Minor and Exotic Pairs</h2>
-        <p>Forex pairs are divided into three main categories based on their liquidity and the currencies involved:</p>
-        <ul>
-          <li><strong>Major Pairs</strong> — Always include the USD. Examples: EUR/USD, GBP/USD, USD/JPY, AUD/USD. Most liquid, lowest spreads.</li>
-          <li><strong>Minor Pairs (Crosses)</strong> — Don't include USD. Examples: EUR/GBP, EUR/JPY, GBP/JPY. Slightly wider spreads.</li>
-          <li><strong>Exotic Pairs</strong> — One major currency + one from an emerging economy. Examples: USD/TRY, EUR/ZAR. Wide spreads, high volatility.</li>
-        </ul>
-        <p>For fundamental traders, major pairs are the most practical to analyze because there is more macroeconomic data, central bank coverage, and news flow available.</p>
-
         <div class="key-terms">
-          <div class="key-term"><div class="key-term-name">Base Currency</div><div class="key-term-def">The first currency in a pair. In EUR/USD, EUR is the base. You're measuring how many USD you need to buy 1 EUR.</div></div>
-          <div class="key-term"><div class="key-term-name">Quote Currency</div><div class="key-term-def">The second currency in a pair. In EUR/USD, USD is the quote currency. The price reflects its value in USD.</div></div>
-          <div class="key-term"><div class="key-term-name">Bid Price</div><div class="key-term-def">The price at which the market (broker) will buy the base currency from you. Always slightly lower than ask.</div></div>
-          <div class="key-term"><div class="key-term-name">Ask Price</div><div class="key-term-def">The price at which the market will sell the base currency to you. Always slightly higher than bid.</div></div>
-          <div class="key-term"><div class="key-term-name">Spread</div><div class="key-term-def">The difference between bid and ask. This is the broker's fee. Tighter spreads = lower cost of trading.</div></div>
-          <div class="key-term"><div class="key-term-name">Pip</div><div class="key-term-def">The smallest standard price move. For most pairs = 0.0001. For JPY pairs = 0.01. Used to measure profit/loss.</div></div>
+          <div class="kt"><div class="kt-name">Base Currency</div><div class="kt-def">The first currency in a pair. In EUR/USD, EUR is the base.</div></div>
+          <div class="kt"><div class="kt-name">Quote Currency</div><div class="kt-def">The second currency. In EUR/USD, USD is the quote.</div></div>
+          <div class="kt"><div class="kt-name">Pip</div><div class="kt-def">Smallest standard price move. For most pairs = 0.0001.</div></div>
+          <div class="kt"><div class="kt-name">Spread</div><div class="kt-def">Difference between bid and ask. The broker's fee.</div></div>
         </div>
-
-        <h2>Why Currency Pairs Matter for Fundamentals</h2>
-        <p>Understanding pairs is crucial for fundamental analysis because every pair represents a comparison between two economies. When you analyze EUR/USD, you're not just looking at Europe or the US in isolation — you're comparing their relative economic health, interest rates, inflation, and growth prospects.</p>
-        <p>This is why two currencies with very different central bank policies (one hiking, one cutting) often see large directional moves. The pair's price reflects the market's view of that divergence.</p>
-
-        <div class="callout">
-          <div class="callout-label">📌 Remember</div>
-          <p>In the next lesson, you'll learn about <strong>pips, lots and leverage</strong> — the mechanics of how position sizes work and how they affect your risk. Understanding this is essential before you start trading.</p>
-        </div>
-      </div>
-      <div class="lesson-nav">
-        <button class="btn-lesson-nav">← Previous: Market Participants</button>
-        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3)">Lesson 3 / 5</div>
-        <button class="btn-lesson-next">Next: Pips, Lots & Leverage →</button>
       </div>
     </div>
   </div>
+
+  <!-- Modules overview -->
+  <div style="margin-top:32px">
+    <div class="section-label">// Full Curriculum</div>
+    <div class="modules-overview">
+      <div class="mo-card"><div class="mo-num">Module 01</div><div class="mo-title">Forex Fundamentals</div><div class="mo-lessons">5 lessons · Beginner</div></div>
+      <div class="mo-card"><div class="mo-num">Module 02</div><div class="mo-title">Macroeconomics 101</div><div class="mo-lessons">6 lessons · Beginner</div></div>
+      <div class="mo-card"><div class="mo-num">Module 03</div><div class="mo-title">Central Banks</div><div class="mo-lessons">7 lessons · Intermediate</div></div>
+      <div class="mo-card"><div class="mo-num">Module 04</div><div class="mo-title">Reading the Calendar</div><div class="mo-lessons">5 lessons · Intermediate</div></div>
+      <div class="mo-card locked"><div class="mo-num">Module 05</div><div class="mo-title">Currency Correlations</div><div class="mo-lessons">4 lessons · 🔒 Basic+</div></div>
+      <div class="mo-card locked"><div class="mo-num">Module 06</div><div class="mo-title">COT & Positioning</div><div class="mo-lessons">4 lessons · 🔒 Basic+</div></div>
+      <div class="mo-card locked"><div class="mo-num">Module 07</div><div class="mo-title">Risk Management</div><div class="mo-lessons">5 lessons · 🔒 Basic+</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="cta-bar">
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--text);margin-bottom:8px">Learn to trade <strong>fundamentals.</strong></h2>
+  <p style="font-size:14px;color:var(--text2);margin-bottom:20px">First 2 lessons free. Full access from $19/month.</p>
+  <a href="auth.html?tab=register" class="btn-gold-lg">Start Learning →</a>
 </div>
 
 <footer>
@@ -245,23 +158,8 @@
   <div class="footer-copy">© 2026 ForexEdge. All rights reserved.</div>
 </footer>
 
-<div id="modalMount"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="nav.js"></script>
-<script>
-renderNav('academy');
-renderModal();
-function toggleModule(header){
-  const lessons=header.nextElementSibling;
-  const isOpen=lessons.classList.contains('open');
-  document.querySelectorAll('.module-lessons').forEach(l=>l.classList.remove('open'));
-  document.querySelectorAll('.module-header').forEach(h=>h.classList.remove('active'));
-  if(!isOpen){lessons.classList.add('open');header.classList.add('active');}
-}
-function loadLesson(id){
-  document.querySelectorAll('.lesson-item').forEach(l=>l.classList.remove('active'));
-  event.target.classList.add('active');
-}
-</script>
+<script>renderNav('academy');</script>
 </body>
 </html>
