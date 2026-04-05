@@ -10,6 +10,7 @@ function renderNav(activePage) {
   const pages = [
     { id: 'index',   label: 'Home',    href: 'index.html' },
     { id: 'news',    label: 'News',    href: 'news.html' },
+    { id: 'journal', label: 'Journal', href: 'journal.html' },
     { id: 'academy', label: 'Academy', href: 'academy.html' },
     { id: 'tools',   label: 'Tools',   href: 'tools.html' },
   ];

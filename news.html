@@ -7,148 +7,149 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <style>
-.feature-hero{padding:80px 48px 60px;text-align:center;position:relative;overflow:hidden}
-.feature-hero::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(201,168,76,0.06) 0%,transparent 70%);pointer-events:none}
-.mock-section{padding:0 48px 80px}
-.mock-container{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;max-width:960px;margin:0 auto}
-.mock-header{padding:16px 20px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;background:var(--bg3)}
+.fhero{padding:80px 48px 60px;text-align:center;position:relative;overflow:hidden}
+.fhero::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(201,168,76,0.06) 0%,transparent 70%);pointer-events:none}
+.mock-wrap{padding:0 48px 60px;max-width:980px;margin:0 auto}
+.mock-box{background:var(--bg2);border:1px solid var(--border2);border-radius:2px;overflow:hidden;margin-bottom:16px}
+.mock-topbar{padding:14px 18px;border-bottom:1px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:space-between}
 .mock-tabs{display:flex;gap:0}
-.mock-tab{padding:7px 18px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);border-bottom:2px solid transparent;cursor:default}
-.mock-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
-.mock-filters{display:flex;gap:6px;padding:12px 20px;border-bottom:1px solid var(--border2);flex-wrap:wrap}
-.mock-filter{padding:3px 12px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.08em;border-radius:20px;border:1px solid var(--border2);color:var(--text3)}
-.mock-filter.active{background:var(--gold-dim);border-color:var(--border);color:var(--gold)}
+.mtab{padding:6px 16px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);border-bottom:2px solid transparent;cursor:default}
+.mtab.on{color:var(--gold);border-bottom-color:var(--gold)}
+.mock-filters{display:flex;gap:6px;padding:10px 18px;border-bottom:1px solid var(--border2);flex-wrap:wrap}
+.mf{padding:3px 11px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.08em;border-radius:20px;border:1px solid var(--border2);color:var(--text3)}
+.mf.on{background:var(--gold-dim);border-color:var(--border);color:var(--gold)}
 .mock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border2)}
-.mock-card{background:var(--bg2);padding:18px}
-.mc-source{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
-.mc-title{font-size:12px;font-weight:500;color:var(--text);line-height:1.5;margin-bottom:8px}
-.mc-summary{font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:10px}
-.mc-ai{background:var(--bg3);border-left:2px solid var(--gold);padding:8px 10px;border-radius:2px}
-.mc-ai-label{font-family:'DM Mono',monospace;font-size:8px;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px}
-.mc-ai-text{font-size:11px;color:var(--text2);line-height:1.5}
-.mc-tag{font-family:'DM Mono',monospace;font-size:8px;padding:2px 6px;border-radius:2px;font-weight:500}
-.mc-tag.bull{background:var(--bull-bg);color:var(--bull)}
-.mc-tag.bear{background:var(--bear-bg);color:var(--bear)}
-.mc-tag.neutral{background:var(--gold-dim);color:var(--gold)}
-.mock-analytics{padding:20px}
-.ma-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
-.ma-card{background:var(--bg3);border:1px solid var(--border2);padding:14px}
-.ma-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px}
-.ma-val{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;line-height:1}
-.ma-val.bull{color:var(--bull)} .ma-val.bear{color:var(--bear)} .ma-val.blue{color:#4a9eff}
-.ma-sub{font-size:10px;color:var(--text3);margin-top:3px}
-.ma-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border2)}
-.ma-row:last-child{border-bottom:none}
-.ma-flag{font-size:13px;width:18px;text-align:center;flex-shrink:0}
-.ma-pair{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--text);width:36px;flex-shrink:0}
-.ma-bar-wrap{flex:1;height:5px;background:var(--bg);border-radius:3px;overflow:hidden}
-.ma-bar{height:100%;border-radius:3px}
-.ma-bar.bull{background:var(--bull)} .ma-bar.bear{background:var(--bear)}
-.ma-score{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;width:40px;text-align:right;flex-shrink:0}
-.ma-score.bull{color:var(--bull)} .ma-score.bear{color:var(--bear)}
-.features-list{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:0 48px 80px;max-width:960px;margin:0 auto}
-.fl-item{background:var(--bg2);border:1px solid var(--border2);padding:20px;border-radius:2px}
-.fl-icon{font-size:20px;margin-bottom:10px}
-.fl-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px}
-.fl-desc{font-size:12px;color:var(--text2);line-height:1.6}
+.mc{background:var(--bg2);padding:16px}
+.mc-src{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
+.mc-title{font-size:12px;font-weight:500;color:var(--text);line-height:1.5;margin-bottom:7px}
+.mc-sum{font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:9px}
+.mc-ai{background:var(--bg3);border-left:2px solid var(--gold);padding:7px 9px;border-radius:2px}
+.mc-ai-lbl{font-family:'DM Mono',monospace;font-size:8px;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:3px}
+.mc-ai-txt{font-size:11px;color:var(--text2);line-height:1.5}
+.mt{font-family:'DM Mono',monospace;font-size:8px;padding:2px 6px;border-radius:2px;font-weight:500}
+.mt.bull{background:var(--bull-bg);color:var(--bull)}
+.mt.bear{background:var(--bear-bg);color:var(--bear)}
+.mt.neutral{background:var(--gold-dim);color:var(--gold)}
+.mblur{filter:blur(3px);pointer-events:none;user-select:none}
+/* Analytics */
+.ma-top{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px;border-bottom:1px solid var(--border2)}
+.mat{background:var(--bg3);border:1px solid var(--border2);padding:12px}
+.mat-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:5px}
+.mat-val{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;line-height:1}
+.mat-val.bull{color:var(--bull)} .mat-val.bear{color:var(--bear)} .mat-val.blue{color:#4a9eff}
+.mat-sub{font-size:10px;color:var(--text3);margin-top:3px}
+.ma-body{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0}
+.ma-col{padding:16px;border-right:1px solid var(--border2)}
+.ma-col:last-child{border-right:none}
+.ma-col-title{font-size:11px;font-weight:500;color:var(--text);margin-bottom:12px}
+.lb-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border2)}
+.lb-row:last-child{border-bottom:none}
+.lb-flag{font-size:13px;width:18px;text-align:center;flex-shrink:0}
+.lb-pair{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--text);width:34px;flex-shrink:0}
+.lb-bar-wrap{flex:1;height:5px;background:var(--bg);border-radius:3px;overflow:hidden}
+.lb-bar{height:100%;border-radius:3px}
+.lb-bar.bull{background:var(--bull)} .lb-bar.bear{background:var(--bear)}
+.lb-score{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;width:40px;text-align:right;flex-shrink:0}
+.lb-score.bull{color:var(--bull)} .lb-score.bear{color:var(--bear)}
+.bd-bars{flex:1;display:flex;height:5px;border-radius:3px;overflow:hidden;gap:1px}
+.bd-bull{background:var(--bull);height:100%} .bd-bear{background:var(--bear);height:100%}
+.bd-count{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);width:30px;text-align:right;flex-shrink:0}
+.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:980px;margin:0 auto;padding:0 48px 60px}
+.feat{background:var(--bg2);border:1px solid var(--border2);padding:18px}
+.feat-icon{font-size:20px;margin-bottom:10px}
+.feat-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:5px}
+.feat-desc{font-size:12px;color:var(--text2);line-height:1.6}
 .cta-bar{background:var(--bg2);border-top:1px solid var(--border2);padding:40px 48px;text-align:center}
-.mock-blur{filter:blur(3px);pointer-events:none;user-select:none;position:relative}
-.mock-blur::after{content:'🔒 Sign in to access live data';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);background:rgba(8,8,8,0.6);filter:none;letter-spacing:0.08em}
-@media(max-width:768px){.feature-hero,.mock-section,.features-list{padding-left:20px;padding-right:20px}.mock-grid{grid-template-columns:1fr}.ma-cards{grid-template-columns:1fr}.features-list{grid-template-columns:1fr}}
+@media(max-width:768px){.fhero,.mock-wrap,.feats,.cta-bar{padding-left:20px;padding-right:20px}.mock-grid{grid-template-columns:1fr}.ma-body{grid-template-columns:1fr}.ma-top{grid-template-columns:1fr}.feats{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div id="navMount"></div>
 
-<div class="feature-hero">
+<div class="fhero">
   <div class="page-label">// Feature</div>
   <h1 class="page-title" style="margin-bottom:12px">AI News <strong>Sentiment</strong></h1>
   <p style="font-size:16px;color:var(--text2);max-width:520px;margin:0 auto 28px;line-height:1.7">Every forex news story, automatically analyzed by AI. Know instantly if it's Bullish, Bearish or Neutral — and why it matters for your pairs.</p>
   <a href="auth.html?tab=register" class="btn-gold-lg">Get Started Free →</a>
 </div>
 
-<!-- MOCK UI -->
-<div class="mock-section">
-  <div class="mock-container">
-    <div class="mock-header">
-      <div class="mock-tabs">
-        <div class="mock-tab active">📰 Feed</div>
-        <div class="mock-tab">📊 Analytics</div>
-      </div>
+<div class="mock-wrap">
+  <!-- FEED TAB -->
+  <div class="mock-box">
+    <div class="mock-topbar">
+      <div class="mock-tabs"><div class="mtab on">📰 Feed</div><div class="mtab">📊 Analytics</div></div>
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3)">Updated 2 min ago</div>
     </div>
     <div class="mock-filters">
-      <div class="mock-filter active">All</div>
-      <div class="mock-filter">🇪🇺 EUR</div>
-      <div class="mock-filter">🇺🇸 USD</div>
-      <div class="mock-filter">🇬🇧 GBP</div>
-      <div class="mock-filter">🇯🇵 JPY</div>
-      <div class="mock-filter">🥇 XAU</div>
-      <div class="mock-filter">🛢️ OIL</div>
+      <div class="mf on">All</div><div class="mf">🇪🇺 EUR</div><div class="mf">🇺🇸 USD</div><div class="mf">🇬🇧 GBP</div><div class="mf">🇯🇵 JPY</div><div class="mf">🥇 XAU</div><div class="mf">🛢️ OIL</div>
     </div>
     <div class="mock-grid">
-      <div class="mock-card">
-        <div class="mc-source"><span>Bloomberg · 14m ago</span><span class="mc-tag bull">▲ Bullish EUR</span></div>
+      <!-- Card 1 -->
+      <div class="mc">
+        <div class="mc-src"><span>Bloomberg · 14m ago</span><span class="mt bull">▲ Bullish EUR</span></div>
         <div class="mc-title">ECB's Villeroy signals rate hike likely as core inflation remains sticky</div>
-        <div class="mc-summary">ECB council member says next move is likely a rate hike, though timing undecided. Markets reprice EUR higher.</div>
-        <div class="mc-ai"><div class="mc-ai-label">🤖 AI Analysis</div><div class="mc-ai-text">Hawkish ECB rhetoric increases rate hike probability → positive for EUR. Policy divergence with Fed widens → EUR/USD upward pressure.</div></div>
+        <div class="mc-sum">ECB council member says next move is likely a rate hike, though timing undecided. Markets reprice EUR higher.</div>
+        <div class="mc-ai"><div class="mc-ai-lbl">🤖 AI Analysis</div><div class="mc-ai-txt">Hawkish ECB rhetoric increases rate hike probability → positive for EUR. Policy divergence with Fed widens → EUR/USD upward pressure.</div></div>
       </div>
-      <div class="mock-card">
-        <div class="mc-source"><span>Reuters · 41m ago</span><span class="mc-tag bear">▼ Bearish USD</span></div>
-        <div class="mc-title">US NFP misses forecast: 48K jobs added vs 65K expected</div>
-        <div class="mc-summary">Weak US labour market data strengthens Fed rate cut expectations. Dollar selling pressure broad-based.</div>
-        <div class="mc-ai"><div class="mc-ai-label">🤖 AI Analysis</div><div class="mc-ai-text">Weak jobs data boosts Fed cut bets → USD selling. USD/JPY likely to decline. Safe-haven JPY may benefit short-term.</div></div>
+      <!-- Card 2 -->
+      <div class="mc">
+        <div class="mc-src"><span>Reuters · 41m ago</span><span class="mt bear">▼ Bearish USD</span></div>
+        <div class="mc-title">US NFP misses forecast: 48K jobs added vs 65K expected, unemployment rises</div>
+        <div class="mc-sum">Weak US labour market data strengthens Fed rate cut expectations. Dollar selling pressure broad-based.</div>
+        <div class="mc-ai"><div class="mc-ai-lbl">🤖 AI Analysis</div><div class="mc-ai-txt">Weak jobs data boosts Fed cut bets → USD selling. USD/JPY likely to decline. Safe-haven JPY may benefit short-term.</div></div>
       </div>
-      <div class="mock-card mock-blur" style="position:relative">
-        <div class="mc-source"><span>DailyFX · 2h ago</span><span class="mc-tag bull">▲ Bullish AUD</span></div>
+      <!-- Card 3 blurred -->
+      <div class="mc mblur">
+        <div class="mc-src"><span>DailyFX · 2h ago</span><span class="mt bull">▲ Bullish AUD</span></div>
         <div class="mc-title">China PMI beats at 52.4, boosting commodity currency outlook</div>
-        <div class="mc-summary">Strong Chinese manufacturing data supports AUD, NZD and commodity-linked currencies globally.</div>
-        <div class="mc-ai"><div class="mc-ai-label">🤖 AI Analysis</div><div class="mc-ai-text">Strong China PMI supports commodity currencies. AUD/USD and NZD/USD find broad support on risk appetite improvement.</div></div>
+        <div class="mc-sum">Strong Chinese manufacturing data supports AUD, NZD and commodity-linked currencies globally.</div>
+        <div class="mc-ai"><div class="mc-ai-lbl">🤖 AI Analysis</div><div class="mc-ai-txt">Strong China PMI supports commodity currencies. AUD/USD and NZD/USD find broad support.</div></div>
       </div>
     </div>
   </div>
 
-  <!-- Analytics mock -->
-  <div class="mock-container" style="margin-top:16px">
-    <div class="mock-header">
-      <div class="mock-tabs">
-        <div class="mock-tab">📰 Feed</div>
-        <div class="mock-tab active">📊 Analytics</div>
-      </div>
+  <!-- ANALYTICS TAB -->
+  <div class="mock-box">
+    <div class="mock-topbar">
+      <div class="mock-tabs"><div class="mtab">📰 Feed</div><div class="mtab on">📊 Analytics</div></div>
     </div>
-    <div class="mock-analytics">
-      <div class="ma-cards">
-        <div class="ma-card"><div class="ma-label">Top Bullish</div><div class="ma-val bull">OIL</div><div class="ma-sub">+73% Net sentiment</div></div>
-        <div class="ma-card"><div class="ma-label">Top Bearish</div><div class="ma-val bear">XAG</div><div class="ma-sub">−67% Net sentiment</div></div>
-        <div class="ma-card"><div class="ma-label">Most Active</div><div class="ma-val blue">USD</div><div class="ma-sub">106 articles today</div></div>
+    <div class="ma-top">
+      <div class="mat"><div class="mat-lbl">Top Bullish</div><div class="mat-val bull">OIL</div><div class="mat-sub">+73% Net sentiment</div></div>
+      <div class="mat"><div class="mat-lbl">Top Bearish</div><div class="mat-val bear">XAG</div><div class="mat-sub">−67% Net sentiment</div></div>
+      <div class="mat"><div class="mat-lbl">Most Active</div><div class="mat-val blue">USD</div><div class="mat-sub">106 articles today</div></div>
+    </div>
+    <div class="ma-body">
+      <!-- Leaderboard -->
+      <div class="ma-col">
+        <div class="ma-col-title">Net Sentiment Leaderboard</div>
+        <div class="lb-row"><span class="lb-flag">🛢️</span><span class="lb-pair">OIL</span><div class="lb-bar-wrap"><div class="lb-bar bull" style="width:73%"></div></div><span class="lb-score bull">+73%</span></div>
+        <div class="lb-row"><span class="lb-flag">🇳🇴</span><span class="lb-pair">NOK</span><div class="lb-bar-wrap"><div class="lb-bar bull" style="width:55%"></div></div><span class="lb-score bull">+55%</span></div>
+        <div class="lb-row"><span class="lb-flag">🥇</span><span class="lb-pair">XAU</span><div class="lb-bar-wrap"><div class="lb-bar bull" style="width:61%"></div></div><span class="lb-score bull">+61%</span></div>
+        <div class="lb-row"><span class="lb-flag">🇪🇺</span><span class="lb-pair">EUR</span><div class="lb-bar-wrap"><div class="lb-bar bull" style="width:42%"></div></div><span class="lb-score bull">+42%</span></div>
+        <div class="lb-row"><span class="lb-flag">🇺🇸</span><span class="lb-pair">USD</span><div class="lb-bar-wrap"><div class="lb-bar bear" style="width:38%"></div></div><span class="lb-score bear">−38%</span></div>
+        <div class="lb-row"><span class="lb-flag">⬜</span><span class="lb-pair">XAG</span><div class="lb-bar-wrap"><div class="lb-bar bear" style="width:12%"></div></div><span class="lb-score bear">−12%</span></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div>
-          <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:12px">Net Sentiment Leaderboard</div>
-          ${[['🛢️','OIL',73,'bull'],['🇳🇴','NOK',55,'bull'],['🥇','XAU',61,'bull'],['🇪🇺','EUR',42,'bull'],['🇺🇸','USD',-38,'bear'],['⬜','XAG',-12,'bear']].map(([f,p,s,t])=>`
-          <div class="ma-row"><span class="ma-flag">${f}</span><span class="ma-pair">${p}</span><div class="ma-bar-wrap"><div class="ma-bar ${t}" style="width:${Math.abs(s)}%"></div></div><span class="ma-score ${t}">${s>0?'+':''}${s}%</span></div>`).join('')}
-        </div>
-        <div class="mock-blur" style="position:relative;background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:14px">
-          <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:12px">Sentiment Breakdown</div>
-          ${[['🛢️','OIL',459,85],['🇺🇸','USD',106,62],['🇯🇵','JPY',46,72],['🥇','XAU',37,80],['🇪🇺','EUR',47,74]].map(([f,p,c,b])=>`
-          <div class="ma-row"><span class="ma-flag">${f}</span><span class="ma-pair">${p}</span><div class="ma-bar-wrap" style="display:flex;gap:1px"><div style="background:var(--bear);height:5px;width:${100-b}%"></div><div style="background:var(--bull);height:5px;width:${b}%"></div></div><span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);width:30px;text-align:right">${c}</span></div>`).join('')}
-        </div>
+      <!-- Breakdown -->
+      <div class="ma-col mblur">
+        <div class="ma-col-title">Sentiment Breakdown</div>
+        <div class="lb-row"><span class="lb-flag">🛢️</span><span class="lb-pair">OIL</span><div class="bd-bars"><div class="bd-bear" style="width:15%"></div><div class="bd-bull" style="width:85%"></div></div><span class="bd-count">459</span></div>
+        <div class="lb-row"><span class="lb-flag">🇺🇸</span><span class="lb-pair">USD</span><div class="bd-bars"><div class="bd-bear" style="width:38%"></div><div class="bd-bull" style="width:62%"></div></div><span class="bd-count">106</span></div>
+        <div class="lb-row"><span class="lb-flag">🇯🇵</span><span class="lb-pair">JPY</span><div class="bd-bars"><div class="bd-bear" style="width:28%"></div><div class="bd-bull" style="width:72%"></div></div><span class="bd-count">46</span></div>
+        <div class="lb-row"><span class="lb-flag">🥇</span><span class="lb-pair">XAU</span><div class="bd-bars"><div class="bd-bear" style="width:20%"></div><div class="bd-bull" style="width:80%"></div></div><span class="bd-count">37</span></div>
+        <div class="lb-row"><span class="lb-flag">🇪🇺</span><span class="lb-pair">EUR</span><div class="bd-bars"><div class="bd-bear" style="width:26%"></div><div class="bd-bull" style="width:74%"></div></div><span class="bd-count">47</span></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Features list -->
-<div style="max-width:960px;margin:0 auto;padding:0 48px 80px">
-  <div class="section-label">// What's Included</div>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px">
-    <div class="fl-item"><div class="fl-icon">🌍</div><div class="fl-title">All major pairs covered</div><div class="fl-desc">EUR, USD, GBP, JPY, AUD, CAD, CHF, NZD, XAU, XAG, OIL and more — every story tagged by affected currency.</div></div>
-    <div class="fl-item"><div class="fl-icon">⚡</div><div class="fl-title">Real-time updates</div><div class="fl-desc">News feed refreshes automatically. AI analysis generated within seconds of each story being published.</div></div>
-    <div class="fl-item"><div class="fl-icon">📊</div><div class="fl-title">Sentiment analytics</div><div class="fl-desc">See the big picture — net sentiment leaderboard and breakdown across all currencies updated continuously.</div></div>
-    <div class="fl-item"><div class="fl-icon">🔍</div><div class="fl-title">Filter by currency</div><div class="fl-desc">Focus on just the pairs you trade. One click to filter the entire feed to EUR, JPY, XAU or any other instrument.</div></div>
-    <div class="fl-item"><div class="fl-icon">🤖</div><div class="fl-title">AI market summary</div><div class="fl-desc">Generate an AI-written daily market summary covering all key themes and actionable insights for the session.</div></div>
-    <div class="fl-item"><div class="fl-icon">📰</div><div class="fl-title">Premium sources</div><div class="fl-desc">Bloomberg, Reuters, ForexLive, DailyFX, FXStreet — only credible, market-moving sources.</div></div>
-  </div>
+<!-- Features -->
+<div class="feats">
+  <div class="feat"><div class="feat-icon">🌍</div><div class="feat-title">All major pairs covered</div><div class="feat-desc">EUR, USD, GBP, JPY, AUD, CAD, CHF, NZD, XAU, XAG, OIL — every story tagged by affected currency.</div></div>
+  <div class="feat"><div class="feat-icon">⚡</div><div class="feat-title">Real-time updates</div><div class="feat-desc">News feed refreshes automatically. AI analysis generated within seconds of each story being published.</div></div>
+  <div class="feat"><div class="feat-icon">📊</div><div class="feat-title">Sentiment analytics</div><div class="feat-desc">Net sentiment leaderboard and breakdown across all currencies — updated continuously throughout the day.</div></div>
+  <div class="feat"><div class="feat-icon">🔍</div><div class="feat-title">Filter by currency</div><div class="feat-desc">Focus on just the pairs you trade. One click to filter the entire feed to EUR, JPY, XAU or any instrument.</div></div>
+  <div class="feat"><div class="feat-icon">🤖</div><div class="feat-title">AI market summary</div><div class="feat-desc">Generate an AI-written daily market summary covering all key themes and actionable insights for the session.</div></div>
+  <div class="feat"><div class="feat-icon">📰</div><div class="feat-title">Premium sources</div><div class="feat-desc">Bloomberg, Reuters, ForexLive, DailyFX, FXStreet — only credible, market-moving sources.</div></div>
 </div>
 
 <div class="cta-bar">
