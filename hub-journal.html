@@ -3,82 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ForexEdge — My Journals</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-<style>
-body{display:flex}
-.section-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;margin-top:16px}
-.section-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;padding:3px 10px;border-radius:20px;white-space:nowrap}
-.section-badge.live{background:var(--bull-bg);color:var(--bull);border:1px solid rgba(76,175,125,0.2)}
-.section-badge.p2{background:rgba(61,139,255,0.12);color:#4a9eff;border:1px solid rgba(61,139,255,0.2)}
-.section-badge.p1{background:rgba(255,140,66,0.12);color:#ff8c42;border:1px solid rgba(255,140,66,0.2)}
-.section-badge.personal{background:rgba(168,85,247,0.12);color:#a855f7;border:1px solid rgba(168,85,247,0.2)}
-.section-line{flex:1;height:1px;background:var(--border2)}
-.jgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:6px}
-.jcard{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden;transition:all 0.2s}
-.jcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity 0.2s}
-.jcard:hover{border-color:var(--border);transform:translateY(-2px)}
-.jcard:hover::before{opacity:1}
-.jcard.live::before{background:linear-gradient(90deg,transparent,var(--bull),transparent)}
-.jcard.p2::before{background:linear-gradient(90deg,transparent,#4a9eff,transparent)}
-.jcard.p1::before{background:linear-gradient(90deg,transparent,#ff8c42,transparent)}
-.jcard.personal::before{background:linear-gradient(90deg,transparent,#a855f7,transparent)}
-.jcard-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
-.jcard-firm{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px}
-.jcard-name{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text);margin-bottom:5px}
-.jcard-actions{display:flex;gap:4px}
-.jstats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border2);border-radius:var(--radius);overflow:hidden;margin-bottom:10px}
-.jstat{background:var(--bg3);padding:9px 7px;text-align:center}
-.jstat-lbl{font-family:'DM Mono',monospace;font-size:8px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px}
-.jstat-val{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;line-height:1}
-.jstat-val.g{color:var(--bull)} .jstat-val.r{color:var(--bear)} .jstat-val.o{color:var(--gold2)}
-.jprog{height:3px;background:var(--bg3);border-radius:2px;margin-bottom:10px;overflow:hidden}
-.jprog-fill{height:100%;border-radius:2px;transition:width 0.8s ease}
-.jopen{width:100%;padding:7px;background:transparent;border:1px solid var(--border2);color:var(--text3);font-family:'Outfit',sans-serif;font-size:11px;cursor:pointer;border-radius:var(--radius);transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px}
-.jopen:hover{border-color:var(--gold);color:var(--gold)}
-.add-jcard{background:transparent;border:1px dashed rgba(201,168,76,0.2);border-radius:var(--radius);padding:18px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;color:rgba(201,168,76,0.4);font-size:12px;min-height:120px}
-.add-jcard:hover{border-color:rgba(201,168,76,0.4);color:var(--gold);background:var(--gold-dim)}
-/* Modals */
-.modal-overlay{position:fixed;inset:0;background:rgba(8,8,8,0.92);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s}
-.modal-overlay.active{opacity:1;pointer-events:all}
-.modal{background:var(--bg3);border:1px solid var(--border);width:100%;max-width:460px;padding:30px;position:relative;transform:translateY(20px);transition:transform 0.3s;margin:16px;border-radius:var(--radius);max-height:90vh;overflow-y:auto}
-.modal-overlay.active .modal{transform:translateY(0)}
-.modal-close{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;width:26px;height:26px;display:flex;align-items:center;justify-content:center}
-.modal-close:hover{color:var(--text)}
-.modal-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;color:var(--text);margin-bottom:16px}
-.fg{margin-bottom:13px}
-.fg-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.falert{padding:8px 11px;border-radius:var(--radius);font-size:11px;margin-bottom:11px;display:none}
-.falert.err{background:var(--bear-bg);border:1px solid rgba(224,92,92,0.2);color:var(--bear)} .falert.show{display:block}
-.fsub{width:100%;padding:10px;background:var(--gold);border:1px solid var(--gold);color:#080808;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:var(--radius);transition:all 0.2s;margin-top:4px}
-.fsub:hover{background:var(--gold2)} .fsub:disabled{opacity:0.5;pointer-events:none}
-</style>
+<title>EagleTrader — My Journals</title>
 </head>
 <body>
-<div id="hubSidebarMount"></div>
+<div id="etSidebarMount"></div>
 <div class="hub-main">
   <div class="hub-topbar">
     <div class="hub-topbar-title">My <strong>Journals</strong></div>
-    <button class="btn-gold" onclick="openCreate()" style="padding:6px 14px;font-size:11px">+ New Journal</button>
+    <button class="et-btn-gold" onclick="etOpenModal('createModal')">+ New Journal</button>
   </div>
   <div class="hub-content">
-    <div id="journalsContent">
-      <div style="text-align:center;padding:60px;color:var(--text3)"><div class="spinner"></div><div style="margin-top:12px;font-size:12px">Loading...</div></div>
+    <div id="journalsContent" class="et-fade">
+      <div style="text-align:center;padding:60px;color:var(--white3)"><div class="et-spinner"></div><div style="margin-top:14px;font-size:13px">Loading journals...</div></div>
     </div>
   </div>
 </div>
 
 <!-- CREATE MODAL -->
-<div class="modal-overlay" id="createModal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('createModal')">✕</button>
-    <div class="modal-title">Create Journal</div>
-    <div id="cAlert" class="falert"></div>
-    <div class="fg"><label class="form-label">Journal Name *</label><input type="text" class="form-input" id="cName" placeholder="e.g. FTMO #1 Live"></div>
-    <div class="fg"><label class="form-label">Firm / Broker</label><input type="text" class="form-input" id="cFirm" placeholder="e.g. FTMO, The5%ers, Personal"></div>
-    <div class="fg"><label class="form-label">Account Type *</label>
-      <select class="form-input" id="cType">
+<div class="et-modal-overlay" id="createModal">
+  <div class="et-modal">
+    <button class="et-modal-close" onclick="etCloseModal('createModal')">✕</button>
+    <div class="et-modal-title">Create Journal</div>
+    <div id="cAlert" class="et-alert" style="display:none"></div>
+    <div class="et-form-group"><label class="et-form-label">Journal Name *</label><input type="text" class="et-form-input" id="cName" placeholder="e.g. FTMO #1 Live"></div>
+    <div class="et-form-group"><label class="et-form-label">Firm / Broker</label><input type="text" class="et-form-input" id="cFirm" placeholder="e.g. FTMO, The5%ers, Personal"></div>
+    <div class="et-form-group"><label class="et-form-label">Account Type *</label>
+      <select class="et-form-input" id="cType">
         <option value="">Select type</option>
         <option value="live">✅ Live Account</option>
         <option value="p2">🎯 Challenge Phase 2</option>
@@ -86,62 +36,64 @@ body{display:flex}
         <option value="personal">💼 Personal Account</option>
       </select>
     </div>
-    <div class="fg-2">
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Initial Balance ($) *</label><input type="number" class="form-input" id="cBalance" placeholder="10000"></div>
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Start Date</label><input type="date" class="form-input" id="cStartDate"></div>
+    <div class="et-form-grid2">
+      <div class="et-form-group"><label class="et-form-label">Initial Balance ($) *</label><input type="number" class="et-form-input" id="cBalance" placeholder="10000"></div>
+      <div class="et-form-group"><label class="et-form-label">Start Date</label><input type="date" class="et-form-input" id="cStartDate"></div>
     </div>
-    <div class="fg-2" style="margin-top:13px">
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Profit Target (%)</label><input type="number" class="form-input" id="cTarget" placeholder="8"></div>
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Max Drawdown (%)</label><input type="number" class="form-input" id="cMaxDD" placeholder="10"></div>
+    <div class="et-form-grid2">
+      <div class="et-form-group"><label class="et-form-label">Profit Target (%)</label><input type="number" class="et-form-input" id="cTarget" placeholder="8"></div>
+      <div class="et-form-group"><label class="et-form-label">Max Drawdown (%)</label><input type="number" class="et-form-input" id="cMaxDD" placeholder="10"></div>
     </div>
-    <div class="fg" style="margin-top:13px"><label class="form-label">Pairs (comma separated)</label><input type="text" class="form-input" id="cPairs" placeholder="EUR/USD, XAU/USD"></div>
-    <button class="fsub" id="cBtn" onclick="createJournal()">Create Journal →</button>
+    <div class="et-form-group"><label class="et-form-label">Pairs (comma separated)</label><input type="text" class="et-form-input" id="cPairs" placeholder="EUR/USD, XAU/USD, GBP/USD"></div>
+    <button class="et-form-submit" id="cBtn" onclick="createJournal()">Create Journal →</button>
   </div>
 </div>
 
 <!-- EDIT MODAL -->
-<div class="modal-overlay" id="editModal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('editModal')">✕</button>
-    <div class="modal-title">Edit Journal</div>
+<div class="et-modal-overlay" id="editModal">
+  <div class="et-modal">
+    <button class="et-modal-close" onclick="etCloseModal('editModal')">✕</button>
+    <div class="et-modal-title">Edit Journal</div>
     <input type="hidden" id="eId">
-    <div class="fg"><label class="form-label">Journal Name *</label><input type="text" class="form-input" id="eName"></div>
-    <div class="fg"><label class="form-label">Firm / Broker</label><input type="text" class="form-input" id="eFirm"></div>
-    <div class="fg"><label class="form-label">Account Type *</label>
-      <select class="form-input" id="eType">
+    <div class="et-form-group"><label class="et-form-label">Journal Name *</label><input type="text" class="et-form-input" id="eName"></div>
+    <div class="et-form-group"><label class="et-form-label">Firm / Broker</label><input type="text" class="et-form-input" id="eFirm"></div>
+    <div class="et-form-group"><label class="et-form-label">Account Type *</label>
+      <select class="et-form-input" id="eType">
         <option value="live">✅ Live Account</option><option value="p2">🎯 Challenge Phase 2</option>
         <option value="p1">⚡ Challenge Phase 1</option><option value="personal">💼 Personal Account</option>
       </select>
     </div>
-    <div class="fg-2">
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Balance ($)</label><input type="number" class="form-input" id="eBalance"></div>
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Start Date</label><input type="date" class="form-input" id="eStartDate"></div>
+    <div class="et-form-grid2">
+      <div class="et-form-group"><label class="et-form-label">Balance ($)</label><input type="number" class="et-form-input" id="eBalance"></div>
+      <div class="et-form-group"><label class="et-form-label">Start Date</label><input type="date" class="et-form-input" id="eStartDate"></div>
     </div>
-    <div class="fg-2" style="margin-top:13px">
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Profit Target (%)</label><input type="number" class="form-input" id="eTarget"></div>
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Max Drawdown (%)</label><input type="number" class="form-input" id="eMaxDD"></div>
+    <div class="et-form-grid2">
+      <div class="et-form-group"><label class="et-form-label">Profit Target (%)</label><input type="number" class="et-form-input" id="eTarget"></div>
+      <div class="et-form-group"><label class="et-form-label">Max Drawdown (%)</label><input type="number" class="et-form-input" id="eMaxDD"></div>
     </div>
-    <div class="fg" style="margin-top:13px"><label class="form-label">Pairs</label><input type="text" class="form-input" id="ePairs"></div>
-    <button class="fsub" onclick="saveEdit()">Save Changes →</button>
+    <div class="et-form-group"><label class="et-form-label">Pairs</label><input type="text" class="et-form-input" id="ePairs"></div>
+    <button class="et-form-submit" onclick="saveEdit()">Save Changes →</button>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="hub-sidebar.js"></script>
 <script>
-let _user, _sb, journals=[], _jStats={};
+let _user, _sb, journals=[], _stats={};
 
 async function main() {
-  const res = await initHubSidebar('journals');
+  const res = await initEtSidebar('journals');
   if (!res) return;
   _user=res.user; _sb=res.sb;
   await loadJournals();
 }
 
-function typeBadge(t) {
-  const m={live:['✅ Live','var(--bull)'],p2:['🎯 Phase 2','#4a9eff'],p1:['⚡ Phase 1','#ff8c42'],personal:['💼 Personal','#a855f7']};
-  const[l,c]=m[t]||['—','var(--gold)'];
-  return `<span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:2px;background:rgba(255,255,255,0.05);color:${c};border:1px solid rgba(255,255,255,0.08);letter-spacing:0.08em;text-transform:uppercase">${l}</span>`;
+function typeColor(t) {
+  return {live:'var(--bull)',p2:'#6ba3ff',p1:'#ff9d5c',personal:'#b87fff'}[t]||'var(--gold)';
+}
+function typePill(t) {
+  const m={live:'✅ Live',p2:'🎯 Phase 2',p1:'⚡ Phase 1',personal:'💼 Personal'};
+  return `<span class="pill ${t}">${m[t]||t}</span>`;
 }
 
 async function loadJournals() {
@@ -155,107 +107,138 @@ async function loadJournals() {
 function renderJournals() {
   const c=document.getElementById('journalsContent');
   if(!journals.length){
-    c.innerHTML=`<div style="text-align:center;padding:80px 20px;color:var(--text3)"><div style="font-size:36px;margin-bottom:14px;opacity:0.3">📒</div><div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text2);margin-bottom:8px">No journals yet</div><div style="font-size:12px;margin-bottom:18px">Create your first trading journal to start tracking performance</div><button class="btn-gold" onclick="openCreate()">+ Create First Journal</button></div>`;
+    c.innerHTML=`<div style="text-align:center;padding:80px 20px">
+      <div style="font-size:48px;margin-bottom:16px;opacity:0.15">📒</div>
+      <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--white);margin-bottom:8px">No journals yet</div>
+      <div style="font-size:14px;color:var(--white2);margin-bottom:24px;line-height:1.6">Create your first trading journal<br>to start tracking performance</div>
+      <button class="et-btn-gold" onclick="etOpenModal('createModal')">+ Create First Journal</button>
+    </div>`;
     return;
   }
+
   const groups={live:[],p2:[],p1:[],personal:[]};
   journals.forEach(j=>{(groups[j.type]||groups.live).push(j);});
   const gL={live:'✅ Live Accounts',p2:'🎯 Challenge — Phase 2',p1:'⚡ Challenge — Phase 1',personal:'💼 Personal Accounts'};
-  const gO=['live','p2','p1','personal'];
+  const gOrder=['live','p2','p1','personal'];
+
   let html='';
-  gO.forEach(g=>{
+  gOrder.forEach(g=>{
     if(!groups[g].length)return;
-    html+=`<div class="section-hdr"><span class="section-badge ${g}">${gL[g]}</span><div class="section-line"></div></div><div class="jgrid">`;
+    const col=typeColor(g);
+    html+=`<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;margin-top:20px">
+      <span style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:4px 12px;border-radius:100px;background:rgba(255,255,255,0.04);color:${col};border:1px solid rgba(255,255,255,0.08);white-space:nowrap">${gL[g]}</span>
+      <div style="flex:1;height:1px;background:var(--border2)"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin-bottom:8px">`;
+
     groups[g].forEach(j=>{
-      const s=_jStats[j.id];
+      const s=_stats[j.id];
       const profit=s?.profit??null, wr=s?.wr??null;
-      const pc=profit===null?'var(--text2)':profit>=0?'var(--bull)':'var(--bear)';
-      const progressColor={live:'var(--bull)',p2:'#4a9eff',p1:'#ff8c42',personal:'#a855f7'}[j.type]||'var(--gold)';
+      const pc=profit===null?'var(--white2)':profit>=0?'var(--bull)':'var(--bear)';
       const progressPct=j.profit_target&&profit!==null?Math.min(Math.max((profit/j.initial_balance*100)/j.profit_target*100,0),100):0;
-      html+=`<div class="jcard ${j.type}">
-        <div class="jcard-top"><div>
-          <div class="jcard-firm">${j.firm||'—'}</div>
-          <div class="jcard-name">${j.name}</div>
-          <div style="margin-top:4px">${typeBadge(j.type)}</div>
+
+      html+=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:20px;position:relative;overflow:hidden;transition:all 0.2s;cursor:pointer"
+        onmouseover="this.style.borderColor='${col}44';this.style.transform='translateY(-2px)'"
+        onmouseout="this.style.borderColor='';this.style.transform=''">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${col},transparent)"></div>
+
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px">${j.firm||'—'}</div>
+            <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:6px">${j.name}</div>
+            <div>${typePill(j.type)}</div>
+          </div>
+          <div style="display:flex;gap:5px">
+            <button class="et-btn-icon" onclick="event.stopPropagation();openEdit('${j.id}')" title="Edit">✏️</button>
+            <button class="et-btn-icon" onclick="event.stopPropagation();deleteJournal('${j.id}')" title="Delete" style="color:var(--bear)">🗑</button>
+          </div>
         </div>
-        <div class="jcard-actions">
-          <button class="btn-icon" onclick="openEdit('${j.id}')" title="Edit">✏️</button>
-          <button class="btn-icon" onclick="deleteJournal('${j.id}')" title="Delete" style="color:var(--bear)">🗑</button>
-        </div></div>
-        <div class="jstats">
-          <div class="jstat"><div class="jstat-lbl">Balance</div><div class="jstat-val o" style="font-size:14px">$${(j.initial_balance||0).toLocaleString('en-US',{maximumFractionDigits:0})}</div></div>
-          <div class="jstat"><div class="jstat-lbl">PnL</div><div class="jstat-val" style="color:${pc};font-size:14px">${profit!==null?(profit>=0?'+':'')+'$'+profit.toFixed(0):'—'}</div></div>
-          <div class="jstat"><div class="jstat-lbl">Win Rate</div><div class="jstat-val o" style="font-size:14px">${wr!==null?wr+'%':'—'}</div></div>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border2);border-radius:4px;overflow:hidden;margin-bottom:12px">
+          <div style="background:var(--bg3);padding:10px 8px;text-align:center">
+            <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--white3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px">Balance</div>
+            <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--gold2)">$${(j.initial_balance||0).toLocaleString('en-US',{maximumFractionDigits:0})}</div>
+          </div>
+          <div style="background:var(--bg3);padding:10px 8px;text-align:center">
+            <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--white3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px">PnL</div>
+            <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:${pc}">${profit!==null?(profit>=0?'+':'')+'$'+profit.toFixed(0):'—'}</div>
+          </div>
+          <div style="background:var(--bg3);padding:10px 8px;text-align:center">
+            <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--white3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px">Win Rate</div>
+            <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--gold2)">${wr!==null?wr+'%':'—'}</div>
+          </div>
         </div>
-        ${j.profit_target&&profit!==null?`<div class="jprog"><div class="jprog-fill" style="width:${progressPct}%;background:${progressColor}"></div></div>`:''}
-        <button class="jopen" onclick="openJournal('${j.id}')">Open Journal →</button>
+
+        ${j.profit_target&&profit!==null?`
+        <div style="height:3px;background:var(--bg3);border-radius:2px;margin-bottom:12px;overflow:hidden">
+          <div style="height:100%;width:${progressPct}%;background:${col};border-radius:2px;transition:width 0.8s ease"></div>
+        </div>`:``}
+
+        <button onclick="openJournal('${j.id}')" style="width:100%;padding:9px;background:transparent;border:1px solid var(--border2);color:var(--white3);font-family:'Syne',sans-serif;font-size:12px;font-weight:500;cursor:pointer;border-radius:4px;transition:all 0.2s"
+          onmouseover="this.style.borderColor='${col}';this.style.color='${col}'"
+          onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">
+          Open Journal →
+        </button>
       </div>`;
     });
-    html+=`<div class="add-jcard" onclick="openCreate()"><span style="font-size:18px">＋</span> Add Account</div></div>`;
+
+    html+=`<div onclick="etOpenModal('createModal')" style="background:transparent;border:1px dashed rgba(200,169,110,0.2);border-radius:4px;padding:18px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;color:rgba(200,169,110,0.4);font-size:13px;min-height:120px"
+      onmouseover="this.style.borderColor='rgba(200,169,110,0.4)';this.style.color='var(--gold)';this.style.background='var(--gold-dim)'"
+      onmouseout="this.style.borderColor='rgba(200,169,110,0.2)';this.style.color='rgba(200,169,110,0.4)';this.style.background='transparent'">
+      <span style="font-size:20px">＋</span> Add Account
+    </div></div>`;
   });
-  c.innerHTML=html;
+
+  c.innerHTML = html;
 }
 
 async function loadAllStats() {
   for(const j of journals){
-    if(_jStats[j.id])continue;
+    if(_stats[j.id])continue;
     const{data}=await _sb.from('journal_trades').select('pnl,status').eq('journal_id',j.id).eq('user_id',_user.id);
     if(data){
       const cl=data.filter(t=>['win','loss','be'].includes(t.status));
       const w=cl.filter(t=>t.status==='win'),l=cl.filter(t=>t.status==='loss');
       const p=cl.reduce((s,t)=>s+(parseFloat(t.pnl)||0),0);
       const wr=(w.length+l.length)>0?((w.length/(w.length+l.length))*100).toFixed(1):null;
-      _jStats[j.id]={profit:p,wr,count:cl.length};
+      _stats[j.id]={profit:p,wr,count:cl.length};
     }
     renderJournals();
   }
 }
 
-function openJournal(id) { window.location.href=`hub-journal-detail.html?id=${id}`; }
+function openJournal(id){window.location.href=`hub-journal-detail.html?id=${id}`;}
 
-// Create
-function openCreate() {
-  ['cName','cFirm','cBalance','cStartDate','cTarget','cMaxDD','cPairs'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('cType').value='';
-  document.getElementById('cAlert').className='falert';
-  document.getElementById('cStartDate').value=new Date().toISOString().split('T')[0];
-  openModal('createModal');
-}
-async function createJournal() {
+async function createJournal(){
   const name=document.getElementById('cName').value.trim(),type=document.getElementById('cType').value,balance=parseFloat(document.getElementById('cBalance').value);
-  if(!name||!type||!balance){const a=document.getElementById('cAlert');a.textContent='Please fill in all required fields.';a.className='falert err show';return;}
+  if(!name||!type||!balance){const a=document.getElementById('cAlert');a.textContent='Please fill in all required fields.';a.className='et-alert err';return;}
   const btn=document.getElementById('cBtn');btn.disabled=true;btn.textContent='Creating...';
   const{error}=await _sb.from('journals').insert({user_id:_user.id,name,type,firm:document.getElementById('cFirm').value.trim(),initial_balance:balance,start_date:document.getElementById('cStartDate').value||null,profit_target:parseFloat(document.getElementById('cTarget').value)||0,max_dd:parseFloat(document.getElementById('cMaxDD').value)||0,pairs:document.getElementById('cPairs').value.trim()});
   btn.disabled=false;btn.textContent='Create Journal →';
-  if(error){const a=document.getElementById('cAlert');a.textContent=error.message;a.className='falert err show';return;}
-  closeModal('createModal');await loadJournals();
+  if(error){const a=document.getElementById('cAlert');a.textContent=error.message;a.className='et-alert err';return;}
+  etCloseModal('createModal');await loadJournals();
 }
 
-// Edit
-function openEdit(id) {
+function openEdit(id){
   const j=journals.find(x=>x.id===id);if(!j)return;
   document.getElementById('eId').value=j.id;document.getElementById('eName').value=j.name;document.getElementById('eFirm').value=j.firm||'';document.getElementById('eType').value=j.type;document.getElementById('eBalance').value=j.initial_balance;document.getElementById('eStartDate').value=j.start_date||'';document.getElementById('eTarget').value=j.profit_target||'';document.getElementById('eMaxDD').value=j.max_dd||'';document.getElementById('ePairs').value=j.pairs||'';
-  openModal('editModal');
+  etOpenModal('editModal');
 }
-async function saveEdit() {
+async function saveEdit(){
   const id=document.getElementById('eId').value;
   const{error}=await _sb.from('journals').update({name:document.getElementById('eName').value.trim(),firm:document.getElementById('eFirm').value.trim(),type:document.getElementById('eType').value,initial_balance:parseFloat(document.getElementById('eBalance').value)||0,start_date:document.getElementById('eStartDate').value||null,profit_target:parseFloat(document.getElementById('eTarget').value)||0,max_dd:parseFloat(document.getElementById('eMaxDD').value)||0,pairs:document.getElementById('ePairs').value.trim()}).eq('id',id);
   if(error){alert(error.message);return;}
-  delete _jStats[id];closeModal('editModal');await loadJournals();
+  delete _stats[id];etCloseModal('editModal');await loadJournals();
 }
-
-// Delete
-async function deleteJournal(id) {
+async function deleteJournal(id){
   const j=journals.find(x=>x.id===id);if(!j)return;
   if(!confirm(`Delete "${j.name}"?\nAll trades will also be deleted.`))return;
   await _sb.from('journals').delete().eq('id',id);
-  delete _jStats[id];await loadJournals();
+  delete _stats[id];await loadJournals();
 }
 
-function openModal(id){document.getElementById(id).classList.add('active');document.body.style.overflow='hidden';}
-function closeModal(id){document.getElementById(id).classList.remove('active');document.body.style.overflow='';}
-document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',function(e){if(e.target===this)closeModal(this.id);}));
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.active').forEach(m=>closeModal(m.id));});
+document.addEventListener('click',e=>{if(e.target.classList.contains('et-modal-overlay'))etCloseModal(e.target.id);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.et-modal-overlay.active').forEach(m=>etCloseModal(m.id));});
 
 main();
 </script>

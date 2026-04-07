@@ -3,105 +3,109 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ForexEdge — Hub</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-<style>
-body{display:flex}
-.qs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px}
-.qs{background:var(--bg2);border:1px solid var(--border2);padding:14px 16px;border-radius:var(--radius)}
-.qs-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
-.qs-val{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;line-height:1}
-.qs-val.g{color:var(--bull)} .qs-val.r{color:var(--bear)} .qs-val.o{color:var(--gold2)}
-.qs-sub{font-size:10px;color:var(--text3);margin-top:3px}
-.ql-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-.ql{background:var(--bg2);border:1px solid var(--border2);padding:18px;border-radius:var(--radius);cursor:pointer;transition:all 0.2s;text-decoration:none;display:block}
-.ql:hover{border-color:var(--border);transform:translateY(-2px)}
-.ql-icon{font-size:22px;margin-bottom:7px}
-.ql-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:3px}
-.ql-desc{font-size:10px;color:var(--text3)}
-/* Profile */
-.p-header{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:22px;margin-bottom:14px;display:flex;align-items:flex-start;gap:18px;position:relative}
-.p-av{width:64px;height:64px;border-radius:50%;background:var(--gold-dim);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:20px;color:var(--gold);font-weight:500;flex-shrink:0;overflow:hidden;cursor:pointer;position:relative}
-.p-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-.p-av-ov{position:absolute;inset:0;background:rgba(0,0,0,0.5);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;font-size:14px}
-.p-av:hover .p-av-ov{opacity:1}
-.p-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);margin-bottom:3px}
-.p-email{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);margin-bottom:7px}
-.p-plan{display:inline-flex;padding:3px 10px;background:var(--gold-dim);border:1px solid var(--border);border-radius:2px;font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase}
-.p-fields{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:18px}
-.p-fl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
-.p-fv{font-size:13px;color:var(--text);padding:8px 11px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius)}
-.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.hub-page{display:none;animation:fadeUp 0.3s ease both}
-.hub-page.active{display:block}
-@media(max-width:600px){.qs-grid{grid-template-columns:repeat(2,1fr)}.p-fields{grid-template-columns:1fr}}
-</style>
+<title>EagleTrader — Hub</title>
 </head>
 <body>
-<div id="hubSidebarMount"></div>
+<div id="etSidebarMount"></div>
 <div class="hub-main">
   <div class="hub-topbar">
     <div class="hub-topbar-title" id="topbarTitle"><strong>Dashboard</strong></div>
-    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3)" id="hubTime"></div>
+    <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--white3)" id="etTime"></div>
   </div>
   <div class="hub-content">
 
-    <!-- DASHBOARD -->
-    <div class="hub-page active" id="page-dashboard">
-      <div style="margin-bottom:20px">
-        <div class="page-label">// Overview</div>
-        <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(22px,3vw,34px);font-weight:300;color:var(--text)">Welcome back, <strong id="dashName">Trader</strong></h1>
+    <!-- DASHBOARD PAGE -->
+    <div id="page-dashboard" class="et-fade">
+      <div style="margin-bottom:24px">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">// Overview</div>
+        <h1 style="font-family:'Playfair Display',serif;font-size:clamp(24px,3vw,38px);font-weight:700;color:var(--white);line-height:1.1">Welcome back, <em style="color:var(--gold);font-style:italic" id="dashName">Trader</em></h1>
       </div>
-      <div class="qs-grid">
-        <div class="qs"><div class="qs-lbl">Journals</div><div class="qs-val o" id="dsJournals">0</div><div class="qs-sub">Active accounts</div></div>
-        <div class="qs"><div class="qs-lbl">Total PnL</div><div class="qs-val g" id="dsPnL">$0</div><div class="qs-sub">All journals</div></div>
-        <div class="qs"><div class="qs-lbl">Trades</div><div class="qs-val o" id="dsTrades">0</div><div class="qs-sub">Logged</div></div>
-        <div class="qs"><div class="qs-lbl">Best Win Rate</div><div class="qs-val g" id="dsWR">—</div><div class="qs-sub" id="dsWRSub">—</div></div>
+
+      <!-- Stats -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:28px">
+        <div class="et-stat"><div class="et-stat-lbl">Journals</div><div class="et-stat-val o" id="dsJournals">0</div><div class="et-stat-sub">Active accounts</div></div>
+        <div class="et-stat"><div class="et-stat-lbl">Total PnL</div><div class="et-stat-val g" id="dsPnL">$0.00</div><div class="et-stat-sub">All journals</div></div>
+        <div class="et-stat"><div class="et-stat-lbl">Trades Logged</div><div class="et-stat-val o" id="dsTrades">0</div><div class="et-stat-sub">All time</div></div>
+        <div class="et-stat"><div class="et-stat-lbl">Best Win Rate</div><div class="et-stat-val g" id="dsWR">—</div><div class="et-stat-sub" id="dsWRSub">—</div></div>
       </div>
-      <div class="ql-grid">
-        <a href="hub-journal.html" class="ql"><div class="ql-icon">📒</div><div class="ql-title">Trading Journal</div><div class="ql-desc">Track your trades</div></a>
-        <a href="#" class="ql" onclick="return false"><div class="ql-icon">📰</div><div class="ql-title">News Sentiment</div><div class="ql-desc">Coming soon</div></a>
-        <a href="#" class="ql" onclick="return false"><div class="ql-icon">🤖</div><div class="ql-title">AI Bias Engine</div><div class="ql-desc">Coming soon</div></a>
-        <a href="#" class="ql" onclick="return false"><div class="ql-icon">🔧</div><div class="ql-title">Tools</div><div class="ql-desc">Coming soon</div></a>
-        <a href="#" class="ql" onclick="return false"><div class="ql-icon">🎓</div><div class="ql-title">Academy</div><div class="ql-desc">Coming soon</div></a>
-        <a href="#" class="ql" onclick="return false"><div class="ql-icon">🏅</div><div class="ql-title">Become a Mentor</div><div class="ql-desc">Coming soon</div></a>
+
+      <!-- Quick links -->
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--white3);margin-bottom:14px">Quick Access</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+        <a href="hub-journal.html" class="et-card" style="padding:20px;text-decoration:none;display:block;transition:all 0.2s;cursor:pointer" onmouseover="this.style.borderColor='var(--gold-border)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='';this.style.transform=''">
+          <div style="font-size:26px;margin-bottom:10px">📒</div>
+          <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:4px">Trading Journal</div>
+          <div style="font-size:12px;color:var(--white3)">Track your trades</div>
+        </a>
+        <div class="et-card" style="padding:20px;opacity:0.45;cursor:default">
+          <div style="font-size:26px;margin-bottom:10px">📰</div>
+          <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:4px">News Sentiment</div>
+          <div style="font-size:12px;color:var(--white3)">Coming soon</div>
+        </div>
+        <div class="et-card" style="padding:20px;opacity:0.45;cursor:default">
+          <div style="font-size:26px;margin-bottom:10px">🤖</div>
+          <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:4px">AI Bias Engine</div>
+          <div style="font-size:12px;color:var(--white3)">Coming soon</div>
+        </div>
+        <div class="et-card" style="padding:20px;opacity:0.45;cursor:default">
+          <div style="font-size:26px;margin-bottom:10px">🎓</div>
+          <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:4px">Academy</div>
+          <div style="font-size:12px;color:var(--white3)">Coming soon</div>
+        </div>
+        <div class="et-card" style="padding:20px;opacity:0.45;cursor:default">
+          <div style="font-size:26px;margin-bottom:10px">🔧</div>
+          <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:4px">Tools</div>
+          <div style="font-size:12px;color:var(--white3)">Coming soon</div>
+        </div>
+        <div class="et-card" style="padding:20px;opacity:0.45;cursor:default">
+          <div style="font-size:26px;margin-bottom:10px">🏅</div>
+          <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:4px">Mentor Hub</div>
+          <div style="font-size:12px;color:var(--white3)">Coming soon</div>
+        </div>
       </div>
     </div>
 
-    <!-- PROFILE -->
-    <div class="hub-page" id="page-profile">
-      <div style="margin-bottom:20px">
-        <div class="page-label">// Account</div>
-        <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(22px,3vw,34px);font-weight:300;color:var(--text)">My <strong>Profile</strong></h1>
+    <!-- PROFILE PAGE -->
+    <div id="page-profile" style="display:none" class="et-fade">
+      <div style="margin-bottom:24px">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">// Account</div>
+        <h1 style="font-family:'Playfair Display',serif;font-size:clamp(24px,3vw,38px);font-weight:700;color:var(--white)">My <em style="color:var(--gold)">Profile</em></h1>
       </div>
-      <div class="p-header">
-        <div class="p-av" id="profileAvatar" onclick="document.getElementById('avatarInput').click()">
+
+      <!-- Profile header -->
+      <div class="et-card" style="padding:24px;display:flex;align-items:flex-start;gap:20px;margin-bottom:16px;position:relative">
+        <div id="profileAvatar" onclick="document.getElementById('avatarInput').click()" style="width:72px;height:72px;border-radius:50%;background:var(--gold-dim);border:2px solid var(--gold-border);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:24px;color:var(--gold);font-weight:500;flex-shrink:0;overflow:hidden;cursor:pointer;position:relative">
           <span id="profileInitials">?</span>
-          <div class="p-av-ov">📷</div>
+          <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;font-size:18px" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">📷</div>
         </div>
         <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
-        <div>
-          <div class="p-name" id="profileName">—</div>
-          <div class="p-email" id="profileEmail">—</div>
-          <div class="p-plan">✦ Free Plan</div>
+        <div style="flex:1">
+          <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--white);margin-bottom:4px" id="profileName">—</div>
+          <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--white2);margin-bottom:10px" id="profileEmail">—</div>
+          <div style="display:inline-flex;padding:4px 12px;background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:100px;font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase">✦ Free Plan</div>
         </div>
-        <button class="btn-ghost" onclick="toggleEdit()" id="editBtn" style="position:absolute;top:14px;right:14px;padding:5px 12px;font-size:11px">✏️ Edit</button>
+        <button onclick="toggleEdit()" id="editBtn" class="et-btn-ghost" style="position:absolute;top:16px;right:16px;padding:7px 14px;font-size:11px">✏️ Edit</button>
       </div>
-      <div class="p-fields" id="pFields">
-        <div><div class="p-fl">Full Name</div><div class="p-fv" id="pfName">—</div></div>
-        <div><div class="p-fl">Email</div><div class="p-fv" id="pfEmail">—</div></div>
-        <div><div class="p-fl">Member Since</div><div class="p-fv" id="pfSince">—</div></div>
-        <div><div class="p-fl">Plan</div><div class="p-fv" style="color:var(--gold)">Free</div></div>
+
+      <!-- Profile fields read-only -->
+      <div id="pFields" class="et-card" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:20px">
+        <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--white3);margin-bottom:5px">Full Name</div><div style="font-size:14px;color:var(--white);padding:10px 13px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius)" id="pfName">—</div></div>
+        <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--white3);margin-bottom:5px">Email</div><div style="font-size:14px;color:var(--white);padding:10px 13px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius)" id="pfEmail">—</div></div>
+        <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--white3);margin-bottom:5px">Member Since</div><div style="font-size:14px;color:var(--white);padding:10px 13px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius)" id="pfSince">—</div></div>
+        <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--white3);margin-bottom:5px">Plan</div><div style="font-size:14px;color:var(--gold);padding:10px 13px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius)">Free</div></div>
       </div>
-      <div id="pEditForm" style="display:none;margin-top:12px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:18px">
-        <div class="form-grid-2" style="margin-bottom:12px">
-          <div><label class="form-label">Full Name</label><input type="text" class="form-input" id="editName"></div>
-          <div><label class="form-label">Email (read-only)</label><input type="email" class="form-input" id="editEmail" disabled style="opacity:0.5"></div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn-gold" onclick="saveProfile()" style="flex:1;padding:9px">Save</button>
-          <button class="btn-ghost" onclick="toggleEdit()" style="padding:9px 14px">Cancel</button>
+
+      <!-- Edit form -->
+      <div id="pEditForm" style="display:none;margin-top:14px" class="et-card">
+        <div style="padding:20px">
+          <div class="et-form-grid2" style="margin-bottom:14px">
+            <div class="et-form-group" style="margin-bottom:0"><label class="et-form-label">Full Name</label><input type="text" class="et-form-input" id="editName"></div>
+            <div class="et-form-group" style="margin-bottom:0"><label class="et-form-label">Email (read-only)</label><input type="email" class="et-form-input" id="editEmail" disabled style="opacity:0.5"></div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button onclick="saveProfile()" class="et-btn-gold" style="flex:1">Save Changes</button>
+            <button onclick="toggleEdit()" class="et-btn-ghost">Cancel</button>
+          </div>
         </div>
       </div>
     </div>
@@ -115,13 +119,12 @@ body{display:flex}
 let _user, _sb;
 
 async function main() {
-  const res = await initHubSidebar('dashboard');
+  const res = await initEtSidebar('dashboard');
   if (!res) return;
   _user = res.user; _sb = res.sb;
   setupUser();
   loadDashStats();
-  // Check if profile hash
-  if (window.location.hash === '#profile') showHubPage('profile');
+  if (window.location.hash === '#profile') showPage('profile');
 }
 
 function setupUser() {
@@ -136,14 +139,14 @@ function setupUser() {
   document.getElementById('pfSince').textContent = new Date(_user.created_at).toLocaleDateString('en-US',{day:'numeric',month:'long',year:'numeric'});
   document.getElementById('editName').value = name;
   document.getElementById('editEmail').value = _user.email;
-  const av = localStorage.getItem('fe_av_'+_user.id);
+  const av = localStorage.getItem('et_av_'+_user.id);
   if (av) setAvatar(av);
 }
 
-function showHubPage(page) {
-  document.querySelectorAll('.hub-page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+page)?.classList.add('active');
-  const titles = {dashboard:'Dashboard', profile:'My Profile'};
+function showPage(page) {
+  document.getElementById('page-dashboard').style.display = page==='dashboard' ? 'block' : 'none';
+  document.getElementById('page-profile').style.display   = page==='profile'   ? 'block' : 'none';
+  const titles = { dashboard:'Dashboard', profile:'My Profile' };
   document.getElementById('topbarTitle').innerHTML = `<strong>${titles[page]||page}</strong>`;
 }
 
@@ -159,35 +162,37 @@ async function loadDashStats() {
     const w = cl.filter(t=>t.status==='win'), l = cl.filter(t=>t.status==='loss');
     totalPnL += cl.reduce((s,t)=>s+(parseFloat(t.pnl)||0),0);
     totalTrades += cl.length;
-    const wr = (w.length+l.length)>0 ? (w.length/(w.length+l.length)*100) : null;
-    if (wr!==null && (bestWR===null||wr>bestWR)) { bestWR=wr; bestName=j.name; }
+    const wr = (w.length+l.length)>0 ? w.length/(w.length+l.length)*100 : null;
+    if (wr!==null&&(bestWR===null||wr>bestWR)) { bestWR=wr; bestName=j.name; }
   }
-  const pEl=document.getElementById('dsPnL'); pEl.textContent=(totalPnL>=0?'+':'')+'$'+totalPnL.toFixed(2); pEl.className='qs-val '+(totalPnL>=0?'g':'r');
+  const pEl=document.getElementById('dsPnL');
+  pEl.textContent=(totalPnL>=0?'+':'')+'$'+totalPnL.toFixed(2);
+  pEl.className='et-stat-val '+(totalPnL>=0?'g':'r');
   document.getElementById('dsTrades').textContent = totalTrades;
   document.getElementById('dsWR').textContent = bestWR!==null ? bestWR.toFixed(1)+'%' : '—';
   document.getElementById('dsWRSub').textContent = bestName || '—';
 }
 
-let editMode=false;
+let editMode = false;
 function toggleEdit() {
-  editMode=!editMode;
-  document.getElementById('pEditForm').style.display=editMode?'block':'none';
-  document.getElementById('editBtn').textContent=editMode?'✕ Cancel':'✏️ Edit';
+  editMode = !editMode;
+  document.getElementById('pEditForm').style.display = editMode ? 'block' : 'none';
+  document.getElementById('editBtn').textContent = editMode ? '✕ Cancel' : '✏️ Edit';
 }
 async function saveProfile() {
-  const name=document.getElementById('editName').value.trim(); if(!name) return;
-  await _sb.auth.updateUser({data:{full_name:name}});
-  _user.user_metadata.full_name=name; setupUser(); toggleEdit();
+  const name = document.getElementById('editName').value.trim(); if (!name) return;
+  await _sb.auth.updateUser({ data:{ full_name:name } });
+  _user.user_metadata.full_name = name; setupUser(); toggleEdit();
 }
 function uploadAvatar(input) {
-  const file=input.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=e=>{localStorage.setItem('fe_av_'+_user.id,e.target.result);setAvatar(e.target.result);};
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { localStorage.setItem('et_av_'+_user.id, e.target.result); setAvatar(e.target.result); };
   reader.readAsDataURL(file);
 }
 function setAvatar(src) {
-  document.getElementById('profileAvatar').innerHTML=`<img src="${src}"><div class="p-av-ov">📷</div>`;
-  document.getElementById('hubAvatar').innerHTML=`<img src="${src}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  document.getElementById('profileAvatar').innerHTML = `<img src="${src}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  document.getElementById('etAvatar').innerHTML = `<img src="${src}">`;
 }
 
 main();

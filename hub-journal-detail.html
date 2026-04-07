@@ -3,272 +3,181 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ForexEdge — Journal</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-<style>
-body{display:flex}
-/* ── Stats grid ── */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:18px}
-.stat{background:var(--bg2);border:1px solid var(--border2);padding:12px 14px;border-radius:var(--radius)}
-.stat-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
-.stat-val{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;line-height:1}
-.stat-val.g{color:var(--bull)} .stat-val.r{color:var(--bear)} .stat-val.o{color:var(--gold2)}
-.stat-sub{font-size:9px;color:var(--text3);margin-top:2px}
-/* ── Layout ── */
-.jd-layout{display:grid;grid-template-columns:1fr 260px;gap:16px;align-items:start}
-/* ── Calendar ── */
-.cal-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;margin-bottom:12px}
-.cal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.cal-title{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:600;color:var(--text)}
-.cal-nav button{background:none;border:1px solid var(--border2);color:var(--text3);width:22px;height:22px;cursor:pointer;font-size:11px;border-radius:var(--radius);transition:all 0.2s}
-.cal-nav button:hover{border-color:var(--gold);color:var(--gold)}
-.cal-nav{display:flex;gap:4px}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.cal-lbl{font-family:'DM Mono',monospace;font-size:8px;color:var(--text3);text-align:center;padding:2px 0}
-.cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:9px;color:var(--text3);border:1px solid transparent;cursor:pointer;transition:all 0.15s;gap:1px;border-radius:var(--radius)}
-.cal-day:hover{border-color:var(--border)} .cal-day.profit{background:var(--bull-bg);border-color:rgba(76,175,125,0.2);color:var(--bull)}
-.cal-day.loss{background:var(--bear-bg);border-color:rgba(224,92,92,0.2);color:var(--bear)} .cal-day.today{border-color:var(--gold)!important;color:var(--gold)}
-.cal-day .pnl{font-family:'DM Mono',monospace;font-size:7px}
-/* ── Equity ── */
-.eq-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:12px;margin-bottom:12px}
-/* ── Sidebar cards ── */
-.sb-card{background:var(--bg2);border:1px solid var(--border2);padding:14px;border-radius:var(--radius);margin-bottom:12px}
-.sb-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
-.sb-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border2)}
-.sb-row:last-child{border-bottom:none}
-.sb-lbl{font-size:11px;color:var(--text2)}
-.sb-val{font-family:'DM Mono',monospace;font-size:10px;font-weight:500}
-.sb-val.g{color:var(--bull)} .sb-val.r{color:var(--bear)} .sb-val.o{color:var(--gold)}
-.ai-card{background:var(--bg2);border:1px solid var(--border);padding:14px;border-radius:var(--radius);border-left:3px solid var(--gold);margin-bottom:12px}
-.ai-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:7px}
-.ai-ins{font-size:11px;color:var(--text2);line-height:1.7;padding:6px 8px;background:var(--bg3);border-radius:var(--radius);margin-bottom:5px}
-.ai-ins:last-child{margin-bottom:0}
-.ai-ins strong{color:var(--bear)}
-/* ── Payout card ── */
-.payout-card{background:var(--bg2);border:1px solid var(--border);padding:14px;border-radius:var(--radius);border-left:3px solid var(--bull);margin-bottom:12px}
-.payout-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--bull);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
-.payout-item{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border2);font-size:11px}
-.payout-item:last-child{border-bottom:none}
-.payout-item-date{color:var(--text3);font-family:'DM Mono',monospace;font-size:9px}
-.payout-item-amount{color:var(--bull);font-family:'DM Mono',monospace;font-size:11px;font-weight:500}
-.payout-item-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:1px 4px;transition:color 0.15s}
-.payout-item-del:hover{color:var(--bear)}
-.payout-total{display:flex;justify-content:space-between;align-items:center;padding:7px 0 0;margin-top:4px;border-top:1px solid var(--border2)}
-.payout-total-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em}
-.payout-total-val{font-family:'DM Mono',monospace;font-size:13px;color:var(--bull);font-weight:500}
-/* ── Table ── */
-.trades-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden}
-.trades-top{padding:10px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:11px;min-width:800px}
-th{font-family:'DM Mono',monospace;font-size:8px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;padding:7px 10px;text-align:left;border-bottom:1px solid var(--border2);background:var(--bg3);white-space:nowrap}
-td{color:var(--text2);padding:7px 10px;border-bottom:1px solid var(--border2);white-space:nowrap}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(201,168,76,0.02)}
-.td-pair{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--text)}
-.td-dir{font-family:'DM Mono',monospace;font-size:8px;padding:2px 5px;border-radius:2px;font-weight:500}
-.td-dir.long{background:var(--bull-bg);color:var(--bull)} .td-dir.short{background:var(--bear-bg);color:var(--bear)}
-.td-pnl{font-family:'DM Mono',monospace;font-size:11px;font-weight:500}
-.td-pnl.pos{color:var(--bull)} .td-pnl.neg{color:var(--bear)}
-.td-status{font-family:'DM Mono',monospace;font-size:8px;padding:2px 5px;border-radius:2px}
-.td-status.win{background:var(--bull-bg);color:var(--bull)} .td-status.loss{background:var(--bear-bg);color:var(--bear)} .td-status.be{background:var(--gold-dim);color:var(--gold)} .td-status.open{background:rgba(74,158,255,0.12);color:#4a9eff}
-.td-tag{font-family:'DM Mono',monospace;font-size:8px;padding:2px 5px;background:var(--gold-dim);border:1px solid var(--border2);color:var(--gold);border-radius:2px}
-.td-mono{font-family:'DM Mono',monospace;font-size:10px}
-.td-emo{font-size:13px}
-.btn-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:2px 4px;transition:color 0.15s}
-.btn-del:hover{color:var(--bear)}
-.empty-t{text-align:center;padding:36px;color:var(--text3);font-size:12px}
-/* ── Modals ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(8,8,8,0.92);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s}
-.modal-overlay.active{opacity:1;pointer-events:all}
-.modal{background:var(--bg3);border:1px solid var(--border);width:100%;max-width:480px;padding:28px;position:relative;transform:translateY(20px);transition:transform 0.3s;margin:16px;border-radius:var(--radius);max-height:90vh;overflow-y:auto}
-.modal-overlay.active .modal{transform:translateY(0)}
-.modal-close{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;width:26px;height:26px;display:flex;align-items:center;justify-content:center}
-.modal-close:hover{color:var(--text)}
-.modal-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;color:var(--text);margin-bottom:16px}
-.fg{margin-bottom:12px}
-.fg-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.fg-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.falert{padding:8px;border-radius:var(--radius);font-size:11px;margin-bottom:10px;display:none}
-.falert.err{background:var(--bear-bg);border:1px solid rgba(224,92,92,0.2);color:var(--bear)} .falert.show{display:block}
-.fsub{width:100%;padding:10px;background:var(--gold);border:1px solid var(--gold);color:#080808;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:var(--radius);transition:all 0.2s;margin-top:4px}
-.fsub:hover{background:var(--gold2)} .fsub:disabled{opacity:0.5;pointer-events:none}
-.emo-row{display:flex;gap:4px;margin-top:4px}
-.emo-btn{flex:1;padding:5px;background:var(--bg);border:1px solid var(--border2);font-size:14px;cursor:pointer;border-radius:var(--radius);transition:all 0.15s;text-align:center}
-.emo-btn:hover,.emo-btn.on{border-color:var(--gold);background:var(--gold-dim)}
-.back-btn{background:none;border:1px solid var(--border2);color:var(--text3);padding:5px 11px;border-radius:var(--radius);cursor:pointer;font-size:11px;font-family:'DM Mono',monospace;letter-spacing:0.05em;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
-.back-btn:hover{border-color:var(--gold);color:var(--gold)}
-@media(max-width:900px){.jd-layout{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:600px){.hub-content{padding:12px}.stats-grid{grid-template-columns:repeat(2,1fr)}}
-</style>
+<title>EagleTrader — Journal</title>
 </head>
 <body>
-<div id="hubSidebarMount"></div>
+<div id="etSidebarMount"></div>
 <div class="hub-main">
-  <div class="hub-topbar" style="gap:10px">
-    <a href="hub-journal.html" class="back-btn">← Journals</a>
+  <div class="hub-topbar" style="gap:12px">
+    <a href="hub-journal.html" style="background:none;border:1px solid var(--border2);color:var(--white3);padding:6px 13px;border-radius:4px;cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;letter-spacing:0.05em;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:5px" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">← Journals</a>
     <div style="flex:1">
       <div class="hub-topbar-title" id="topbarTitle"><strong>Journal</strong></div>
     </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn-gold" onclick="openAddTrade()" style="padding:6px 14px;font-size:11px">+ Log Trade</button>
-      <button class="btn-ghost" onclick="openPayout()" style="padding:6px 12px;font-size:11px">💸 Payout</button>
-    </div>
+    <button class="et-btn-gold" onclick="etOpenModal('addTradeModal')" style="padding:7px 16px;font-size:11px">+ Log Trade</button>
+    <button class="et-btn-ghost" onclick="etOpenModal('payoutModal')" style="padding:7px 14px;font-size:11px">💸 Payout</button>
   </div>
-  <div class="hub-content">
+  <div class="hub-content et-fade">
 
-    <!-- Stats -->
-    <div class="stats-grid" id="statsGrid">
-      <div class="stat"><div class="stat-lbl">Initial Balance</div><div class="stat-val o" id="stBalance">$0</div><div class="stat-sub">Starting capital</div></div>
-      <div class="stat"><div class="stat-lbl">Current Balance</div><div class="stat-val" id="stCurrent">$0</div><div class="stat-sub" id="stCurrentSub">—</div></div>
-      <div class="stat"><div class="stat-lbl">Net Profit</div><div class="stat-val" id="stProfit">$0</div><div class="stat-sub">P&L</div></div>
-      <div class="stat"><div class="stat-lbl">Payouts</div><div class="stat-val g" id="stPayouts">$0</div><div class="stat-sub">Withdrawn</div></div>
-      <div class="stat"><div class="stat-lbl">Trades</div><div class="stat-val o" id="stTrades">0</div><div class="stat-sub">Closed</div></div>
-      <div class="stat"><div class="stat-lbl">Win Rate</div><div class="stat-val o" id="stWR">—</div></div>
-      <div class="stat"><div class="stat-lbl">Avg R</div><div class="stat-val o" id="stAvgR">—</div></div>
-      <div class="stat"><div class="stat-lbl">Expectancy</div><div class="stat-val o" id="stExp">$0</div></div>
-      <div class="stat"><div class="stat-lbl">Wins</div><div class="stat-val g" id="stWins">0</div></div>
-      <div class="stat"><div class="stat-lbl">Break Even</div><div class="stat-val o" id="stBE">0</div></div>
-      <div class="stat"><div class="stat-lbl">Losses</div><div class="stat-val r" id="stLosses">0</div></div>
-      <div class="stat"><div class="stat-lbl">Profit Factor</div><div class="stat-val o" id="stPF">—</div></div>
+    <!-- Stats grid -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px;margin-bottom:22px" id="statsGrid">
+      <div class="et-stat"><div class="et-stat-lbl">Initial Balance</div><div class="et-stat-val o" id="stBal">$0</div></div>
+      <div class="et-stat"><div class="et-stat-lbl">Current Balance</div><div class="et-stat-val" id="stCur">$0</div><div class="et-stat-sub" id="stCurSub">—</div></div>
+      <div class="et-stat"><div class="et-stat-lbl">Net Profit</div><div class="et-stat-val" id="stProfit">$0</div></div>
+      <div class="et-stat"><div class="et-stat-lbl">Payouts</div><div class="et-stat-val g" id="stPayouts">$0</div></div>
+      <div class="et-stat"><div class="et-stat-lbl">Trades</div><div class="et-stat-val o" id="stTrades">0</div><div class="et-stat-sub">Closed</div></div>
+      <div class="et-stat"><div class="et-stat-lbl">Win Rate</div><div class="et-stat-val o" id="stWR">—</div></div>
+      <div class="et-stat"><div class="et-stat-lbl">Avg R</div><div class="et-stat-val o" id="stAvgR">—</div></div>
+      <div class="et-stat"><div class="et-stat-lbl">Expectancy</div><div class="et-stat-val o" id="stExp">—</div></div>
+      <div class="et-stat"><div class="et-stat-lbl">Wins</div><div class="et-stat-val g" id="stWins">0</div></div>
+      <div class="et-stat"><div class="et-stat-lbl">Break Even</div><div class="et-stat-val o" id="stBE">0</div></div>
+      <div class="et-stat"><div class="et-stat-lbl">Losses</div><div class="et-stat-val r" id="stLosses">0</div></div>
+      <div class="et-stat"><div class="et-stat-lbl">Profit Factor</div><div class="et-stat-val o" id="stPF">—</div></div>
     </div>
 
-    <div class="jd-layout">
+    <!-- Layout: left main, right sidebar -->
+    <div style="display:grid;grid-template-columns:1fr 280px;gap:18px;align-items:start">
+
+      <!-- LEFT -->
       <div>
         <!-- Calendar -->
-        <div class="cal-card">
-          <div class="cal-hdr">
-            <div class="cal-title" id="calTitle">—</div>
-            <div class="cal-nav"><button onclick="calNav(-1)">‹</button><button onclick="calNav(1)">›</button></div>
+        <div class="et-card" style="padding:16px;margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--white)" id="calTitle">—</div>
+            <div style="display:flex;gap:5px">
+              <button onclick="calNav(-1)" style="background:none;border:1px solid var(--border2);color:var(--white3);width:24px;height:24px;cursor:pointer;font-size:12px;border-radius:4px;transition:all 0.2s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">‹</button>
+              <button onclick="calNav(1)"  style="background:none;border:1px solid var(--border2);color:var(--white3);width:24px;height:24px;cursor:pointer;font-size:12px;border-radius:4px;transition:all 0.2s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">›</button>
+            </div>
           </div>
-          <div class="cal-grid" id="calGrid"></div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px" id="calGrid"></div>
         </div>
-        <!-- Equity -->
-        <div class="eq-card">
-          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px">Equity Curve</div>
+
+        <!-- Equity curve -->
+        <div class="et-card" style="padding:14px;margin-bottom:14px">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:10px">Equity Curve</div>
           <svg id="eqSvg" viewBox="0 0 600 70" preserveAspectRatio="none" style="width:100%;height:52px">
-            <defs><linearGradient id="eqg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c9a84c" stop-opacity="0.2"/><stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/></linearGradient></defs>
-            <path id="eqLine" d="M0,35 L600,35" fill="none" stroke="var(--border2)" stroke-width="1" stroke-dasharray="4"/>
+            <defs><linearGradient id="eqg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c8a96e" stop-opacity="0.18"/><stop offset="100%" stop-color="#c8a96e" stop-opacity="0"/></linearGradient></defs>
+            <path id="eqLine" d="M0,35 L600,35" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="4"/>
             <path id="eqFill" d="" fill="url(#eqg)"/>
           </svg>
         </div>
+
         <!-- Trades table -->
-        <div class="trades-card">
-          <div class="trades-top">
-            <span style="font-size:12px;font-weight:500;color:var(--text)">Trade History</span>
-            <button class="btn-gold" onclick="openAddTrade()" style="padding:4px 10px;font-size:10px">+ Add Trade</button>
+        <div class="et-card" style="overflow:hidden">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:14px;font-weight:600;color:var(--white)">Trade History</span>
+            <button class="et-btn-gold" onclick="etOpenModal('addTradeModal')" style="padding:5px 12px;font-size:10px">+ Add</button>
           </div>
-          <div class="table-wrap">
-            <table>
+          <div class="et-table-wrap">
+            <table class="et-table">
               <thead><tr>
                 <th>Date</th><th>Pair</th><th>Dir</th><th>Entry</th><th>Exit</th><th>SL</th><th>TP</th>
                 <th>Lots</th><th>PnL</th><th>R</th><th>Risk $</th>
                 <th>Status</th><th>Session</th><th>Tag</th><th>Emotion</th><th>Notes</th><th></th>
               </tr></thead>
-              <tbody id="tradesBody"><tr><td colspan="17"><div class="empty-t">No trades yet — log your first trade!</div></td></tr></tbody>
+              <tbody id="tradesBody"><tr><td colspan="17" style="text-align:center;padding:40px;color:var(--white3);font-size:13px">No trades yet — log your first trade!</td></tr></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- Sidebar -->
-      <div>
+      <!-- RIGHT sidebar -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+
         <!-- AI Coach -->
-        <div class="ai-card">
-          <div class="ai-lbl">🤖 AI Coach</div>
-          <div id="aiBox"><div class="ai-ins" style="color:var(--text3);font-style:italic;font-size:11px">Add more trades to unlock insights.</div></div>
+        <div style="background:var(--bg2);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:16px;border-radius:4px">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:10px">🤖 AI Coach</div>
+          <div id="aiBox"><div style="font-size:12px;color:var(--white3);font-style:italic;line-height:1.6">Add more trades to unlock personalized insights.</div></div>
         </div>
-        <!-- Payout History -->
-        <div class="payout-card">
-          <div class="payout-lbl">
+
+        <!-- Payouts -->
+        <div style="background:var(--bg2);border:1px solid rgba(76,175,125,0.25);border-left:3px solid var(--bull);padding:16px;border-radius:4px">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--bull);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
             <span>💸 Payout History</span>
-            <button onclick="openPayout()" style="background:none;border:1px solid rgba(76,175,125,0.3);color:var(--bull);font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;cursor:pointer;border-radius:2px;letter-spacing:0.05em">+ Add</button>
+            <button onclick="etOpenModal('payoutModal')" style="background:none;border:1px solid rgba(76,175,125,0.3);color:var(--bull);font-family:'DM Mono',monospace;font-size:8px;padding:2px 8px;cursor:pointer;border-radius:2px;letter-spacing:0.05em;transition:all 0.15s" onmouseover="this.style.background='var(--bull-bg)'" onmouseout="this.style.background='none'">+ Add</button>
           </div>
-          <div id="payoutsList"><div style="font-size:11px;color:var(--text3);font-style:italic;padding:4px 0">No payouts yet.</div></div>
-          <div class="payout-total"><span class="payout-total-lbl">Total Payouts</span><span class="payout-total-val" id="payoutsTotal">$0.00</span></div>
+          <div id="payoutsList"><div style="font-size:12px;color:var(--white3);font-style:italic">No payouts yet.</div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0 0;margin-top:6px;border-top:1px solid var(--border2)">
+            <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);text-transform:uppercase;letter-spacing:0.08em">Total Payouts</span>
+            <span style="font-family:'DM Mono',monospace;font-size:14px;color:var(--bull);font-weight:500" id="payoutsTotal">$0.00</span>
+          </div>
         </div>
+
         <!-- Performance -->
-        <div class="sb-card">
-          <div class="sb-title">Performance</div>
-          <div class="sb-row"><span class="sb-lbl">Best pair</span><span class="sb-val o" id="sbBest">—</span></div>
-          <div class="sb-row"><span class="sb-lbl">Worst pair</span><span class="sb-val r" id="sbWorst">—</span></div>
-          <div class="sb-row"><span class="sb-lbl">Best session</span><span class="sb-val g" id="sbBestSess">—</span></div>
-          <div class="sb-row"><span class="sb-lbl">Winners</span><span class="sb-val g" id="sbWins">0</span></div>
-          <div class="sb-row"><span class="sb-lbl">Losers</span><span class="sb-val r" id="sbLosses">0</span></div>
-          <div class="sb-row"><span class="sb-lbl">Largest win</span><span class="sb-val g" id="sbLW">—</span></div>
-          <div class="sb-row"><span class="sb-lbl">Largest loss</span><span class="sb-val r" id="sbLL">—</span></div>
-          <div class="sb-row"><span class="sb-lbl">Avg win</span><span class="sb-val g" id="sbAW">—</span></div>
-          <div class="sb-row"><span class="sb-lbl">Avg loss</span><span class="sb-val r" id="sbAL">—</span></div>
+        <div class="et-card" style="padding:16px">
+          <div style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:12px">Performance</div>
+          <div id="perfRows"></div>
         </div>
+
       </div>
     </div>
   </div>
 </div>
 
 <!-- ADD TRADE MODAL -->
-<div class="modal-overlay" id="addTradeModal">
-  <div class="modal" style="max-width:520px">
-    <button class="modal-close" onclick="closeModal('addTradeModal')">✕</button>
-    <div class="modal-title">Log a Trade</div>
-    <div id="atAlert" class="falert"></div>
-    <div class="fg-2">
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Pair *</label>
-        <select class="form-input" id="atPair"><option>EUR/USD</option><option>GBP/USD</option><option>USD/JPY</option><option>AUD/USD</option><option>USD/CAD</option><option>NZD/USD</option><option>USD/CHF</option><option>EUR/GBP</option><option>EUR/JPY</option><option>GBP/JPY</option><option>XAU/USD</option><option>XAG/USD</option></select>
+<div class="et-modal-overlay" id="addTradeModal">
+  <div class="et-modal" style="max-width:520px">
+    <button class="et-modal-close" onclick="etCloseModal('addTradeModal')">✕</button>
+    <div class="et-modal-title">Log a Trade</div>
+    <div id="atAlert" class="et-alert" style="display:none"></div>
+    <div class="et-form-grid2">
+      <div class="et-form-group"><label class="et-form-label">Pair *</label>
+        <select class="et-form-input" id="atPair"><option>EUR/USD</option><option>GBP/USD</option><option>USD/JPY</option><option>AUD/USD</option><option>USD/CAD</option><option>NZD/USD</option><option>USD/CHF</option><option>EUR/GBP</option><option>EUR/JPY</option><option>GBP/JPY</option><option>XAU/USD</option><option>XAG/USD</option></select>
       </div>
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Direction *</label>
-        <select class="form-input" id="atDir"><option value="long">Long (Buy)</option><option value="short">Short (Sell)</option></select>
-      </div>
-    </div>
-    <div class="fg-3" style="margin-top:12px">
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Entry *</label><input type="number" class="form-input" id="atEntry" step="0.00001"></div>
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Exit *</label><input type="number" class="form-input" id="atExit" step="0.00001"></div>
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Lot Size</label><input type="number" class="form-input" id="atLot" value="0.10" step="0.01"></div>
-    </div>
-    <div class="fg-3" style="margin-top:12px">
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Stop Loss</label><input type="number" class="form-input" id="atSL" step="0.00001"></div>
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Take Profit</label><input type="number" class="form-input" id="atTP" step="0.00001"></div>
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Risk ($)</label><input type="number" class="form-input" id="atRisk" placeholder="100"></div>
-    </div>
-    <div class="fg-2" style="margin-top:12px">
-      <div class="fg" style="margin-bottom:0"><label class="form-label">PnL ($) *</label><input type="number" class="form-input" id="atPnL"></div>
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Date *</label><input type="date" class="form-input" id="atDate"></div>
-    </div>
-    <div class="fg-3" style="margin-top:12px">
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Status *</label>
-        <select class="form-input" id="atStatus"><option value="win">Win</option><option value="loss">Loss</option><option value="be">Break Even</option><option value="open">Open</option></select>
-      </div>
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Session</label>
-        <select class="form-input" id="atSession"><option value="">—</option><option>Asia</option><option>London</option><option>New York</option></select>
-      </div>
-      <div class="fg" style="margin-bottom:0"><label class="form-label">Tag</label>
-        <select class="form-input" id="atTag"><option>Disciplined</option><option>FOMO Entry</option><option>Revenge Trade</option><option>News Play</option><option>Breakout</option><option>Pullback</option><option>Fundamental Setup</option></select>
+      <div class="et-form-group"><label class="et-form-label">Direction *</label>
+        <select class="et-form-input" id="atDir"><option value="long">Long (Buy)</option><option value="short">Short (Sell)</option></select>
       </div>
     </div>
-    <div class="fg" style="margin-top:12px"><label class="form-label">Notes</label><textarea class="form-input" id="atNotes" rows="2" style="resize:none"></textarea></div>
-    <div class="fg" style="margin-top:0"><label class="form-label">Emotion at Entry</label>
-      <div class="emo-row" id="emoRow">
-        <button class="emo-btn" onclick="setEmo(1,this)">😰</button>
-        <button class="emo-btn" onclick="setEmo(2,this)">😟</button>
-        <button class="emo-btn on" onclick="setEmo(3,this)">😐</button>
-        <button class="emo-btn" onclick="setEmo(4,this)">🙂</button>
-        <button class="emo-btn" onclick="setEmo(5,this)">😎</button>
+    <div class="et-form-grid3">
+      <div class="et-form-group"><label class="et-form-label">Entry *</label><input type="number" class="et-form-input" id="atEntry" step="0.00001"></div>
+      <div class="et-form-group"><label class="et-form-label">Exit *</label><input type="number" class="et-form-input" id="atExit" step="0.00001"></div>
+      <div class="et-form-group"><label class="et-form-label">Lots</label><input type="number" class="et-form-input" id="atLot" value="0.10" step="0.01"></div>
+    </div>
+    <div class="et-form-grid3">
+      <div class="et-form-group"><label class="et-form-label">Stop Loss</label><input type="number" class="et-form-input" id="atSL" step="0.00001"></div>
+      <div class="et-form-group"><label class="et-form-label">Take Profit</label><input type="number" class="et-form-input" id="atTP" step="0.00001"></div>
+      <div class="et-form-group"><label class="et-form-label">Risk ($)</label><input type="number" class="et-form-input" id="atRisk" placeholder="100"></div>
+    </div>
+    <div class="et-form-grid2">
+      <div class="et-form-group"><label class="et-form-label">PnL ($) *</label><input type="number" class="et-form-input" id="atPnL"></div>
+      <div class="et-form-group"><label class="et-form-label">Date *</label><input type="date" class="et-form-input" id="atDate"></div>
+    </div>
+    <div class="et-form-grid3">
+      <div class="et-form-group"><label class="et-form-label">Status *</label>
+        <select class="et-form-input" id="atStatus"><option value="win">Win</option><option value="loss">Loss</option><option value="be">Break Even</option><option value="open">Open</option></select>
+      </div>
+      <div class="et-form-group"><label class="et-form-label">Session</label>
+        <select class="et-form-input" id="atSession"><option value="">—</option><option>Asia</option><option>London</option><option>New York</option></select>
+      </div>
+      <div class="et-form-group"><label class="et-form-label">Tag</label>
+        <select class="et-form-input" id="atTag"><option>Disciplined</option><option>FOMO Entry</option><option>Revenge Trade</option><option>News Play</option><option>Breakout</option><option>Pullback</option><option>Fundamental Setup</option></select>
       </div>
     </div>
-    <button class="fsub" id="atBtn" onclick="saveTrade()">Save Trade →</button>
+    <div class="et-form-group"><label class="et-form-label">Notes</label><textarea class="et-form-input" id="atNotes" rows="2" style="resize:none"></textarea></div>
+    <div class="et-form-group"><label class="et-form-label">Emotion at Entry</label>
+      <div class="et-emo-row" id="emoRow">
+        <button class="et-emo-btn" onclick="setEmo(1,this)">😰</button>
+        <button class="et-emo-btn" onclick="setEmo(2,this)">😟</button>
+        <button class="et-emo-btn on" onclick="setEmo(3,this)">😐</button>
+        <button class="et-emo-btn" onclick="setEmo(4,this)">🙂</button>
+        <button class="et-emo-btn" onclick="setEmo(5,this)">😎</button>
+      </div>
+    </div>
+    <button class="et-form-submit" id="atBtn" onclick="saveTrade()">Save Trade →</button>
   </div>
 </div>
 
 <!-- PAYOUT MODAL -->
-<div class="modal-overlay" id="payoutModal">
-  <div class="modal" style="max-width:380px">
-    <button class="modal-close" onclick="closeModal('payoutModal')">✕</button>
-    <div class="modal-title">Log Payout</div>
-    <div id="paAlert" class="falert"></div>
-    <div class="fg"><label class="form-label">Amount ($) *</label><input type="number" class="form-input" id="paAmount" placeholder="500.00" style="font-family:'DM Mono',monospace;font-size:18px;text-align:center;color:var(--bull)"></div>
-    <div class="fg"><label class="form-label">Date *</label><input type="date" class="form-input" id="paDate"></div>
-    <div class="fg"><label class="form-label">Note (optional)</label><input type="text" class="form-input" id="paNote" placeholder="Payout #1"></div>
-    <button class="fsub" onclick="savePayout()" style="background:var(--bull);border-color:var(--bull)">Confirm Payout →</button>
+<div class="et-modal-overlay" id="payoutModal">
+  <div class="et-modal" style="max-width:380px">
+    <button class="et-modal-close" onclick="etCloseModal('payoutModal')">✕</button>
+    <div class="et-modal-title">Log Payout</div>
+    <div id="paAlert" class="et-alert" style="display:none"></div>
+    <div class="et-form-group"><label class="et-form-label">Amount ($) *</label>
+      <input type="number" class="et-form-input" id="paAmount" placeholder="500.00" style="font-family:'DM Mono',monospace;font-size:20px;text-align:center;color:var(--bull)">
+    </div>
+    <div class="et-form-group"><label class="et-form-label">Date *</label><input type="date" class="et-form-input" id="paDate"></div>
+    <div class="et-form-group"><label class="et-form-label">Note (optional)</label><input type="text" class="et-form-input" id="paNote" placeholder="Payout #1"></div>
+    <button class="et-form-submit green" onclick="savePayout()">Confirm Payout →</button>
   </div>
 </div>
 
@@ -281,13 +190,10 @@ const MONTHS=['January','February','March','April','May','June','July','August',
 const EMO=['','😰','😟','😐','🙂','😎'];
 
 async function main(){
-  const res=await initHubSidebar('journals');
-  if(!res)return;
+  const res=await initEtSidebar('journals'); if(!res)return;
   _user=res.user;_sb=res.sb;
-  // Get journal id from URL
   const id=new URLSearchParams(window.location.search).get('id');
   if(!id){window.location.href='hub-journal.html';return;}
-  // Load journal
   const{data:j,error}=await _sb.from('journals').select('*').eq('id',id).eq('user_id',_user.id).single();
   if(error||!j){window.location.href='hub-journal.html';return;}
   _journal=j;
@@ -295,35 +201,34 @@ async function main(){
   await Promise.all([loadTrades(),loadPayouts()]);
 }
 
-// ── TRADES ──
 async function loadTrades(){
   const{data,error}=await _sb.from('journal_trades').select('*').eq('journal_id',_journal.id).eq('user_id',_user.id).order('trade_date',{ascending:false});
   if(error){console.error(error);return;}
   trades=data||[];
-  renderTrades();renderStats();renderCalendar();renderEquity();renderAI();
+  renderTrades();renderStats();renderCalendar();renderEquity();renderAI();renderPerf();
 }
 
 function renderTrades(){
   const tb=document.getElementById('tradesBody');
-  if(!trades.length){tb.innerHTML='<tr><td colspan="17"><div class="empty-t">No trades yet — log your first trade!</div></td></tr>';return;}
+  if(!trades.length){tb.innerHTML='<tr><td colspan="17" style="text-align:center;padding:40px;color:var(--white3);font-size:13px">No trades yet — log your first trade!</td></tr>';return;}
   tb.innerHTML=trades.map(t=>`<tr>
-    <td class="td-mono" style="font-size:9px;color:var(--text3)">${t.trade_date||'—'}</td>
-    <td class="td-pair">${t.pair}</td>
-    <td><span class="td-dir ${t.direction}">${(t.direction||'').toUpperCase()}</span></td>
-    <td class="td-mono">${t.entry_price||'—'}</td>
-    <td class="td-mono">${t.exit_price||'—'}</td>
-    <td class="td-mono" style="color:var(--text3)">${t.stop_loss||'—'}</td>
-    <td class="td-mono" style="color:var(--text3)">${t.take_profit||'—'}</td>
-    <td class="td-mono">${t.lot_size||'—'}</td>
-    <td><span class="td-pnl ${(t.pnl||0)>=0?'pos':'neg'}">${(t.pnl||0)>=0?'+':''}$${Math.abs(t.pnl||0).toFixed(2)}</span></td>
-    <td class="td-mono">${t.r_multiple||'—'}</td>
-    <td class="td-mono" style="color:var(--text3)">${t.risk_amount?'$'+t.risk_amount:'—'}</td>
-    <td><span class="td-status ${t.status}">${(t.status||'').toUpperCase()}</span></td>
-    <td style="font-size:10px;color:var(--text2)">${t.session||'—'}</td>
-    <td><span class="td-tag">${t.tag||'—'}</span></td>
-    <td class="td-emo">${EMO[t.emotion||3]}</td>
-    <td style="font-size:10px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis">${t.notes||'—'}</td>
-    <td><button class="btn-del" onclick="deleteTrade('${t.id}')">✕</button></td>
+    <td style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3)">${t.trade_date||'—'}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:var(--white)">${t.pair}</td>
+    <td><span class="pill ${t.direction}">${(t.direction||'').toUpperCase()}</span></td>
+    <td style="font-family:'DM Mono',monospace;font-size:10px">${t.entry_price||'—'}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:10px">${t.exit_price||'—'}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)">${t.stop_loss||'—'}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)">${t.take_profit||'—'}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:10px">${t.lot_size||'—'}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:${(t.pnl||0)>=0?'var(--bull)':'var(--bear)'}">${(t.pnl||0)>=0?'+':''}$${Math.abs(t.pnl||0).toFixed(2)}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:10px">${t.r_multiple||'—'}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)">${t.risk_amount?'$'+t.risk_amount:'—'}</td>
+    <td><span class="pill ${t.status}">${(t.status||'').toUpperCase()}</span></td>
+    <td style="font-size:11px;color:var(--white2)">${t.session||'—'}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:2px">${t.tag||'—'}</td>
+    <td style="font-size:14px">${EMO[t.emotion||3]}</td>
+    <td style="font-size:11px;color:var(--white3);max-width:120px;overflow:hidden;text-overflow:ellipsis">${t.notes||'—'}</td>
+    <td><button onclick="deleteTrade('${t.id}')" style="background:none;border:none;color:var(--white3);cursor:pointer;font-size:12px;padding:2px 5px;transition:color 0.15s" onmouseover="this.style.color='var(--bear)'" onmouseout="this.style.color='var(--white3)'">✕</button></td>
   </tr>`).join('');
 }
 
@@ -331,22 +236,22 @@ function renderStats(){
   const init=parseFloat(_journal.initial_balance)||0;
   const cl=trades.filter(t=>['win','loss','be'].includes(t.status));
   const wins=cl.filter(t=>t.status==='win'),losses=cl.filter(t=>t.status==='loss'),be=cl.filter(t=>t.status==='be');
-  const totalPnL=cl.reduce((s,t)=>s+(parseFloat(t.pnl)||0),0);
-  const totalPayouts=payouts.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
-  const current=init+totalPnL;
-  const pct=init?((totalPnL/init)*100).toFixed(2):0;
+  const tp=cl.reduce((s,t)=>s+(parseFloat(t.pnl)||0),0);
+  const tPay=payouts.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+  const cur=init+tp, pct=init?((tp/init)*100).toFixed(2):0;
   const wr=(wins.length+losses.length)>0?((wins.length/(wins.length+losses.length))*100).toFixed(1):'—';
   const gw=wins.reduce((s,t)=>s+(parseFloat(t.pnl)||0),0);
   const gl=Math.abs(losses.reduce((s,t)=>s+(parseFloat(t.pnl)||0),0));
   const pf=gl>0?(gw/gl).toFixed(2):wins.length?'∞':'—';
   const rVals=cl.filter(t=>t.r_multiple).map(t=>parseFloat(t.r_multiple));
   const avgR=rVals.length?(rVals.reduce((a,b)=>a+b,0)/rVals.length).toFixed(2):'—';
-  const exp=cl.length?(totalPnL/cl.length).toFixed(2):'—';
-  document.getElementById('stBalance').textContent='$'+(init).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-  const curEl=document.getElementById('stCurrent');curEl.textContent='$'+current.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});curEl.className='stat-val '+(current>=init?'g':'r');
-  document.getElementById('stCurrentSub').textContent=(totalPnL>=0?'+':'')+pct+'%';
-  const profEl=document.getElementById('stProfit');profEl.textContent=(totalPnL>=0?'+':'')+'$'+Math.abs(totalPnL).toFixed(2);profEl.className='stat-val '+(totalPnL>=0?'g':'r');
-  document.getElementById('stPayouts').textContent='$'+totalPayouts.toFixed(2);
+  const exp=cl.length?(tp/cl.length).toFixed(2):'—';
+
+  document.getElementById('stBal').textContent='$'+init.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const cEl=document.getElementById('stCur');cEl.textContent='$'+cur.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});cEl.className='et-stat-val '+(cur>=init?'g':'r');
+  document.getElementById('stCurSub').textContent=(tp>=0?'+':'')+pct+'%';
+  const pEl=document.getElementById('stProfit');pEl.textContent=(tp>=0?'+':'')+'$'+Math.abs(tp).toFixed(2);pEl.className='et-stat-val '+(tp>=0?'g':'r');
+  document.getElementById('stPayouts').textContent='$'+tPay.toFixed(2);
   document.getElementById('stTrades').textContent=cl.length;
   document.getElementById('stWR').textContent=wr!=='—'?wr+'%':'—';
   document.getElementById('stAvgR').textContent=avgR;
@@ -355,20 +260,33 @@ function renderStats(){
   document.getElementById('stBE').textContent=be.length;
   document.getElementById('stLosses').textContent=losses.length;
   document.getElementById('stPF').textContent=pf;
-  // Sidebar performance
+}
+
+function renderPerf(){
+  const cl=trades.filter(t=>['win','loss','be'].includes(t.status));
+  const wins=cl.filter(t=>t.status==='win'),losses=cl.filter(t=>t.status==='loss');
   const pp={},ss={};
   cl.forEach(t=>{pp[t.pair]=(pp[t.pair]||0)+(parseFloat(t.pnl)||0);if(t.session)ss[t.session]=(ss[t.session]||0)+(parseFloat(t.pnl)||0);});
   const ps=Object.entries(pp).sort((a,b)=>b[1]-a[1]);
   const bsess=Object.entries(ss).sort((a,b)=>b[1]-a[1]);
-  document.getElementById('sbBest').textContent=ps.length?ps[0][0]:'—';
-  document.getElementById('sbWorst').textContent=ps.length>1?ps[ps.length-1][0]:ps.length?ps[0][0]:'—';
-  document.getElementById('sbBestSess').textContent=bsess.length?bsess[0][0]:'—';
-  document.getElementById('sbWins').textContent=wins.length;
-  document.getElementById('sbLosses').textContent=losses.length;
-  document.getElementById('sbLW').textContent=wins.length?'+$'+Math.max(...wins.map(t=>parseFloat(t.pnl)||0)).toFixed(2):'—';
-  document.getElementById('sbLL').textContent=losses.length?'-$'+Math.abs(Math.min(...losses.map(t=>parseFloat(t.pnl)||0))).toFixed(2):'—';
-  document.getElementById('sbAW').textContent=wins.length?'+$'+(gw/wins.length).toFixed(2):'—';
-  document.getElementById('sbAL').textContent=losses.length?'-$'+(gl/losses.length).toFixed(2):'—';
+  const gw=wins.reduce((s,t)=>s+(parseFloat(t.pnl)||0),0);
+  const gl=Math.abs(losses.reduce((s,t)=>s+(parseFloat(t.pnl)||0),0));
+  const rows=[
+    ['Best pair', ps.length?ps[0][0]:'—', 'o'],
+    ['Worst pair', ps.length>1?ps[ps.length-1][0]:ps.length?ps[0][0]:'—', 'r'],
+    ['Best session', bsess.length?bsess[0][0]:'—', 'g'],
+    ['Winners', wins.length, 'g'],
+    ['Losers', losses.length, 'r'],
+    ['Largest win', wins.length?'+$'+Math.max(...wins.map(t=>parseFloat(t.pnl)||0)).toFixed(2):'—', 'g'],
+    ['Largest loss', losses.length?'-$'+Math.abs(Math.min(...losses.map(t=>parseFloat(t.pnl)||0))).toFixed(2):'—', 'r'],
+    ['Avg win', wins.length?'+$'+(gw/wins.length).toFixed(2):'—', 'g'],
+    ['Avg loss', losses.length?'-$'+(gl/losses.length).toFixed(2):'—', 'r'],
+  ];
+  document.getElementById('perfRows').innerHTML=rows.map(([l,v,c])=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border2)">
+      <span style="font-size:12px;color:var(--white2)">${l}</span>
+      <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--${c==='g'?'bull':c==='r'?'bear':'gold2'})">${v}</span>
+    </div>`).join('')+'<div style="height:0;border-bottom:none"></div>';
 }
 
 function renderEquity(){
@@ -383,6 +301,7 @@ function renderEquity(){
   document.getElementById('eqLine').setAttribute('d',d);
   document.getElementById('eqLine').setAttribute('stroke',col);
   document.getElementById('eqLine').setAttribute('stroke-dasharray','');
+  document.getElementById('eqLine').setAttribute('stroke-width','2');
   document.getElementById('eqFill').setAttribute('d',d+` L${W},${H} L0,${H} Z`);
 }
 
@@ -391,13 +310,16 @@ function renderCalendar(){
   const first=new Date(calY,calM,1).getDay(),dim=new Date(calY,calM+1,0).getDate();
   const off=first===0?6:first-1,today=new Date();
   const dp={};trades.forEach(t=>{if(!t.trade_date)return;const d=new Date(t.trade_date);if(d.getFullYear()===calY&&d.getMonth()===calM){const day=d.getDate();dp[day]=(dp[day]||0)+(parseFloat(t.pnl)||0);}});
-  let h=['Mo','Tu','We','Th','Fr','Sa','Su'].map(d=>`<div class="cal-lbl">${d}</div>`).join('');
-  for(let i=0;i<off;i++)h+='<div class="cal-day"></div>';
+  let h=['Mo','Tu','We','Th','Fr','Sa','Su'].map(d=>`<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);text-align:center;padding:3px 0">${d}</div>`).join('');
+  for(let i=0;i<off;i++)h+=`<div></div>`;
   for(let d=1;d<=dim;d++){
     const it=today.getDate()===d&&today.getMonth()===calM&&today.getFullYear()===calY;
-    const p=dp[d];const cls=it?'today':p>0?'profit':p<0?'loss':'';
-    const pl=p!==undefined?`<div class="pnl">${p>=0?'+':''}$${Math.abs(p).toFixed(0)}</div>`:'';
-    h+=`<div class="cal-day ${cls}">${d}${pl}</div>`;
+    const p=dp[d];
+    const bg=it?'transparent':p>0?'var(--bull-bg)':p<0?'var(--bear-bg)':'transparent';
+    const border=it?'1px solid var(--gold)':p>0?'1px solid rgba(76,175,125,0.2)':p<0?'1px solid rgba(224,92,92,0.2)':'1px solid transparent';
+    const color=it?'var(--gold)':p>0?'var(--bull)':p<0?'var(--bear)':'var(--white3)';
+    const pnlHtml=p!==undefined?`<div style="font-family:'DM Mono',monospace;font-size:7px">${p>=0?'+':''}$${Math.abs(p).toFixed(0)}</div>`:'';
+    h+=`<div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:9px;background:${bg};border:${border};cursor:pointer;transition:all 0.15s;gap:1px;border-radius:3px;color:${color}">${d}${pnlHtml}</div>`;
   }
   document.getElementById('calGrid').innerHTML=h;
 }
@@ -408,51 +330,46 @@ function renderAI(){
   const ins=[];
   const ls=trades.filter(t=>t.status==='loss');
   const fri=ls.filter(t=>t.trade_date&&new Date(t.trade_date).getDay()===5);
-  if(fri.length>=2){const fp=fri.reduce((s,t)=>s+(parseFloat(t.pnl)||0),0);ins.push(`<strong>${fri.length} losing trades on Fridays</strong> — $${Math.abs(fp).toFixed(0)} lost. Consider reducing Friday exposure.`);}
+  if(fri.length>=2){const fp=fri.reduce((s,t)=>s+(parseFloat(t.pnl)||0),0);ins.push(`<strong style="color:var(--bear)">${fri.length} losing trades on Fridays</strong> — $${Math.abs(fp).toFixed(0)} lost. Consider reducing Friday exposure.`);}
   const fomo=trades.filter(t=>t.tag==='FOMO Entry');
-  if(fomo.length>=2){const fp=fomo.reduce((s,t)=>s+(parseFloat(t.pnl)||0),0);ins.push(`<strong>FOMO trades</strong> net ${fp>=0?'+':''}$${fp.toFixed(0)}. Review your entry discipline.`);}
+  if(fomo.length>=2){const fp=fomo.reduce((s,t)=>s+(parseFloat(t.pnl)||0),0);ins.push(`<strong style="color:var(--bear)">FOMO trades</strong> net ${fp>=0?'+':''}$${fp.toFixed(0)}. Review entry discipline.`);}
   const tp={};trades.forEach(t=>{if(t.tag)tp[t.tag]=(tp[t.tag]||0)+(parseFloat(t.pnl)||0);});
   const bt=Object.entries(tp).sort((a,b)=>b[1]-a[1])[0];
-  if(bt&&bt[1]>0)ins.push(`Best setup: <strong>"${bt[0]}"</strong> with +$${bt[1].toFixed(0)}. Double down on this edge.`);
-  const wEmoPnL={};trades.forEach(t=>{const e=t.emotion||3;if(!wEmoPnL[e])wEmoPnL[e]=[];wEmoPnL[e].push(parseFloat(t.pnl)||0);});
-  const bestEmo=Object.entries(wEmoPnL).map(([e,ps])=>({e,avg:ps.reduce((a,b)=>a+b,0)/ps.length})).sort((a,b)=>b.avg-a.avg)[0];
-  if(bestEmo)ins.push(`You perform best when feeling ${EMO[bestEmo.e]} — avg $${bestEmo.avg.toFixed(0)} per trade in that state.`);
+  if(bt&&bt[1]>0)ins.push(`Best setup: <strong style="color:var(--gold)">"${bt[0]}"</strong> — +$${bt[1].toFixed(0)}. Double down on this edge.`);
   if(!ins.length)ins.push('Keep logging trades consistently to unlock personalized coaching insights.');
-  document.getElementById('aiBox').innerHTML=ins.map(i=>`<div class="ai-ins">${i}</div>`).join('');
+  document.getElementById('aiBox').innerHTML=ins.map(i=>`<div style="font-size:12px;color:var(--white2);line-height:1.7;padding:8px;background:var(--bg3);border-radius:4px;margin-bottom:6px">${i}</div>`).join('');
 }
 
-// ── PAYOUTS ──
+// Payouts
 async function loadPayouts(){
   const{data}=await _sb.from('journal_payouts').select('*').eq('journal_id',_journal.id).eq('user_id',_user.id).order('payout_date',{ascending:false});
   payouts=data||[];renderPayouts();
 }
-
 function renderPayouts(){
-  const list=document.getElementById('payoutsList');
   const total=payouts.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
   document.getElementById('payoutsTotal').textContent='$'+total.toFixed(2);
-  if(!payouts.length){list.innerHTML='<div style="font-size:11px;color:var(--text3);font-style:italic;padding:4px 0">No payouts yet.</div>';return;}
-  list.innerHTML=payouts.map(p=>`<div class="payout-item">
-    <div><div style="font-size:11px;color:var(--text2)">${p.note||'Payout'}</div><div class="payout-item-date">${p.payout_date||'—'}</div></div>
-    <div style="display:flex;align-items:center;gap:6px"><span class="payout-item-amount">+$${parseFloat(p.amount).toFixed(2)}</span><button class="payout-item-del" onclick="deletePayout('${p.id}')">✕</button></div>
-  </div>`).join('');
-  // Update stats too
+  const list=document.getElementById('payoutsList');
+  if(!payouts.length){list.innerHTML='<div style="font-size:12px;color:var(--white3);font-style:italic">No payouts yet.</div>';renderStats();return;}
+  list.innerHTML=payouts.map(p=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border2)">
+      <div>
+        <div style="font-size:12px;color:var(--white2)">${p.note||'Payout'}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);margin-top:1px">${p.payout_date||'—'}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--bull);font-weight:500">+$${parseFloat(p.amount).toFixed(2)}</span>
+        <button onclick="deletePayout('${p.id}')" style="background:none;border:none;color:var(--white3);cursor:pointer;font-size:11px;padding:1px 4px;transition:color 0.15s" onmouseover="this.style.color='var(--bear)'" onmouseout="this.style.color='var(--white3)'">✕</button>
+      </div>
+    </div>`).join('');
   renderStats();
 }
-
-function openPayout(){
-  document.getElementById('paAmount').value='';document.getElementById('paNote').value='';
-  document.getElementById('paDate').value=new Date().toISOString().split('T')[0];
-  document.getElementById('paAlert').className='falert';
-  openModal('payoutModal');
-}
+function openPayout(){etOpenModal('payoutModal');}
 async function savePayout(){
-  const amount=parseFloat(document.getElementById('paAmount').value);
-  const date=document.getElementById('paDate').value;
-  if(!amount||amount<=0){const a=document.getElementById('paAlert');a.textContent='Please enter a valid amount.';a.className='falert err show';return;}
+  const amount=parseFloat(document.getElementById('paAmount').value),date=document.getElementById('paDate').value;
+  if(!amount||amount<=0){const a=document.getElementById('paAlert');a.textContent='Please enter a valid amount.';a.className='et-alert err';return;}
   const{error}=await _sb.from('journal_payouts').insert({journal_id:_journal.id,user_id:_user.id,amount,payout_date:date||null,note:document.getElementById('paNote').value.trim()||null});
   if(error){alert(error.message);return;}
-  closeModal('payoutModal');await loadPayouts();
+  etCloseModal('payoutModal');await loadPayouts();
 }
 async function deletePayout(id){
   if(!confirm('Delete this payout?'))return;
@@ -460,39 +377,34 @@ async function deletePayout(id){
   await loadPayouts();
 }
 
-// ── ADD TRADE ──
+// Trades
 function openAddTrade(){
   document.getElementById('atDate').value=new Date().toISOString().split('T')[0];
   ['atEntry','atExit','atSL','atTP','atRisk','atPnL','atNotes'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('atAlert').className='falert';
-  emo=3;document.querySelectorAll('.emo-btn').forEach((b,i)=>b.classList.toggle('on',i===2));
-  openModal('addTradeModal');
+  document.getElementById('atAlert').style.display='none';
+  emo=3;document.querySelectorAll('.et-emo-btn').forEach((b,i)=>b.classList.toggle('on',i===2));
+  etOpenModal('addTradeModal');
 }
-function setEmo(v,el){emo=v;document.querySelectorAll('.emo-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
-
+function setEmo(v,el){emo=v;document.querySelectorAll('.et-emo-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
 async function saveTrade(){
   const entry=parseFloat(document.getElementById('atEntry').value),exit=parseFloat(document.getElementById('atExit').value),pnl=parseFloat(document.getElementById('atPnL').value);
-  if(!entry||!exit||isNaN(pnl)){const a=document.getElementById('atAlert');a.textContent='Entry, exit and PnL are required.';a.className='falert err show';return;}
+  if(!entry||!exit||isNaN(pnl)){const a=document.getElementById('atAlert');a.textContent='Entry, exit and PnL are required.';a.className='et-alert err';a.style.display='block';return;}
   const btn=document.getElementById('atBtn');btn.disabled=true;btn.textContent='Saving...';
   const sl=parseFloat(document.getElementById('atSL').value),tp=parseFloat(document.getElementById('atTP').value),dir=document.getElementById('atDir').value;
-  let r=null;if(sl&&tp&&entry){const risk=Math.abs(entry-sl);const reward=dir==='long'?tp-entry:entry-tp;if(risk>0)r=parseFloat((reward/risk).toFixed(2));}
+  let r=null;if(sl&&tp&&entry){const risk=Math.abs(entry-sl),reward=dir==='long'?tp-entry:entry-tp;if(risk>0)r=parseFloat((reward/risk).toFixed(2));}
   const{error}=await _sb.from('journal_trades').insert({journal_id:_journal.id,user_id:_user.id,pair:document.getElementById('atPair').value,direction:dir,entry_price:entry,exit_price:exit,stop_loss:sl||null,take_profit:tp||null,lot_size:parseFloat(document.getElementById('atLot').value)||null,risk_amount:parseFloat(document.getElementById('atRisk').value)||null,pnl,r_multiple:r,status:document.getElementById('atStatus').value,session:document.getElementById('atSession').value||null,trade_date:document.getElementById('atDate').value,tag:document.getElementById('atTag').value,notes:document.getElementById('atNotes').value||null,emotion:emo});
   btn.disabled=false;btn.textContent='Save Trade →';
-  if(error){const a=document.getElementById('atAlert');a.textContent=error.message;a.className='falert err show';return;}
-  closeModal('addTradeModal');await loadTrades();
+  if(error){const a=document.getElementById('atAlert');a.textContent=error.message;a.className='et-alert err';a.style.display='block';return;}
+  etCloseModal('addTradeModal');await loadTrades();
 }
-
 async function deleteTrade(id){
   if(!confirm('Delete this trade?'))return;
   await _sb.from('journal_trades').delete().eq('id',id).eq('user_id',_user.id);
   await loadTrades();
 }
 
-// ── MODALS ──
-function openModal(id){document.getElementById(id).classList.add('active');document.body.style.overflow='hidden';}
-function closeModal(id){document.getElementById(id).classList.remove('active');document.body.style.overflow='';}
-document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',function(e){if(e.target===this)closeModal(this.id);}));
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.active').forEach(m=>closeModal(m.id));});
+document.addEventListener('click',e=>{if(e.target.classList.contains('et-modal-overlay'))etCloseModal(e.target.id);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.et-modal-overlay.active').forEach(m=>etCloseModal(m.id));});
 
 main();
 </script>
