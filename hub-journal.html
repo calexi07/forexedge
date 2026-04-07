@@ -7,9 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="hub.css">
-
 </head>
-<body class="et-loading">
+<body class="et-loading" data-active-page="journals">
 <div id="et-loader">
   <div class="et-loader-logo">
     <div class="et-loader-eagle">🦅</div>
@@ -26,7 +25,10 @@
   </div>
   <div class="hub-content">
     <div id="journalsContent" class="et-fade">
-      <div style="text-align:center;padding:60px;color:var(--white3)"><div class="et-spinner"></div><div style="margin-top:14px;font-size:13px">Loading journals...</div></div>
+      <div style="text-align:center;padding:60px;color:var(--white3)">
+        <div class="et-spinner"></div>
+        <div style="margin-top:14px;font-size:13px">Loading journals...</div>
+      </div>
     </div>
   </div>
 </div>
@@ -38,7 +40,7 @@
     <div class="et-modal-title">Create Journal</div>
     <div id="cAlert" class="et-alert" style="display:none"></div>
     <div class="et-form-group"><label class="et-form-label">Journal Name *</label><input type="text" class="et-form-input" id="cName" placeholder="e.g. FTMO #1 Live"></div>
-    <div class="et-form-group"><label class="et-form-label">Firm / Broker</label><input type="text" class="et-form-input" id="cFirm" placeholder="e.g. FTMO, The5%ers, Personal"></div>
+    <div class="et-form-group"><label class="et-form-label">Firm / Broker</label><input type="text" class="et-form-input" id="cFirm" placeholder="e.g. FTMO, The5%ers"></div>
     <div class="et-form-group"><label class="et-form-label">Account Type *</label>
       <select class="et-form-input" id="cType">
         <option value="">Select type</option>
@@ -56,7 +58,7 @@
       <div class="et-form-group"><label class="et-form-label">Profit Target (%)</label><input type="number" class="et-form-input" id="cTarget" placeholder="8"></div>
       <div class="et-form-group"><label class="et-form-label">Max Drawdown (%)</label><input type="number" class="et-form-input" id="cMaxDD" placeholder="10"></div>
     </div>
-    <div class="et-form-group"><label class="et-form-label">Pairs (comma separated)</label><input type="text" class="et-form-input" id="cPairs" placeholder="EUR/USD, XAU/USD, GBP/USD"></div>
+    <div class="et-form-group"><label class="et-form-label">Pairs</label><input type="text" class="et-form-input" id="cPairs" placeholder="EUR/USD, XAU/USD"></div>
     <button class="et-form-submit" id="cBtn" onclick="createJournal()">Create Journal →</button>
   </div>
 </div>
@@ -88,6 +90,22 @@
   </div>
 </div>
 
+<!-- PAYOUT MODAL (quick add from journal list) -->
+<div class="et-modal-overlay" id="quickPayoutModal">
+  <div class="et-modal" style="max-width:380px">
+    <button class="et-modal-close" onclick="etCloseModal('quickPayoutModal')">✕</button>
+    <div class="et-modal-title">Register Payout</div>
+    <div style="font-size:13px;color:var(--white2);margin-bottom:16px">Journal: <strong id="qpJournalName" style="color:var(--gold)">—</strong></div>
+    <input type="hidden" id="qpJournalId">
+    <div class="et-form-group"><label class="et-form-label">Amount ($) *</label>
+      <input type="number" class="et-form-input" id="qpAmount" placeholder="500.00" style="font-family:'DM Mono',monospace;font-size:20px;text-align:center;color:var(--bull)">
+    </div>
+    <div class="et-form-group"><label class="et-form-label">Date *</label><input type="date" class="et-form-input" id="qpDate"></div>
+    <div class="et-form-group"><label class="et-form-label">Note (optional)</label><input type="text" class="et-form-input" id="qpNote" placeholder="Payout #1"></div>
+    <button class="et-form-submit green" onclick="saveQuickPayout()">Confirm Payout →</button>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="hub-sidebar.js"></script>
 <script>
@@ -98,11 +116,15 @@ async function main() {
   if (!res) return;
   _user=res.user; _sb=res.sb;
   await loadJournals();
+  // Close dropdown on outside click
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.jcard-menu')) {
+      document.querySelectorAll('.jcard-dropdown.open').forEach(d => d.classList.remove('open'));
+    }
+  });
 }
 
-function typeColor(t) {
-  return {live:'var(--bull)',p2:'#6ba3ff',p1:'#ff9d5c',personal:'#b87fff'}[t]||'var(--gold)';
-}
+function typeColor(t) { return {live:'var(--bull)',p2:'#6ba3ff',p1:'#ff9d5c',personal:'#b87fff'}[t]||'var(--gold)'; }
 function typePill(t) {
   const m={live:'✅ Live',p2:'🎯 Phase 2',p1:'⚡ Phase 1',personal:'💼 Personal'};
   return `<span class="pill ${t}">${m[t]||t}</span>`;
@@ -116,13 +138,21 @@ async function loadJournals() {
   loadAllStats();
 }
 
+function toggleMenu(id) {
+  const dd = document.getElementById('dd-'+id);
+  if (!dd) return;
+  const isOpen = dd.classList.contains('open');
+  document.querySelectorAll('.jcard-dropdown.open').forEach(d=>d.classList.remove('open'));
+  if (!isOpen) dd.classList.add('open');
+}
+
 function renderJournals() {
   const c=document.getElementById('journalsContent');
   if(!journals.length){
     c.innerHTML=`<div style="text-align:center;padding:80px 20px">
       <div style="font-size:48px;margin-bottom:16px;opacity:0.15">📒</div>
       <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--white);margin-bottom:8px">No journals yet</div>
-      <div style="font-size:14px;color:var(--white2);margin-bottom:24px;line-height:1.6">Create your first trading journal<br>to start tracking performance</div>
+      <div style="font-size:14px;color:var(--white2);margin-bottom:24px;line-height:1.6">Create your first trading journal to start tracking performance</div>
       <button class="et-btn-gold" onclick="etOpenModal('createModal')">+ Create First Journal</button>
     </div>`;
     return;
@@ -132,8 +162,8 @@ function renderJournals() {
   journals.forEach(j=>{(groups[j.type]||groups.live).push(j);});
   const gL={live:'✅ Live Accounts',p2:'🎯 Challenge — Phase 2',p1:'⚡ Challenge — Phase 1',personal:'💼 Personal Accounts'};
   const gOrder=['live','p2','p1','personal'];
-
   let html='';
+
   gOrder.forEach(g=>{
     if(!groups[g].length)return;
     const col=typeColor(g);
@@ -149,20 +179,25 @@ function renderJournals() {
       const pc=profit===null?'var(--white2)':profit>=0?'var(--bull)':'var(--bear)';
       const progressPct=j.profit_target&&profit!==null?Math.min(Math.max((profit/j.initial_balance*100)/j.profit_target*100,0),100):0;
 
-      html+=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:20px;position:relative;overflow:hidden;transition:all 0.2s;cursor:pointer"
-        onmouseover="this.style.borderColor='${col}44';this.style.transform='translateY(-2px)'"
-        onmouseout="this.style.borderColor='';this.style.transform=''">
+      html+=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:20px;position:relative;overflow:visible;transition:border-color 0.2s"
+        onmouseover="this.style.borderColor='${col}44'" onmouseout="this.style.borderColor='var(--border2)'">
         <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${col},transparent)"></div>
 
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
-          <div>
+          <div style="flex:1;min-width:0">
             <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px">${j.firm||'—'}</div>
-            <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:6px">${j.name}</div>
+            <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${j.name}</div>
             <div>${typePill(j.type)}</div>
           </div>
-          <div style="display:flex;gap:5px">
-            <button class="et-btn-icon" onclick="event.stopPropagation();openEdit('${j.id}')" title="Edit">✏️</button>
-            <button class="et-btn-icon" onclick="event.stopPropagation();deleteJournal('${j.id}')" title="Delete" style="color:var(--bear)">🗑</button>
+          <!-- Options menu -->
+          <div class="jcard-menu" style="margin-left:10px;flex-shrink:0">
+            <button class="jcard-menu-btn" onclick="event.stopPropagation();toggleMenu('${j.id}')">⋯</button>
+            <div class="jcard-dropdown" id="dd-${j.id}">
+              <button class="jcard-dropdown-item" onclick="openJournal('${j.id}')">📒 Open Journal</button>
+              <button class="jcard-dropdown-item" onclick="openEdit('${j.id}')">✏️ Edit Journal</button>
+              <button class="jcard-dropdown-item" onclick="openQuickPayout('${j.id}','${j.name.replace(/'/g,"\\'")}')">💸 Register Payout</button>
+              <button class="jcard-dropdown-item danger" onclick="deleteJournal('${j.id}')">🗑 Delete</button>
+            </div>
           </div>
         </div>
 
@@ -181,10 +216,7 @@ function renderJournals() {
           </div>
         </div>
 
-        ${j.profit_target&&profit!==null?`
-        <div style="height:3px;background:var(--bg3);border-radius:2px;margin-bottom:12px;overflow:hidden">
-          <div style="height:100%;width:${progressPct}%;background:${col};border-radius:2px;transition:width 0.8s ease"></div>
-        </div>`:``}
+        ${j.profit_target&&profit!==null?`<div style="height:3px;background:var(--bg3);border-radius:2px;margin-bottom:12px;overflow:hidden"><div style="height:100%;width:${progressPct}%;background:${col};border-radius:2px"></div></div>`:''}
 
         <button onclick="openJournal('${j.id}')" style="width:100%;padding:9px;background:transparent;border:1px solid var(--border2);color:var(--white3);font-family:'Syne',sans-serif;font-size:12px;font-weight:500;cursor:pointer;border-radius:4px;transition:all 0.2s"
           onmouseover="this.style.borderColor='${col}';this.style.color='${col}'"
@@ -221,37 +253,61 @@ async function loadAllStats() {
 
 function openJournal(id){window.location.href=`hub-journal-detail.html?id=${id}`;}
 
+function openQuickPayout(journalId, journalName) {
+  document.getElementById('qpJournalId').value = journalId;
+  document.getElementById('qpJournalName').textContent = journalName;
+  document.getElementById('qpAmount').value = '';
+  document.getElementById('qpNote').value = '';
+  document.getElementById('qpDate').value = new Date().toISOString().split('T')[0];
+  document.querySelectorAll('.jcard-dropdown.open').forEach(d=>d.classList.remove('open'));
+  etOpenModal('quickPayoutModal');
+}
+
+async function saveQuickPayout() {
+  const amount = parseFloat(document.getElementById('qpAmount').value);
+  const date   = document.getElementById('qpDate').value;
+  const journalId = document.getElementById('qpJournalId').value;
+  if (!amount || amount <= 0) { alert('Please enter a valid amount.'); return; }
+  const{error}=await _sb.from('journal_payouts').insert({journal_id:journalId,user_id:_user.id,amount,payout_date:date||null,note:document.getElementById('qpNote').value.trim()||null});
+  if(error){alert(error.message);return;}
+  etCloseModal('quickPayoutModal');
+  alert(`Payout of $${amount.toFixed(2)} registered! ✅`);
+}
+
 async function createJournal(){
   const name=document.getElementById('cName').value.trim(),type=document.getElementById('cType').value,balance=parseFloat(document.getElementById('cBalance').value);
-  if(!name||!type||!balance){const a=document.getElementById('cAlert');a.textContent='Please fill in all required fields.';a.className='et-alert err';return;}
+  if(!name||!type||!balance){const a=document.getElementById('cAlert');a.textContent='Please fill in all required fields.';a.className='et-alert err';a.style.display='block';return;}
   const btn=document.getElementById('cBtn');btn.disabled=true;btn.textContent='Creating...';
   const{error}=await _sb.from('journals').insert({user_id:_user.id,name,type,firm:document.getElementById('cFirm').value.trim(),initial_balance:balance,start_date:document.getElementById('cStartDate').value||null,profit_target:parseFloat(document.getElementById('cTarget').value)||0,max_dd:parseFloat(document.getElementById('cMaxDD').value)||0,pairs:document.getElementById('cPairs').value.trim()});
   btn.disabled=false;btn.textContent='Create Journal →';
-  if(error){const a=document.getElementById('cAlert');a.textContent=error.message;a.className='et-alert err';return;}
-  etCloseModal('createModal');await loadJournals();
+  if(error){const a=document.getElementById('cAlert');a.textContent=error.message;a.className='et-alert err';a.style.display='block';return;}
+  etCloseModal('createModal');
+  await loadJournals();
+  await refreshSidebarJournals();
 }
 
 function openEdit(id){
+  document.querySelectorAll('.jcard-dropdown.open').forEach(d=>d.classList.remove('open'));
   const j=journals.find(x=>x.id===id);if(!j)return;
   document.getElementById('eId').value=j.id;document.getElementById('eName').value=j.name;document.getElementById('eFirm').value=j.firm||'';document.getElementById('eType').value=j.type;document.getElementById('eBalance').value=j.initial_balance;document.getElementById('eStartDate').value=j.start_date||'';document.getElementById('eTarget').value=j.profit_target||'';document.getElementById('eMaxDD').value=j.max_dd||'';document.getElementById('ePairs').value=j.pairs||'';
   etOpenModal('editModal');
 }
 async function saveEdit(){
   const id=document.getElementById('eId').value;
-  const{error}=await _sb.from('journals').update({name:document.getElementById('eName').value.trim(),firm:document.getElementById('eFirm').value.trim(),type:document.getElementById('eType').value,initial_balance:parseFloat(document.getElementById('eBalance').value)||0,start_date:document.getElementById('eStartDate').value||null,profit_target:parseFloat(document.getElementById('eTarget').value)||0,max_dd:parseFloat(document.getElementById('eMaxDD').value)||0,pairs:document.getElementById('ePairs').value.trim()}).eq('id',id);
+  const{error}=await _sb.from('journals').update({name:document.getElementById('eName').value.trim(),firm:document.getElementById('eFirm').value.trim(),type:document.getElementById('eType').value,initial_balance:parseFloat(document.getElementById('eBalance').value)||0,start_date:document.getElementById('eStartDate').value||null,profit_target:parseFloat(document.getElementById('eTarget').value)||0,max_dd:document.getElementById('eMaxDD').value?parseFloat(document.getElementById('eMaxDD').value):0,pairs:document.getElementById('ePairs').value.trim()}).eq('id',id);
   if(error){alert(error.message);return;}
-  delete _stats[id];etCloseModal('editModal');await loadJournals();
+  delete _stats[id];etCloseModal('editModal');await loadJournals();await refreshSidebarJournals();
 }
 async function deleteJournal(id){
+  document.querySelectorAll('.jcard-dropdown.open').forEach(d=>d.classList.remove('open'));
   const j=journals.find(x=>x.id===id);if(!j)return;
   if(!confirm(`Delete "${j.name}"?\nAll trades will also be deleted.`))return;
   await _sb.from('journals').delete().eq('id',id);
-  delete _stats[id];await loadJournals();
+  delete _stats[id];await loadJournals();await refreshSidebarJournals();
 }
 
 document.addEventListener('click',e=>{if(e.target.classList.contains('et-modal-overlay'))etCloseModal(e.target.id);});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.et-modal-overlay.active').forEach(m=>etCloseModal(m.id));});
-
 main();
 </script>
 </body>

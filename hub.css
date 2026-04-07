@@ -284,3 +284,55 @@
 
 /* Hide body content until loaded */
 body.et-loading > *:not(#et-loader) { visibility: hidden; }
+
+/* ── Sub-items (journal list in sidebar) ── */
+.et-item.et-sub {
+  padding-left: 36px !important;
+  font-size: 12px !important;
+  color: var(--white3) !important;
+}
+.et-item.et-sub:hover:not(.soon) { color: var(--white2) !important; }
+.et-item.et-sub.active { color: var(--gold) !important; }
+
+/* ── Journal detail topbar spacing ── */
+.hub-topbar { gap: 12px; flex-wrap: wrap; }
+.hub-topbar-actions { display: flex; gap: 8px; align-items: center; }
+
+/* ── Journal detail content padding fix ── */
+.hub-content { padding: 28px 28px; }
+
+/* ── Stats grid 2 rows ── */
+.et-stats-2row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 22px; }
+@media(max-width:1200px) { .et-stats-2row { grid-template-columns: repeat(4,1fr); } }
+@media(max-width:800px)  { .et-stats-2row { grid-template-columns: repeat(3,1fr); } }
+@media(max-width:500px)  { .et-stats-2row { grid-template-columns: repeat(2,1fr); } }
+
+/* ── Journal card options menu ── */
+.jcard-menu { position: relative; }
+.jcard-menu-btn {
+  width: 32px; height: 32px; background: transparent;
+  border: 1px solid var(--border2); color: var(--white3);
+  cursor: pointer; border-radius: var(--radius);
+  transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.jcard-menu-btn:hover { border-color: var(--gold-border); color: var(--gold); }
+.jcard-dropdown {
+  position: absolute; top: 36px; right: 0;
+  background: var(--bg3); border: 1px solid var(--gold-border);
+  border-radius: var(--radius); min-width: 180px;
+  z-index: 100; overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+  display: none;
+}
+.jcard-dropdown.open { display: block; animation: etFadeUp 0.15s ease both; }
+.jcard-dropdown-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px; font-size: 13px; color: var(--white2);
+  cursor: pointer; transition: all 0.15s; border-bottom: 1px solid var(--border2);
+  border: none; width: 100%; background: none; text-align: left;
+  font-family: var(--font-ui);
+}
+.jcard-dropdown-item:last-child { border-bottom: none; }
+.jcard-dropdown-item:hover { background: var(--gold-dim); color: var(--white); }
+.jcard-dropdown-item.danger:hover { background: var(--bear-bg); color: var(--bear); }

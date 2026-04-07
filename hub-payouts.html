@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EagleTrader — Payouts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="hub.css">
+</head>
+<body class="et-loading" data-active-page="payouts">
+<div id="et-loader">
+  <div class="et-loader-logo">
+    <div class="et-loader-eagle">🦅</div>
+    <div class="et-loader-name">Eagle<span>Trader</span></div>
+  </div>
+  <div class="et-loader-bar"><div class="et-loader-bar-fill"></div></div>
+  <div class="et-loader-text">Loading payouts...</div>
+</div>
+<div id="etSidebarMount"></div>
+<div class="hub-main">
+  <div class="hub-topbar">
+    <div class="hub-topbar-title">💸 <strong>Payouts</strong></div>
+    <button class="et-btn-gold" onclick="etOpenModal('addPayoutModal')">+ Register Payout</button>
+  </div>
+  <div class="hub-content et-fade">
+
+    <!-- Summary stats -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:28px" id="summaryStats">
+      <div class="et-stat"><div class="et-stat-lbl">Total Payouts</div><div class="et-stat-val g" id="sumTotal">$0.00</div><div class="et-stat-sub">All journals</div></div>
+      <div class="et-stat"><div class="et-stat-lbl">This Month</div><div class="et-stat-val o" id="sumMonth">$0.00</div></div>
+      <div class="et-stat"><div class="et-stat-lbl">Payout Count</div><div class="et-stat-val o" id="sumCount">0</div></div>
+      <div class="et-stat"><div class="et-stat-lbl">Avg Payout</div><div class="et-stat-val o" id="sumAvg">$0.00</div></div>
+    </div>
+
+    <!-- Payouts table -->
+    <div class="et-card" style="overflow:hidden">
+      <div style="padding:14px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <span style="font-size:15px;font-weight:600;color:var(--white)">Payout History</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <select id="filterJournal" class="et-form-input" style="width:auto;padding:6px 10px;font-size:12px" onchange="renderPayouts()">
+            <option value="">All journals</option>
+          </select>
+        </div>
+      </div>
+      <div class="et-table-wrap">
+        <table class="et-table">
+          <thead><tr>
+            <th>Date</th><th>Journal</th><th>Amount</th><th>Note</th><th></th>
+          </tr></thead>
+          <tbody id="payoutsBody">
+            <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--white3);font-size:13px">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Per journal breakdown -->
+    <div style="margin-top:28px">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--white3);margin-bottom:14px">By Journal</div>
+      <div id="journalBreakdown" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD PAYOUT MODAL -->
+<div class="et-modal-overlay" id="addPayoutModal">
+  <div class="et-modal" style="max-width:400px">
+    <button class="et-modal-close" onclick="etCloseModal('addPayoutModal')">✕</button>
+    <div class="et-modal-title">Register Payout</div>
+    <div class="et-form-group"><label class="et-form-label">Journal *</label>
+      <select class="et-form-input" id="apJournal">
+        <option value="">Select journal</option>
+      </select>
+    </div>
+    <div class="et-form-group"><label class="et-form-label">Amount ($) *</label>
+      <input type="number" class="et-form-input" id="apAmount" placeholder="500.00" style="font-family:'DM Mono',monospace;font-size:20px;text-align:center;color:var(--bull)">
+    </div>
+    <div class="et-form-group"><label class="et-form-label">Date *</label><input type="date" class="et-form-input" id="apDate"></div>
+    <div class="et-form-group"><label class="et-form-label">Note (optional)</label><input type="text" class="et-form-input" id="apNote" placeholder="Payout #1"></div>
+    <button class="et-form-submit green" onclick="savePayout()">Confirm Payout →</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="hub-sidebar.js"></script>
+<script>
+let _user, _sb, allPayouts=[], allJournals=[];
+
+async function main() {
+  const res = await initEtSidebar('payouts');
+  if (!res) return;
+  _user=res.user; _sb=res.sb;
+  await Promise.all([loadJournals(), loadPayouts()]);
+}
+
+async function loadJournals() {
+  const{data}=await _sb.from('journals').select('id,name,type,initial_balance').eq('user_id',_user.id).order('created_at',{ascending:false});
+  allJournals=data||[];
+  // Populate journal filter and add payout select
+  const fsel=document.getElementById('filterJournal');
+  const asel=document.getElementById('apJournal');
+  allJournals.forEach(j=>{
+    const o1=document.createElement('option');o1.value=j.id;o1.textContent=j.name;fsel.appendChild(o1);
+    const o2=document.createElement('option');o2.value=j.id;o2.textContent=j.name;asel.appendChild(o2);
+  });
+}
+
+async function loadPayouts() {
+  const{data}=await _sb.from('journal_payouts').select('*').eq('user_id',_user.id).order('payout_date',{ascending:false}).order('created_at',{ascending:false});
+  allPayouts=data||[];
+  renderPayouts();
+  renderSummary();
+  renderBreakdown();
+}
+
+function renderPayouts() {
+  const filter=document.getElementById('filterJournal').value;
+  const filtered=filter?allPayouts.filter(p=>p.journal_id===filter):allPayouts;
+  const tb=document.getElementById('payoutsBody');
+  if(!filtered.length){
+    tb.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--white3);font-size:13px">No payouts yet. Register your first payout above.</td></tr>`;
+    return;
+  }
+  tb.innerHTML=filtered.map(p=>{
+    const j=allJournals.find(x=>x.id===p.journal_id);
+    return `<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--white3)">${p.payout_date||'—'}</td>
+      <td><span style="font-size:13px;font-weight:500;color:var(--white)">${j?.name||'—'}</span><br><span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3)">${j?.type?.toUpperCase()||''}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:14px;font-weight:600;color:var(--bull)">+$${parseFloat(p.amount).toFixed(2)}</td>
+      <td style="font-size:12px;color:var(--white2)">${p.note||'—'}</td>
+      <td><button onclick="deletePayout('${p.id}')" style="background:none;border:none;color:var(--white3);cursor:pointer;font-size:12px;padding:2px 5px;transition:color 0.15s" onmouseover="this.style.color='var(--bear)'" onmouseout="this.style.color='var(--white3)'">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderSummary() {
+  const total=allPayouts.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+  const now=new Date();
+  const thisMonth=allPayouts.filter(p=>{
+    if(!p.payout_date)return false;
+    const d=new Date(p.payout_date);
+    return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();
+  }).reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+  const avg=allPayouts.length?total/allPayouts.length:0;
+  document.getElementById('sumTotal').textContent='$'+total.toFixed(2);
+  document.getElementById('sumMonth').textContent='$'+thisMonth.toFixed(2);
+  document.getElementById('sumCount').textContent=allPayouts.length;
+  document.getElementById('sumAvg').textContent='$'+avg.toFixed(2);
+}
+
+function renderBreakdown() {
+  const bd=document.getElementById('journalBreakdown');
+  if(!allJournals.length){bd.innerHTML='';return;}
+  bd.innerHTML=allJournals.map(j=>{
+    const jPayouts=allPayouts.filter(p=>p.journal_id===j.id);
+    const total=jPayouts.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+    const count=jPayouts.length;
+    const lastDate=jPayouts.length?jPayouts[0].payout_date||'—':'—';
+    const col={live:'var(--bull)',p2:'#6ba3ff',p1:'#ff9d5c',personal:'#b87fff'}[j.type]||'var(--gold)';
+    return `<div class="et-card" style="padding:16px;border-left:3px solid ${col}">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">${j.type?.toUpperCase()||'—'}</div>
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${j.name}</div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border2)">
+        <span style="font-size:12px;color:var(--white2)">Total</span>
+        <span style="font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--bull)">$${total.toFixed(2)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border2)">
+        <span style="font-size:12px;color:var(--white2)">Count</span>
+        <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--white)">${count}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0">
+        <span style="font-size:12px;color:var(--white2)">Last payout</span>
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--white3)">${lastDate}</span>
+      </div>
+      <button onclick="openAddPayoutFor('${j.id}')" style="width:100%;margin-top:10px;padding:7px;background:transparent;border:1px solid var(--border2);color:var(--white3);font-family:'Syne',sans-serif;font-size:11px;cursor:pointer;border-radius:4px;transition:all 0.2s"
+        onmouseover="this.style.borderColor='${col}';this.style.color='${col}'"
+        onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">+ Add Payout</button>
+    </div>`;
+  }).join('');
+}
+
+function openAddPayoutFor(journalId) {
+  document.getElementById('apJournal').value = journalId;
+  document.getElementById('apAmount').value = '';
+  document.getElementById('apNote').value = '';
+  document.getElementById('apDate').value = new Date().toISOString().split('T')[0];
+  etOpenModal('addPayoutModal');
+}
+
+async function savePayout() {
+  const journalId=document.getElementById('apJournal').value;
+  const amount=parseFloat(document.getElementById('apAmount').value);
+  const date=document.getElementById('apDate').value;
+  if(!journalId){alert('Please select a journal.');return;}
+  if(!amount||amount<=0){alert('Please enter a valid amount.');return;}
+  const{error}=await _sb.from('journal_payouts').insert({journal_id:journalId,user_id:_user.id,amount,payout_date:date||null,note:document.getElementById('apNote').value.trim()||null});
+  if(error){alert(error.message);return;}
+  etCloseModal('addPayoutModal');
+  await loadPayouts();
+}
+
+async function deletePayout(id) {
+  if(!confirm('Delete this payout?'))return;
+  await _sb.from('journal_payouts').delete().eq('id',id).eq('user_id',_user.id);
+  await loadPayouts();
+}
+
+document.addEventListener('click',e=>{if(e.target.classList.contains('et-modal-overlay'))etCloseModal(e.target.id);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.et-modal-overlay.active').forEach(m=>etCloseModal(m.id));});
+main();
+</script>
+</body>
+</html>

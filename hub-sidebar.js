@@ -1,54 +1,24 @@
-/* EagleTrader — Hub Sidebar (no inline CSS — uses hub.css) */
+/* EagleTrader — Hub Sidebar */
 const _HUB_URL = 'https://vaimxhgqcdhjhdiaampa.supabase.co';
 const _HUB_KEY = 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
 
-function renderEtSidebar(activePage, userName, userId) {
+function renderEtSidebar(activePage, userName, userId, journals=[]) {
   const ini = (userName||'U').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
   const av = localStorage.getItem('et_av_'+userId);
   const avHtml = av ? `<img src="${av}">` : `<span>${ini}</span>`;
 
-  const sections = [
-    { cat:'Overview', items:[
-      { id:'dashboard', label:'Dashboard', icon:'📊', href:'hub.html' }
-    ]},
-    { cat:'Trading Journal', items:[
-      { id:'journals', label:'My Journals', icon:'📒', href:'hub-journal.html' }
-    ]},
-    { cat:'Fundamental Analysis', items:[
-      { id:'news',     label:'News Sentiment', icon:'📰', soon:true },
-      { id:'bias',     label:'AI Bias Engine',  icon:'🤖', soon:true },
-      { id:'banks',    label:'Central Banks',   icon:'🏦', soon:true },
-      { id:'calendar', label:'Econ Calendar',   icon:'📅', soon:true }
-    ]},
-    { cat:'Tools', items:[
-      { id:'calc', label:'Calculators',  icon:'🔧', soon:true },
-      { id:'corr', label:'Correlations', icon:'🔗', soon:true }
-    ]},
-    { cat:'Academy', items:[
-      { id:'academy', label:'Forex Academy', icon:'🎓', soon:true },
-      { id:'quizzes', label:'Quizzes',       icon:'📝', soon:true }
-    ]},
-    { cat:'Community', items:[
-      { id:'mentor', label:'Sign as Mentor', icon:'🏅', soon:true }
-    ]},
-    { cat:'Account', items:[
-      { id:'profile', label:'My Profile', icon:'👤', href:'hub.html#profile' }
-    ]}
-  ];
-
-  let navHtml = '';
-  sections.forEach(sec => {
-    navHtml += `<span class="et-cat">${sec.cat}</span>`;
-    sec.items.forEach(item => {
-      if (item.soon) {
-        navHtml += `<div class="et-item soon"><span class="et-icon">${item.icon}</span>${item.label}<span class="et-soon-tag">soon</span></div>`;
-      } else {
-        const cls = item.id === activePage ? ' active' : '';
-        navHtml += `<a href="${item.href}" class="et-item${cls}"><span class="et-icon">${item.icon}</span>${item.label}</a>`;
-      }
+  // Build journals sub-items
+  let journalItems = '';
+  if (journals.length) {
+    const typeIcon = {live:'✅',p2:'🎯',p1:'⚡',personal:'💼'};
+    journals.forEach(j => {
+      const isActive = activePage === 'journal-'+j.id ? ' active' : '';
+      journalItems += `<a href="hub-journal-detail.html?id=${j.id}" class="et-item et-sub${isActive}">
+        <span class="et-icon" style="font-size:11px">${typeIcon[j.type]||'📒'}</span>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${j.name}</span>
+      </a>`;
     });
-    navHtml += `<div class="et-divider"></div>`;
-  });
+  }
 
   const html = `
     <a href="index.html" class="et-logo">
@@ -62,27 +32,61 @@ function renderEtSidebar(activePage, userName, userId) {
         <div class="et-uplan">Free Plan</div>
       </div>
     </a>
-    <nav class="et-nav">${navHtml}</nav>
+    <nav class="et-nav">
+      <span class="et-cat">Overview</span>
+      <a href="hub.html" class="et-item${activePage==='dashboard'?' active':''}">
+        <span class="et-icon">📊</span>Dashboard
+      </a>
+      <div class="et-divider"></div>
+
+      <span class="et-cat">Trading Journal</span>
+      <a href="hub-journal.html" class="et-item${activePage==='journals'?' active':''}">
+        <span class="et-icon">📒</span>My Journals
+      </a>
+      ${journalItems}
+      <a href="hub-payouts.html" class="et-item${activePage==='payouts'?' active':''}">
+        <span class="et-icon">💸</span>Payouts
+      </a>
+      <div class="et-divider"></div>
+
+      <span class="et-cat">Coming Soon</span>
+      <div class="et-item soon"><span class="et-icon">📰</span>News Sentiment<span class="et-soon-tag">soon</span></div>
+      <div class="et-item soon"><span class="et-icon">🤖</span>AI Bias Engine<span class="et-soon-tag">soon</span></div>
+      <div class="et-item soon"><span class="et-icon">🏦</span>Central Banks<span class="et-soon-tag">soon</span></div>
+      <div class="et-item soon"><span class="et-icon">🎓</span>Academy<span class="et-soon-tag">soon</span></div>
+      <div class="et-item soon"><span class="et-icon">🏅</span>Mentor Hub<span class="et-soon-tag">soon</span></div>
+      <div class="et-divider"></div>
+
+      <span class="et-cat">Account</span>
+      <a href="hub.html#profile" class="et-item${activePage==='profile'?' active':''}">
+        <span class="et-icon">👤</span>My Profile
+      </a>
+    </nav>
     <div class="et-sidebar-bottom">
       <button class="et-signout" onclick="etSignOut()">← Sign Out</button>
     </div>`;
 
   const mount = document.getElementById('etSidebarMount');
   if (!mount) return;
-  const aside = document.createElement('aside');
-  aside.id = 'etSidebar';
+  let aside = document.getElementById('etSidebar');
+  if (!aside) {
+    aside = document.createElement('aside');
+    aside.id = 'etSidebar';
+    mount.appendChild(aside);
+  }
   aside.innerHTML = html;
-  mount.appendChild(aside);
 
   // Mobile toggle
-  const toggle = document.createElement('button');
-  toggle.id = 'etMobileToggle'; toggle.textContent = '☰';
-  document.body.appendChild(toggle);
-  const overlay = document.createElement('div');
-  overlay.className = 'et-mob-overlay'; overlay.id = 'etMobOverlay';
-  document.body.appendChild(overlay);
-  toggle.addEventListener('click', () => { aside.classList.toggle('open'); overlay.classList.toggle('open'); });
-  overlay.addEventListener('click', () => { aside.classList.remove('open'); overlay.classList.remove('open'); });
+  if (!document.getElementById('etMobileToggle')) {
+    const toggle = document.createElement('button');
+    toggle.id = 'etMobileToggle'; toggle.textContent = '☰';
+    document.body.appendChild(toggle);
+    const overlay = document.createElement('div');
+    overlay.className = 'et-mob-overlay'; overlay.id = 'etMobOverlay';
+    document.body.appendChild(overlay);
+    toggle.addEventListener('click', () => { aside.classList.toggle('open'); overlay.classList.toggle('open'); });
+    overlay.addEventListener('click', () => { aside.classList.remove('open'); overlay.classList.remove('open'); });
+  }
 }
 
 async function initEtSidebar(activePage) {
@@ -92,22 +96,33 @@ async function initEtSidebar(activePage) {
   const user = session.user;
   const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Trader';
   window._etUser = user; window._etSb = _sb;
-  renderEtSidebar(activePage, name, user.id);
+
+  // Load journals for sidebar
+  const { data: journals } = await _sb.from('journals').select('id,name,type').eq('user_id', user.id).order('created_at', { ascending: true });
+  window._etJournals = journals || [];
+
+  renderEtSidebar(activePage, name, user.id, journals || []);
+
   const timeEl = document.getElementById('etTime');
   if (timeEl) { const t=()=>timeEl.textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); t(); setInterval(t,1000); }
-  // Hide loader
   hideLoader();
   return { user, sb: _sb };
+}
+
+// Call this after creating/deleting a journal to refresh sidebar
+async function refreshSidebarJournals() {
+  if (!window._etSb || !window._etUser) return;
+  const { data } = await window._etSb.from('journals').select('id,name,type').eq('user_id', window._etUser.id).order('created_at', { ascending: true });
+  window._etJournals = data || [];
+  const activePage = document.body.dataset.activePage || '';
+  const name = window._etUser.user_metadata?.full_name || window._etUser.email?.split('@')[0] || 'Trader';
+  renderEtSidebar(activePage, name, window._etUser.id, data || []);
 }
 
 async function etSignOut() { await window._etSb?.auth.signOut(); window.location.href = 'index.html'; }
 function etOpenModal(id)  { document.getElementById(id)?.classList.add('active'); document.body.style.overflow='hidden'; }
 function etCloseModal(id) { document.getElementById(id)?.classList.remove('active'); document.body.style.overflow=''; }
-
 function hideLoader() {
   const loader = document.getElementById('et-loader');
-  if (loader) {
-    loader.classList.add('hidden');
-    document.body.classList.remove('et-loading');
-  }
+  if (loader) { loader.classList.add('hidden'); document.body.classList.remove('et-loading'); }
 }

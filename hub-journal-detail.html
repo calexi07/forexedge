@@ -28,10 +28,10 @@
     <button class="et-btn-gold" onclick="etOpenModal('addTradeModal')" style="padding:7px 16px;font-size:11px">+ Log Trade</button>
     <button class="et-btn-ghost" onclick="etOpenModal('payoutModal')" style="padding:7px 14px;font-size:11px">💸 Payout</button>
   </div>
-  <div class="hub-content et-fade">
+  <div class="hub-content et-fade" style="padding-top:32px">
 
     <!-- Stats grid -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px;margin-bottom:22px" id="statsGrid">
+    <div class="et-stats-2row" id="statsGrid">
       <div class="et-stat"><div class="et-stat-lbl">Initial Balance</div><div class="et-stat-val o" id="stBal">$0</div></div>
       <div class="et-stat"><div class="et-stat-lbl">Current Balance</div><div class="et-stat-val" id="stCur">$0</div><div class="et-stat-sub" id="stCurSub">—</div></div>
       <div class="et-stat"><div class="et-stat-lbl">Net Profit</div><div class="et-stat-val" id="stProfit">$0</div></div>
@@ -95,10 +95,13 @@
       <!-- RIGHT sidebar -->
       <div style="display:flex;flex-direction:column;gap:14px">
 
-        <!-- AI Coach -->
-        <div style="background:var(--bg2);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:16px;border-radius:4px">
-          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:10px">🤖 AI Coach</div>
-          <div id="aiBox"><div style="font-size:12px;color:var(--white3);font-style:italic;line-height:1.6">Add more trades to unlock personalized insights.</div></div>
+        <!-- AI Coach - Coming Soon -->
+        <div style="background:var(--bg2);border:1px solid var(--border2);padding:16px;border-radius:4px;opacity:0.7">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+            <span>🤖 AI Coach</span>
+            <span style="background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border);padding:2px 8px;border-radius:100px;font-size:8px;letter-spacing:0.1em">SOON</span>
+          </div>
+          <div style="font-size:12px;color:var(--white3);line-height:1.7">AI-powered pattern detection — identifies your losing habits and suggests improvements based on your trade history.</div>
         </div>
 
         <!-- Payouts -->
@@ -217,7 +220,7 @@ async function loadTrades(){
   const{data,error}=await _sb.from('journal_trades').select('*').eq('journal_id',_journal.id).eq('user_id',_user.id).order('trade_date',{ascending:false});
   if(error){console.error(error);return;}
   trades=data||[];
-  renderTrades();renderStats();renderCalendar();renderEquity();renderAI();renderPerf();
+  renderTrades();renderStats();renderCalendar();renderEquity();renderPerf();
 }
 
 function renderTrades(){
