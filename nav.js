@@ -1,5 +1,5 @@
-const _NAV_URL = (typeof SUPABASE_URL !== 'undefined') ? SUPABASE_URL : 'https://vaimxhgqcdhjhdiaampa.supabase.co';
-const _NAV_KEY = (typeof SUPABASE_KEY !== 'undefined') ? SUPABASE_KEY : 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
+const _NAV_URL = 'https://vaimxhgqcdhjhdiaampa.supabase.co';
+const _NAV_KEY = 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
 
 function renderNav(activePage) {
   const pages = [
@@ -9,7 +9,9 @@ function renderNav(activePage) {
     { id: 'academy', label: 'Academy', href: 'academy.html' },
     { id: 'tools',   label: 'Tools',   href: 'tools.html' },
   ];
-  const links = pages.map(p => `<li><a href="${p.href}" class="nav-link ${activePage===p.id?'active':''}">${p.label}</a></li>`).join('');
+  const links = pages.map(p =>
+    `<li><a href="${p.href}" class="nav-link ${activePage===p.id?'active':''}">${p.label}</a></li>`
+  ).join('');
 
   document.getElementById('navMount').innerHTML = `
     <nav>
@@ -28,27 +30,40 @@ function renderNav(activePage) {
       ${pages.map(p=>`<a href="${p.href}" class="${activePage===p.id?'active':''}">${p.label}</a>`).join('')}
       <a href="auth.html?tab=register" style="color:var(--gold)" id="mobileAuthLink">Get Access →</a>
     </div>`;
-  checkNavAuthState();
+
+  // Wait for Supabase to be ready then check auth
+  waitForSupabase(checkNavAuthState);
 }
 
 function toggleMobileNav() {
   document.getElementById('mobileNav')?.classList.toggle('open');
 }
 
+// Retry until window.supabase is available (CDN might still be loading)
+function waitForSupabase(callback, attempts=0) {
+  if (window.supabase && window.supabase.createClient) {
+    callback();
+  } else if (attempts < 20) {
+    setTimeout(() => waitForSupabase(callback, attempts + 1), 100);
+  }
+}
+
 async function checkNavAuthState() {
   try {
-    if (!window.supabase) return;
-    const _sb = (typeof supabase !== 'undefined' && supabase.auth) ? supabase : window.supabase.createClient(_NAV_URL, _NAV_KEY);
+    const _sb = window.supabase.createClient(_NAV_URL, _NAV_KEY);
     const { data: { session } } = await _sb.auth.getSession();
     if (!session?.user) return;
+
     const user = session.user;
     const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Trader';
     const initials = name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+
     // Check both avatar key variants
     const savedAvatar = localStorage.getItem('et_av_'+user.id) || localStorage.getItem('fe_avatar_'+user.id);
     const avatarHtml = savedAvatar
       ? `<img src="${savedAvatar}" style="width:26px;height:26px;border-radius:50%;object-fit:cover">`
       : `<span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold)">${initials}</span>`;
+
     const ctaEl = document.getElementById('navCta');
     if (ctaEl) {
       ctaEl.innerHTML = `
@@ -60,16 +75,18 @@ async function checkNavAuthState() {
     }
     const ml = document.getElementById('mobileAuthLink');
     if (ml) { ml.href='hub.html'; ml.textContent='My Hub →'; }
-  } catch(e) { console.warn('Nav auth:', e); }
+  } catch(e) {
+    console.warn('Nav auth check failed:', e);
+  }
 }
 
 async function navSignOut() {
   try {
-    const _sb = (typeof supabase !== 'undefined' && supabase.auth) ? supabase : window.supabase.createClient(_NAV_URL, _NAV_KEY);
+    const _sb = window.supabase.createClient(_NAV_URL, _NAV_KEY);
     await _sb.auth.signOut();
   } catch(e) {}
   window.location.href = 'index.html';
 }
 
 function openModal(view) { window.location.href = view==='register' ? 'auth.html?tab=register' : 'auth.html'; }
-function closeModal(){}; function switchModal(){}; function renderModal(){}; function updateNavAuth(){};
+function closeModal(){} function switchModal(){} function renderModal(){} function updateNavAuth(){}
