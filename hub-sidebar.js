@@ -1,4 +1,4 @@
-/* EagleTrader — Hub Sidebar */
+/* EaglePips — Hub Sidebar */
 const _HUB_URL = 'https://vaimxhgqcdhjhdiaampa.supabase.co';
 const _HUB_KEY = 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
 
@@ -23,7 +23,7 @@ function renderEtSidebar(activePage, userName, userId, journals=[]) {
   const html = `
     <a href="index.html" class="et-logo">
       <div class="et-logo-mark">🦅</div>
-      <div class="et-logo-name">Eagle<span>Trader</span></div>
+      <div class="et-logo-name">Eagle<span>Pips</span></div>
     </a>
     <a href="hub.html#profile" class="et-user">
       <div class="et-avatar" id="etAvatar">${avHtml}</div>

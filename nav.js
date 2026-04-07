@@ -17,7 +17,7 @@ function renderNav(activePage) {
     <nav>
       <a href="index.html" class="nav-logo">
         <div style="width:28px;height:28px;background:linear-gradient(135deg,#c8a96e,#8a6a32);clip-path:polygon(50% 0%,85% 15%,100% 50%,85% 85%,50% 100%,15% 85%,0% 50%,15% 15%);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">🦅</div>
-        Eagle<span>Trader</span>
+        Eagle<span>Pips</span>
       </a>
       <ul class="nav-links">${links}</ul>
       <div class="nav-cta" id="navCta">
