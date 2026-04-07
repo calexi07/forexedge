@@ -915,46 +915,7 @@ footer {
   <div class="footer-copy">© 2026 EagleTrader. All rights reserved.</div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="checkIndexAuth()"></script>
 <script>
-
-/* ── Email capture ── */
-const waitlist = [];
-
-function submitEmail(source) {
-  const inputId = source === 'hero' ? 'heroEmail' : 'ctaEmail';
-  const formId  = source === 'hero' ? 'heroForm'  : 'ctaForm';
-  const succId  = source === 'hero' ? 'heroSuccess': 'ctaSuccess';
-
-  const email = document.getElementById(inputId).value.trim();
-  if (!email || !email.includes('@')) {
-    document.getElementById(inputId).style.borderColor = 'rgba(224,92,92,0.5)';
-    setTimeout(() => document.getElementById(inputId).style.borderColor = '', 1500);
-    return;
-  }
-
-  // Save to localStorage for now
-  const list = JSON.parse(localStorage.getItem('et_waitlist') || '[]');
-  if (!list.includes(email)) { list.push(email); localStorage.setItem('et_waitlist', JSON.stringify(list)); }
-
-  document.getElementById(formId).style.display = 'none';
-  document.getElementById(succId).style.display = 'block';
-}
-
-/* ── Scroll animations ── */
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.style.opacity = '1';
-      e.target.style.transform = 'translateY(0)';
-    }
-  });
-}, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' });
-document.querySelectorAll('.rm-card, .journal-text, .journal-mock, .cta-inner, .roadmap-header').forEach(el => {
-  el.style.opacity = '1';
-  observer.observe(el);
-});
-
 /* ── Auth state check for nav ── */
 async function checkIndexAuth() {
   try {
@@ -995,6 +956,46 @@ async function signOutIndex() {
   } catch(e) {}
   window.location.reload();
 }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="checkIndexAuth()"></script>
+<script>
+
+/* ── Email capture ── */
+const waitlist = [];
+
+function submitEmail(source) {
+  const inputId = source === 'hero' ? 'heroEmail' : 'ctaEmail';
+  const formId  = source === 'hero' ? 'heroForm'  : 'ctaForm';
+  const succId  = source === 'hero' ? 'heroSuccess': 'ctaSuccess';
+
+  const email = document.getElementById(inputId).value.trim();
+  if (!email || !email.includes('@')) {
+    document.getElementById(inputId).style.borderColor = 'rgba(224,92,92,0.5)';
+    setTimeout(() => document.getElementById(inputId).style.borderColor = '', 1500);
+    return;
+  }
+
+  // Save to localStorage for now
+  const list = JSON.parse(localStorage.getItem('et_waitlist') || '[]');
+  if (!list.includes(email)) { list.push(email); localStorage.setItem('et_waitlist', JSON.stringify(list)); }
+
+  document.getElementById(formId).style.display = 'none';
+  document.getElementById(succId).style.display = 'block';
+}
+
+/* ── Scroll animations ── */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' });
+document.querySelectorAll('.rm-card, .journal-text, .journal-mock, .cta-inner, .roadmap-header').forEach(el => {
+  el.style.opacity = '1';
+  observer.observe(el);
+});
 
 /* ── Enter key on email inputs ── */
 document.getElementById('heroEmail').addEventListener('keydown', e => { if (e.key === 'Enter') submitEmail('hero'); });
