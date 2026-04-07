@@ -915,8 +915,7 @@ footer {
   <div class="footer-copy">© 2026 EagleTrader. All rights reserved.</div>
 </footer>
 
-<script src="nav.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="renderNav('index')"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="checkIndexAuth()"></script>
 <script>
 
 /* ── Email capture ── */
@@ -955,6 +954,47 @@ document.querySelectorAll('.rm-card, .journal-text, .journal-mock, .cta-inner, .
   el.style.opacity = '1';
   observer.observe(el);
 });
+
+/* ── Auth state check for nav ── */
+async function checkIndexAuth() {
+  try {
+    const _sb = window.supabase.createClient(
+      'https://vaimxhgqcdhjhdiaampa.supabase.co',
+      'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH'
+    );
+    const { data: { session } } = await _sb.auth.getSession();
+    if (!session?.user) return;
+
+    const user = session.user;
+    const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Trader';
+    const initials = name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+    const savedAvatar = localStorage.getItem('et_av_'+user.id) || localStorage.getItem('fe_avatar_'+user.id);
+    const avatarHtml = savedAvatar
+      ? `<img src="${savedAvatar}" style="width:26px;height:26px;border-radius:50%;object-fit:cover">`
+      : `<span style="font-family:'DM Mono',monospace;font-size:11px;color:#08090c">${initials}</span>`;
+
+    const ctaEl = document.getElementById('navCta');
+    if (ctaEl) {
+      ctaEl.innerHTML = `
+        <a href="hub.html" class="btn-nav btn-ghost-nav" style="display:inline-flex;align-items:center;gap:8px">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(200,169,110,0.15);border:1px solid rgba(200,169,110,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">${avatarHtml}</div>
+          My Hub
+        </a>
+        <button class="btn-nav btn-gold-nav" onclick="signOutIndex()">Sign Out</button>`;
+    }
+  } catch(e) { console.warn('Auth check:', e); }
+}
+
+async function signOutIndex() {
+  try {
+    const _sb = window.supabase.createClient(
+      'https://vaimxhgqcdhjhdiaampa.supabase.co',
+      'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH'
+    );
+    await _sb.auth.signOut();
+  } catch(e) {}
+  window.location.reload();
+}
 
 /* ── Enter key on email inputs ── */
 document.getElementById('heroEmail').addEventListener('keydown', e => { if (e.key === 'Enter') submitEmail('hero'); });
