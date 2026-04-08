@@ -249,14 +249,21 @@ function renderList() {
     return;
   }
   el.innerHTML = articles.map(a => `
-    <div class="al-item ${editingId===a.id?'active':''}" onclick="editArticle('${a.id}')">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
-        <div class="al-title">${a.title}</div>
+    <div class="al-item ${editingId===a.id?'active':''}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px" onclick="editArticle('${a.id}')">
+        <div class="al-title" style="flex:1">${a.title}</div>
         <span class="al-status ${a.published?'published':'draft'}">${a.published?'Live':'Draft'}</span>
       </div>
-      <div class="al-meta">
-        <span>${a.category||'Market Update'}</span>
-        <span>${new Date(a.created_at).toLocaleDateString('en-US',{day:'numeric',month:'short'})}</span>
+      <div class="al-meta" style="justify-content:space-between;margin-top:4px">
+        <div style="display:flex;gap:10px;cursor:pointer" onclick="editArticle('${a.id}')">
+          <span>${a.category||'Market Update'}</span>
+          <span>${new Date(a.created_at).toLocaleDateString('en-US',{day:'numeric',month:'short'})}</span>
+        </div>
+        <div style="display:flex;gap:5px">
+          <a href="article.html?slug=${a.slug}" target="_blank" style="background:none;border:1px solid rgba(255,255,255,0.06);color:var(--white3);font-family:'DM Mono',monospace;font-size:8px;padding:2px 6px;cursor:pointer;border-radius:2px;text-decoration:none;letter-spacing:0.05em;transition:all 0.15s" onmouseover="this.style.color='var(--bull)';this.style.borderColor='rgba(76,175,125,0.3)'" onmouseout="this.style.color='var(--white3)';this.style.borderColor='rgba(255,255,255,0.06)'">↗ View</a>
+          <button onclick="event.stopPropagation();unpublishArticle('${a.id}','${a.published}')" style="background:none;border:1px solid rgba(255,255,255,0.06);color:var(--white3);font-family:'DM Mono',monospace;font-size:8px;padding:2px 6px;cursor:pointer;border-radius:2px;letter-spacing:0.05em;transition:all 0.15s" onmouseover="this.style.color='var(--gold)';this.style.borderColor='var(--gold-border)'" onmouseout="this.style.color='var(--white3)';this.style.borderColor='rgba(255,255,255,0.06)'">${a.published?'Unpublish':'Publish'}</button>
+          <button onclick="event.stopPropagation();deleteArticle('${a.id}')" style="background:none;border:1px solid rgba(255,255,255,0.06);color:var(--white3);font-family:'DM Mono',monospace;font-size:8px;padding:2px 6px;cursor:pointer;border-radius:2px;letter-spacing:0.05em;transition:all 0.15s" onmouseover="this.style.color='var(--bear)';this.style.borderColor='rgba(224,92,92,0.3)'" onmouseout="this.style.color='var(--white3)';this.style.borderColor='rgba(255,255,255,0.06)'">🗑 Delete</button>
+        </div>
       </div>
     </div>`).join('');
 }
@@ -354,10 +361,21 @@ async function saveArticle(publish) {
 }
 
 async function deleteArticle(id) {
-  if (!confirm('Delete this article permanently?')) return;
+  const a = articles.find(x => x.id === id);
+  if (!confirm(`Delete "${a?.title}"?
+
+This cannot be undone.`)) return;
   await _sb.from('articles').delete().eq('id', id);
   if (editingId === id) newArticle();
   await loadArticles();
+  setSaveStatus('Article deleted');
+}
+
+async function unpublishArticle(id, isPublished) {
+  const newState = isPublished === 'true' || isPublished === true ? false : true;
+  await _sb.from('articles').update({ published: newState, published_at: newState ? new Date().toISOString() : null }).eq('id', id);
+  await loadArticles();
+  setSaveStatus(newState ? '✓ Published' : '✓ Unpublished');
 }
 
 function togglePreview() {
