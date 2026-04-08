@@ -57,8 +57,6 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="hub-sidebar.js"></script>
 <script>
 let _user,_sb,users=[];
 const SB_URL='https://vaimxhgqcdhjhdiaampa.supabase.co';
@@ -212,5 +210,7 @@ async function saveRoles(){
 document.addEventListener('click',e=>{if(e.target.classList.contains('et-modal-overlay'))etCloseModal(e.target.id);});
 main();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="hub-sidebar.js" onload="main()"></script>
 </body>
 </html>

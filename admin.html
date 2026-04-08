@@ -23,9 +23,8 @@
     <div style="text-align:center;padding:60px"><div class="et-spinner"></div></div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="hub-sidebar.js"></script>
 <script>
+
 async function main() {
   const res = await initEtSidebar('admin');
   if (!res) return;
@@ -42,7 +41,7 @@ async function renderHub(res) {
   // Load counts
   const [art, usr, wid] = await Promise.all([
     _sb.from('articles').select('id,published', {count:'exact'}),
-    _sb.from('auth.users').select('id', {count:'exact'}).catch(()=>({count:0})),
+    _sb.from('profiles').select('id', {count:'exact'}),
     _sb.from('sidebar_widgets').select('id', {count:'exact'})
   ]);
   const artTotal = art.data?.length || 0;
@@ -84,7 +83,9 @@ async function renderHub(res) {
       </div>
     </div>`;
 }
-main();
+
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="hub-sidebar.js" onload="main()"></script>
 </body>
 </html>
