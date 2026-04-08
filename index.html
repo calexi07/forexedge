@@ -941,6 +941,7 @@ async function checkIndexAuth() {
           <div style="width:26px;height:26px;border-radius:50%;background:rgba(200,169,110,0.15);border:1px solid rgba(200,169,110,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">${avatarHtml}</div>
           My Hub
         </a>
+        ${user.user_metadata?.is_admin ? '<a href="admin-articles.html" class="btn-nav btn-ghost-nav" style="font-size:11px;padding:6px 12px">⚙️ Admin</a>' : ''}
         <button class="btn-nav btn-gold-nav" onclick="signOutIndex()">Sign Out</button>`;
     }
   } catch(e) { console.warn('Auth check:', e); }

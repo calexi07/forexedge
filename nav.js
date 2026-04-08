@@ -4,6 +4,7 @@ const _NAV_KEY = 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
 function renderNav(activePage) {
   const pages = [
     { id: 'index',   label: 'Home',    href: 'index.html' },
+    { id: 'updates', label: 'Market Updates', href: 'market-updates.html' },
     { id: 'news',    label: 'News',    href: 'news.html' },
     { id: 'journal', label: 'Journal', href: 'journal.html' },
     { id: 'academy', label: 'Academy', href: 'academy.html' },
@@ -64,6 +65,7 @@ async function checkNavAuthState() {
       ? `<img src="${savedAvatar}" style="width:26px;height:26px;border-radius:50%;object-fit:cover">`
       : `<span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold)">${initials}</span>`;
 
+    const isAdmin = user.user_metadata?.is_admin === true;
     const ctaEl = document.getElementById('navCta');
     if (ctaEl) {
       ctaEl.innerHTML = `
@@ -71,6 +73,7 @@ async function checkNavAuthState() {
           <div style="width:26px;height:26px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">${avatarHtml}</div>
           My Hub
         </a>
+        ${isAdmin ? '<a href="admin-articles.html" class="btn-ghost" style="font-size:11px;padding:6px 12px">⚙️ Admin</a>' : ''}
         <button class="btn-gold" onclick="navSignOut()">Sign Out</button>`;
     }
     const ml = document.getElementById('mobileAuthLink');
