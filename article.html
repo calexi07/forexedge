@@ -168,8 +168,7 @@
 <script>
 function checkIndexAuth() {}
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="initPage()"></script>
-<script src="nav.js"></script>
+
 <script>
 const SB_URL = 'https://vaimxhgqcdhjhdiaampa.supabase.co';
 const SB_KEY = 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
@@ -224,6 +223,13 @@ function parseContent(content) {
   return html;
 }
 
+async function adminDelete(id) {
+  if (!confirm('Delete this article permanently?')) return;
+  const _sb = window.supabase.createClient(SB_URL, SB_KEY);
+  await _sb.from('articles').delete().eq('id', id);
+  window.location.href = 'market-updates.html';
+}
+
 async function initPage() {
   renderNav('updates');
   const slug = new URLSearchParams(window.location.search).get('slug');
@@ -251,6 +257,10 @@ async function initPage() {
   // Update page title
   document.title = `EaglePips — ${article.title}`;
 
+  // Check if admin
+  const { data: { session } } = await _sb.auth.getSession();
+  const isAdmin = session?.user?.user_metadata?.is_admin === true;
+
   // Fetch adjacent articles
   const { data: allArticles } = await _sb
     .from('articles').select('id,title,slug,published_at')
@@ -266,6 +276,13 @@ async function initPage() {
 
   document.getElementById('articlePage').innerHTML = `
     <a href="market-updates.html" class="article-back">← Back to Market Updates</a>
+    ${isAdmin ? `<div style="background:rgba(200,169,110,0.08);border:1px solid rgba(200,169,110,0.2);border-radius:4px;padding:10px 16px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);letter-spacing:0.08em">⚙️ ADMIN</span>
+      <div style="display:flex;gap:8px">
+        <a href="admin-articles.html" onclick="localStorage.setItem('ep_edit_slug','${article.slug}')" style="padding:5px 12px;background:transparent;border:1px solid rgba(200,169,110,0.3);color:var(--gold);font-family:'Syne',sans-serif;font-size:11px;cursor:pointer;border-radius:3px;text-decoration:none">✏️ Edit</a>
+        <button onclick="adminDelete('${article.id}')" style="padding:5px 12px;background:transparent;border:1px solid rgba(224,92,92,0.3);color:#e05c5c;font-family:'Syne',sans-serif;font-size:11px;cursor:pointer;border-radius:3px">🗑 Delete</button>
+      </div>
+    </div>` : ''}
     <div class="article-header">
       <span class="article-tag ${tagClass(article.category)}">${article.category || 'Market Update'}</span>
       <h1 class="article-h1">${article.title}</h1>
@@ -285,5 +302,8 @@ async function initPage() {
   `;
 }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="initPage()"></script>
+<script src="nav.js"></script>
+
 </body>
 </html>
