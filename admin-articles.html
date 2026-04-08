@@ -3,446 +3,351 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EaglePips — Admin</title>
+<title>EaglePips — Articles</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="hub.css">
 <style>
-/* Admin specific */
-.admin-layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: start; }
-.articles-list { background: var(--bg2); border: 1px solid var(--border2); border-radius: 4px; overflow: hidden; }
-.articles-list-header {
-  padding: 14px 16px; border-bottom: 1px solid var(--border2);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.al-item {
-  padding: 14px 16px; border-bottom: 1px solid var(--border2);
-  cursor: pointer; transition: background 0.15s;
-  display: flex; flex-direction: column; gap: 4px;
-}
-.al-item:last-child { border-bottom: none; }
-.al-item:hover { background: var(--gold-dim); }
-.al-item.active { background: var(--gold-dim); border-left: 2px solid var(--gold); }
-.al-title { font-size: 13px; font-weight: 500; color: var(--white); line-height: 1.3; }
-.al-meta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--white3); display: flex; gap: 10px; }
-.al-status {
-  font-family: 'DM Mono', monospace; font-size: 8px; padding: 2px 7px;
-  border-radius: 100px; letter-spacing: 0.08em; text-transform: uppercase;
-}
-.al-status.published { background: var(--bull-bg); color: var(--bull); border: 1px solid rgba(76,175,125,0.2); }
-.al-status.draft     { background: rgba(255,255,255,0.04); color: var(--white3); border: 1px solid var(--border2); }
-
-/* Editor */
-.editor-panel { background: var(--bg2); border: 1px solid var(--border2); border-radius: 4px; overflow: hidden; }
-.editor-toolbar {
-  padding: 12px 16px; border-bottom: 1px solid var(--border2);
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  background: var(--bg3);
-}
-.tb-btn {
-  padding: 5px 10px; background: transparent;
-  border: 1px solid var(--border2); color: var(--white2);
-  font-family: 'DM Mono', monospace; font-size: 10px;
-  cursor: pointer; border-radius: 3px; transition: all 0.15s;
-  letter-spacing: 0.05em;
-}
-.tb-btn:hover { border-color: var(--gold-border); color: var(--gold); }
-.tb-sep { width: 1px; height: 20px; background: var(--border2); }
-.editor-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
-.editor-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.editor-field { display: flex; flex-direction: column; gap: 6px; }
-.field-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--white3); }
-.editor-textarea {
-  width: 100%; min-height: 420px;
-  background: var(--bg); border: 1px solid var(--border2);
-  color: var(--white); font-family: 'Syne', sans-serif;
-  font-size: 14px; line-height: 1.8; font-weight: 300;
-  padding: 14px; border-radius: 3px; outline: none;
-  resize: vertical; transition: border-color 0.2s;
-}
-.editor-textarea:focus { border-color: var(--gold-border); }
-
-/* Markdown help */
-.md-help {
-  background: var(--bg3); border: 1px solid var(--border2);
-  border-radius: 3px; padding: 12px 14px; font-size: 11px;
-  color: var(--white3); line-height: 1.8;
-}
-.md-help code { font-family: 'DM Mono', monospace; font-size: 10px; background: rgba(255,255,255,0.06); padding: 1px 4px; border-radius: 2px; color: var(--gold); }
-
-/* Preview */
-.preview-panel { background: var(--bg2); border: 1px solid var(--border2); border-radius: 4px; padding: 28px; max-height: 600px; overflow-y: auto; display: none; }
-.preview-panel.active { display: block; }
-.preview-panel h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--white); margin: 28px 0 12px; }
-.preview-panel h3 { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--white); margin: 22px 0 10px; }
-.preview-panel p { font-size: 14px; color: #c8c4bc; line-height: 1.8; margin-bottom: 14px; }
-.preview-panel strong { color: var(--white); }
-.preview-panel em { color: var(--gold); }
-.preview-panel blockquote { border-left: 3px solid var(--gold); padding: 10px 16px; background: rgba(200,169,110,0.06); margin: 16px 0; color: #a09880; font-style: italic; }
-.preview-panel ul, .preview-panel ol { padding-left: 20px; margin-bottom: 14px; }
-.preview-panel li { font-size: 14px; color: #c8c4bc; margin-bottom: 6px; }
-.preview-panel hr { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 28px 0; }
-
-.empty-list { text-align: center; padding: 40px 20px; color: var(--white3); font-size: 13px; }
-.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-@media(max-width: 1000px) {
-  .admin-layout { grid-template-columns: 1fr; }
-  .articles-list { max-height: 300px; overflow-y: auto; }
-}
+.admin-layout{display:grid;grid-template-columns:280px 1fr;gap:18px;align-items:start}
+.art-list{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;position:sticky;top:74px;max-height:calc(100vh - 100px);display:flex;flex-direction:column}
+.art-list-hdr{padding:12px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;background:var(--bg3);flex-shrink:0}
+.art-list-body{overflow-y:auto;flex:1}
+.al-item{padding:11px 14px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background 0.15s}
+.al-item:last-child{border-bottom:none}
+.al-item:hover{background:var(--gold-dim)}
+.al-item.active{background:var(--gold-dim);border-left:2px solid var(--gold)}
+.al-title{font-size:12px;font-weight:500;color:var(--white);line-height:1.3;margin-bottom:4px}
+.al-meta{font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.spill{font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;border-radius:100px;letter-spacing:0.06em;text-transform:uppercase}
+.spill.live{background:var(--bull-bg);color:var(--bull);border:1px solid rgba(76,175,125,0.2)}
+.spill.draft{background:rgba(255,255,255,0.04);color:var(--white3);border:1px solid var(--border2)}
+.editor-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;overflow:hidden}
+.md-bar{padding:8px 14px;border-bottom:1px solid var(--border2);display:flex;gap:3px;flex-wrap:wrap;align-items:center;background:rgba(0,0,0,0.15)}
+.tb{padding:4px 9px;background:transparent;border:1px solid var(--border2);color:var(--white2);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;border-radius:3px;transition:all 0.15s;white-space:nowrap}
+.tb:hover{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
+.tb-sep{width:1px;height:16px;background:var(--border2);margin:0 3px;flex-shrink:0}
+.tb-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.1em;text-transform:uppercase;padding:0 3px;white-space:nowrap}
+.ed-body{padding:18px;display:flex;flex-direction:column;gap:13px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+.keynotes-wrap{display:flex;flex-direction:column;gap:6px}
+.kn-row{display:flex;gap:6px;align-items:center}
+.kn-del{width:28px;height:36px;background:none;border:1px solid var(--border2);color:var(--white3);cursor:pointer;border-radius:3px;font-size:12px;flex-shrink:0;transition:all 0.15s}
+.kn-del:hover{border-color:var(--bear);color:var(--bear)}
+.kn-add{width:100%;padding:7px;background:transparent;border:1px dashed rgba(200,169,110,0.2);color:rgba(200,169,110,0.5);font-family:'Syne',sans-serif;font-size:12px;cursor:pointer;border-radius:3px;transition:all 0.15s}
+.kn-add:hover{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
+.content-ta{width:100%;min-height:460px;background:var(--bg);border:1px solid var(--border2);color:var(--white);font-family:'Syne',sans-serif;font-size:14px;line-height:1.85;font-weight:300;padding:14px;border-radius:3px;outline:none;resize:vertical;transition:border-color 0.2s}
+.content-ta:focus{border-color:var(--gold-border);box-shadow:0 0 0 3px var(--gold-dim)}
+.md-ref{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:12px 14px}
+.md-ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:5px;margin-top:8px}
+.md-row{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--white2)}
+.mc{font-family:'DM Mono',monospace;font-size:10px;background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:2px;color:var(--gold);white-space:nowrap}
+.preview-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:28px;display:none}
+.preview-wrap.open{display:block}
+.pc h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--white);margin:28px 0 12px}
+.pc h3{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--white);margin:20px 0 10px}
+.pc p{font-size:15px;color:#c8c4bc;line-height:1.85;margin-bottom:14px}
+.pc strong{color:var(--white)}.pc em{color:var(--gold);font-style:italic}
+.pc ul,.pc ol{padding-left:20px;margin-bottom:14px}
+.pc li{font-size:14px;color:#c8c4bc;margin-bottom:5px;line-height:1.7}
+.pc blockquote{border-left:3px solid var(--gold);padding:10px 16px;background:rgba(200,169,110,0.06);margin:16px 0;font-style:italic;color:#a09880}
+.pc hr{border:none;border-top:1px solid rgba(255,255,255,0.06);margin:28px 0}
+.pc img{max-width:100%;border-radius:4px;margin:16px 0;border:1px solid rgba(255,255,255,0.06);display:block}
+.pc .cb{padding:12px 16px;border-radius:3px;margin:16px 0;font-size:14px;line-height:1.7}
+.pc .cb-bull{border-left:3px solid var(--bull);background:rgba(76,175,125,0.07);color:#c8c4bc}
+.pc .cb-bear{border-left:3px solid var(--bear);background:rgba(224,92,92,0.07);color:#c8c4bc}
+.pc .cb-note{border-left:3px solid var(--gold);background:rgba(200,169,110,0.07);color:#c8c4bc}
+.pc .img-split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.pc .img-split img{margin:0}
+@media(max-width:900px){.admin-layout{grid-template-columns:1fr}.art-list{position:relative;top:auto;max-height:260px}}
 </style>
 </head>
 <body class="et-loading">
 <div id="et-loader">
-  <div class="et-loader-logo">
-    <div class="et-loader-eagle">🦅</div>
-    <div class="et-loader-name">Eagle<span>Pips</span></div>
-  </div>
+  <div class="et-loader-logo"><div class="et-loader-eagle">🦅</div><div class="et-loader-name">Eagle<span>Pips</span></div></div>
   <div class="et-loader-bar"><div class="et-loader-bar-fill"></div></div>
-  <div class="et-loader-text">Loading admin panel...</div>
+  <div class="et-loader-text">Loading editor...</div>
 </div>
 <div id="etSidebarMount"></div>
 <div class="hub-main">
   <div class="hub-topbar">
-    <div class="hub-topbar-title">✍️ <strong>Article Editor</strong></div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <span id="saveStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)"></span>
-      <button class="et-btn-ghost" onclick="togglePreview()" style="padding:6px 14px;font-size:11px">👁 Preview</button>
-      <button class="et-btn-ghost" onclick="saveArticle(false)" style="padding:6px 14px;font-size:11px">💾 Save Draft</button>
-      <button class="et-btn-gold" onclick="saveArticle(true)" style="padding:6px 14px;font-size:11px">🚀 Publish</button>
-    </div>
+    <a href="admin.html" style="background:none;border:1px solid var(--border2);color:var(--white3);padding:5px 12px;border-radius:3px;font-family:'DM Mono',monospace;font-size:11px;text-decoration:none;transition:all 0.2s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">← Admin</a>
+    <div class="hub-topbar-title" style="flex:1;margin-left:14px">✍️ <strong>Articles</strong></div>
+    <span id="saveStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)"></span>
+    <button class="et-btn-ghost" onclick="togglePreview()" style="padding:6px 12px;font-size:11px">👁 Preview</button>
+    <button class="et-btn-ghost" onclick="saveArticle(false)" style="padding:6px 12px;font-size:11px">💾 Draft</button>
+    <button class="et-btn-gold" onclick="saveArticle(true)" style="padding:6px 12px;font-size:11px">🚀 Publish</button>
   </div>
   <div class="hub-content" id="adminContent">
-    <div style="text-align:center;padding:60px;color:var(--white3)">
-      <div class="spinner"></div>
-      <div style="margin-top:12px;font-size:13px">Checking permissions...</div>
-    </div>
+    <div style="text-align:center;padding:60px"><div class="et-spinner"></div></div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="hub-sidebar.js"></script>
 <script>
-let _user, _sb;
-let articles = [], editingId = null, showPreview = false;
+let _user,_sb,articles=[],editingId=null,keynotes=[],previewOpen=false;
 
-async function main() {
-  const res = await initEtSidebar('admin');
-  if (!res) return;
-  _user = res.user; _sb = res.sb;
-
-  // Check admin
-  const isAdmin = _user.user_metadata?.is_admin === true;
-  if (!isAdmin) {
-    document.getElementById('adminContent').innerHTML = `
-      <div style="text-align:center;padding:80px 20px">
-        <div style="font-size:48px;margin-bottom:16px;opacity:0.2">🔒</div>
-        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--white);margin-bottom:8px">Access Denied</div>
-        <div style="font-size:14px;color:var(--white2);margin-bottom:24px">You don't have admin permissions.</div>
-        <a href="hub.html" class="et-btn-ghost">← Back to Hub</a>
-      </div>`;
-    return;
-  }
-
-  renderAdminPanel();
+async function main(){
+  const res=await initEtSidebar('admin');
+  if(!res)return;
+  _user=res.user;_sb=res.sb;
+  if(!_user.user_metadata?.is_admin){document.getElementById('adminContent').innerHTML='<div style="text-align:center;padding:60px;color:var(--white3)">Access denied.</div>';return;}
+  renderLayout();
   await loadArticles();
 }
 
-function renderAdminPanel() {
-  document.getElementById('adminContent').innerHTML = `
+function renderLayout(){
+  document.getElementById('adminContent').innerHTML=`
     <div class="admin-layout">
-
-      <!-- Articles list -->
       <div>
-        <div class="articles-list">
-          <div class="articles-list-header">
-            <span style="font-size:13px;font-weight:600;color:var(--white)">Articles</span>
-            <button class="et-btn-gold" onclick="newArticle()" style="padding:5px 12px;font-size:10px">+ New</button>
+        <div class="art-list">
+          <div class="art-list-hdr">
+            <span style="font-size:12px;font-weight:600;color:var(--white)">Articles</span>
+            <button class="et-btn-gold" onclick="newArticle()" style="padding:4px 10px;font-size:10px">+ New</button>
           </div>
-          <div id="articlesList">
-            <div class="empty-list"><div class="spinner"></div></div>
-          </div>
+          <div class="art-list-body" id="artList"><div style="padding:20px;text-align:center"><div class="et-spinner"></div></div></div>
         </div>
       </div>
-
-      <!-- Editor -->
       <div>
-        <div class="editor-panel" id="editorPanel">
-          <div class="editor-toolbar">
-            <button class="tb-btn" onclick="insertMd('**','**')"><b>B</b></button>
-            <button class="tb-btn" onclick="insertMd('*','*')"><i>I</i></button>
-            <button class="tb-btn" onclick="insertMd('\\n## ','')">H2</button>
-            <button class="tb-btn" onclick="insertMd('\\n### ','')">H3</button>
+        <div class="editor-wrap" id="editorWrap">
+          <div class="md-bar">
+            <span class="tb-lbl">Text</span>
+            <button class="tb" onclick="ins('**','**')"><b>B</b></button>
+            <button class="tb" onclick="ins('*','*')"><i>I</i></button>
+            <button class="tb" onclick="ins('\\n## ','\\n')">H2</button>
+            <button class="tb" onclick="ins('\\n### ','\\n')">H3</button>
             <div class="tb-sep"></div>
-            <button class="tb-btn" onclick="insertMd('\\n- ','')">List</button>
-            <button class="tb-btn" onclick="insertMd('\\n> ','')">Quote</button>
-            <button class="tb-btn" onclick="insertMd('\\n---\\n','')">---</button>
+            <span class="tb-lbl">Block</span>
+            <button class="tb" onclick="ins('\\n- ','')">• List</button>
+            <button class="tb" onclick="ins('\\n> ','')">❝ Quote</button>
+            <button class="tb" onclick="ins('\\n---\\n','')">— Line</button>
             <div class="tb-sep"></div>
-            <button class="tb-btn" onclick="insertMd('\\n[BULL]\\n','\\n[/BULL]\\n')">🟢 Bull</button>
-            <button class="tb-btn" onclick="insertMd('\\n[BEAR]\\n','\\n[/BEAR]\\n')">🔴 Bear</button>
-            <button class="tb-btn" onclick="insertMd('\\n[NOTE]\\n','\\n[/NOTE]\\n')">📝 Note</button>
+            <span class="tb-lbl">Callout</span>
+            <button class="tb" onclick="ins('\\n[BULL]\\n','\\n[/BULL]\\n')">🟢 Bull</button>
+            <button class="tb" onclick="ins('\\n[BEAR]\\n','\\n[/BEAR]\\n')">🔴 Bear</button>
+            <button class="tb" onclick="ins('\\n[NOTE]\\n','\\n[/NOTE]\\n')">📝 Note</button>
+            <div class="tb-sep"></div>
+            <span class="tb-lbl">Media</span>
+            <button class="tb" onclick="insertImg()">🖼 Image</button>
+            <button class="tb" onclick="ins('\\n[SPLIT]\\n![Left](URL1)\\n![Right](URL2)\\n[/SPLIT]\\n','')">⊞ 2-col</button>
           </div>
-          <div class="editor-body">
-            <div class="et-form-group">
-              <label class="et-form-label">Title *</label>
-              <input type="text" class="et-form-input" id="eTitle" placeholder="e.g. EUR/USD Weekly Analysis — April 2026" oninput="autoSlug()">
-            </div>
-            <div class="editor-row">
-              <div class="et-form-group">
-                <label class="et-form-label">Slug (URL) *</label>
-                <input type="text" class="et-form-input" id="eSlug" placeholder="eurusd-weekly-april-2026">
-              </div>
-              <div class="et-form-group">
-                <label class="et-form-label">Category</label>
+          <div class="ed-body">
+            <div><label class="et-form-label">Title *</label><input type="text" class="et-form-input" id="eTitle" placeholder="e.g. EUR/USD Weekly Analysis — April 2026" oninput="autoSlug()"></div>
+            <div class="r2">
+              <div><label class="et-form-label">Slug (URL) *</label><input type="text" class="et-form-input" id="eSlug" placeholder="eurusd-weekly-april-2026"></div>
+              <div><label class="et-form-label">Category</label>
                 <select class="et-form-input" id="eCategory">
-                  <option>Market Update</option>
-                  <option>Technical Analysis</option>
-                  <option>Fundamental Analysis</option>
+                  <option>Market Update</option><option>Technical Analysis</option><option>Fundamental Analysis</option>
                 </select>
               </div>
             </div>
-            <div class="et-form-group">
-              <label class="et-form-label">Excerpt (short description)</label>
-              <input type="text" class="et-form-input" id="eExcerpt" placeholder="Brief description shown in the article list...">
+            <div class="r2">
+              <div><label class="et-form-label">Author Name</label><input type="text" class="et-form-input" id="eAuthor" placeholder="Your name"></div>
+              <div><label class="et-form-label">Cover Image URL</label><input type="url" class="et-form-input" id="eCover" placeholder="https://..."></div>
             </div>
-            <div class="et-form-group">
-              <label class="et-form-label">Cover Image URL (optional)</label>
-              <input type="url" class="et-form-input" id="eCover" placeholder="https://...">
+            <div><label class="et-form-label">Excerpt (short preview shown in feed)</label><input type="text" class="et-form-input" id="eExcerpt" placeholder="Brief summary of the analysis..."></div>
+            <div>
+              <label class="et-form-label">Key Points (Keynotes)</label>
+              <div class="keynotes-wrap" id="keynotesWrap"></div>
+              <button class="kn-add" onclick="addKeynote()">+ Add Key Point</button>
             </div>
-            <div class="et-form-group">
-              <label class="et-form-label">Tags (comma separated)</label>
-              <input type="text" class="et-form-input" id="eTags" placeholder="EUR/USD, Weekly, Fundamental">
+            <div><label class="et-form-label">Tags (comma separated)</label><input type="text" class="et-form-input" id="eTags" placeholder="EUR/USD, Weekly, COT Data"></div>
+            <div>
+              <label class="et-form-label">Content *</label>
+              <textarea class="content-ta" id="eContent" placeholder="## Overview&#10;&#10;Write your analysis here...&#10;&#10;[BULL]&#10;Price is above the 200 EMA — bullish bias.&#10;[/BULL]&#10;&#10;![Chart](https://image-url.com/chart.png)&#10;&#10;## Key Levels&#10;&#10;- Support: 1.0820&#10;- Resistance: 1.0950"></textarea>
             </div>
-            <div class="editor-field">
-              <span class="field-label">Content (Markdown supported)</span>
-              <textarea class="editor-textarea" id="eContent" placeholder="Write your analysis here...&#10;&#10;## Setup&#10;&#10;**EUR/USD** is currently trading at 1.1320...&#10;&#10;[BULL]&#10;Bullish bias — price above key support&#10;[/BULL]"></textarea>
-            </div>
-            <div class="md-help">
-              <strong style="color:var(--white2)">Formatting:</strong>
-              <code>**bold**</code> &nbsp; <code>*italic*</code> &nbsp;
-              <code>## Heading</code> &nbsp; <code>- list item</code> &nbsp;
-              <code>> quote</code> &nbsp; <code>---</code> divider &nbsp;
-              <code>[BULL]...[/BULL]</code> bullish box &nbsp;
-              <code>[BEAR]...[/BEAR]</code> bearish box &nbsp;
-              <code>[NOTE]...[/NOTE]</code> note box
+            <div class="md-ref">
+              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.12em;text-transform:uppercase">Markdown Reference</div>
+              <div class="md-ref-grid">
+                <div class="md-row"><code class="mc">**text**</code><span>Bold</span></div>
+                <div class="md-row"><code class="mc">*text*</code><span>Italic</span></div>
+                <div class="md-row"><code class="mc">## Heading</code><span>H2 Title</span></div>
+                <div class="md-row"><code class="mc">### Heading</code><span>H3 Title</span></div>
+                <div class="md-row"><code class="mc">- item</code><span>Bullet list</span></div>
+                <div class="md-row"><code class="mc">> text</code><span>Quote block</span></div>
+                <div class="md-row"><code class="mc">---</code><span>Divider line</span></div>
+                <div class="md-row"><code class="mc">![alt](url)</code><span>Image</span></div>
+                <div class="md-row"><code class="mc">[BULL]...[/BULL]</code><span>Bullish callout</span></div>
+                <div class="md-row"><code class="mc">[BEAR]...[/BEAR]</code><span>Bearish callout</span></div>
+                <div class="md-row"><code class="mc">[NOTE]...[/NOTE]</code><span>Note callout</span></div>
+                <div class="md-row"><code class="mc">[SPLIT]![](u)![](u)[/SPLIT]</code><span>2-col images</span></div>
+              </div>
             </div>
           </div>
         </div>
-
-        <!-- Preview -->
-        <div class="preview-panel" id="previewPanel"></div>
+        <div class="preview-wrap" id="previewWrap">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+            <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase">Preview</span>
+            <button onclick="togglePreview()" style="background:none;border:none;color:var(--white3);cursor:pointer;font-size:12px;font-family:'Syne',sans-serif">✕ Close Preview</button>
+          </div>
+          <div id="previewContent" class="pc"></div>
+        </div>
       </div>
     </div>`;
+  addKeynote();
+  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveArticle(false);}});
 }
 
-async function loadArticles() {
-  const { data } = await _sb.from('articles').select('*').order('created_at', { ascending: false });
-  articles = data || [];
-  renderList();
+async function loadArticles(){
+  const{data}=await _sb.from('articles').select('*').order('created_at',{ascending:false});
+  articles=data||[];renderList();
 }
 
-function renderList() {
-  const el = document.getElementById('articlesList');
-  if (!articles.length) {
-    el.innerHTML = '<div class="empty-list">No articles yet.<br>Click "+ New" to start writing.</div>';
-    return;
-  }
-  el.innerHTML = articles.map(a => `
-    <div class="al-item ${editingId===a.id?'active':''}">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px" onclick="editArticle('${a.id}')">
-        <div class="al-title" style="flex:1">${a.title}</div>
-        <span class="al-status ${a.published?'published':'draft'}">${a.published?'Live':'Draft'}</span>
+function renderList(){
+  const el=document.getElementById('artList');
+  if(!articles.length){el.innerHTML='<div style="padding:20px;text-align:center;font-size:12px;color:var(--white3)">No articles yet.</div>';return;}
+  el.innerHTML=articles.map(a=>`
+    <div class="al-item ${editingId===a.id?'active':''}" onclick="loadArt('${a.id}')">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:4px">
+        <div class="al-title">${a.title||'Untitled'}</div>
+        <span class="spill ${a.published?'live':'draft'}">${a.published?'Live':'Draft'}</span>
       </div>
-      <div class="al-meta" style="justify-content:space-between;margin-top:4px">
-        <div style="display:flex;gap:10px;cursor:pointer" onclick="editArticle('${a.id}')">
-          <span>${a.category||'Market Update'}</span>
-          <span>${new Date(a.created_at).toLocaleDateString('en-US',{day:'numeric',month:'short'})}</span>
-        </div>
-        <div style="display:flex;gap:5px">
-          <a href="article.html?slug=${a.slug}" target="_blank" style="background:none;border:1px solid rgba(255,255,255,0.06);color:var(--white3);font-family:'DM Mono',monospace;font-size:8px;padding:2px 6px;cursor:pointer;border-radius:2px;text-decoration:none;letter-spacing:0.05em;transition:all 0.15s" onmouseover="this.style.color='var(--bull)';this.style.borderColor='rgba(76,175,125,0.3)'" onmouseout="this.style.color='var(--white3)';this.style.borderColor='rgba(255,255,255,0.06)'">↗ View</a>
-          <button onclick="event.stopPropagation();unpublishArticle('${a.id}','${a.published}')" style="background:none;border:1px solid rgba(255,255,255,0.06);color:var(--white3);font-family:'DM Mono',monospace;font-size:8px;padding:2px 6px;cursor:pointer;border-radius:2px;letter-spacing:0.05em;transition:all 0.15s" onmouseover="this.style.color='var(--gold)';this.style.borderColor='var(--gold-border)'" onmouseout="this.style.color='var(--white3)';this.style.borderColor='rgba(255,255,255,0.06)'">${a.published?'Unpublish':'Publish'}</button>
-          <button onclick="event.stopPropagation();deleteArticle('${a.id}')" style="background:none;border:1px solid rgba(255,255,255,0.06);color:var(--white3);font-family:'DM Mono',monospace;font-size:8px;padding:2px 6px;cursor:pointer;border-radius:2px;letter-spacing:0.05em;transition:all 0.15s" onmouseover="this.style.color='var(--bear)';this.style.borderColor='rgba(224,92,92,0.3)'" onmouseout="this.style.color='var(--white3)';this.style.borderColor='rgba(255,255,255,0.06)'">🗑 Delete</button>
-        </div>
+      <div class="al-meta">
+        <span>${a.category||'—'}</span>
+        <span>${new Date(a.created_at).toLocaleDateString('en-US',{day:'numeric',month:'short'})}</span>
+      </div>
+      <div style="margin-top:5px;display:flex;gap:8px">
+        ${a.published?`<a href="article.html?slug=${a.slug}" target="_blank" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);text-decoration:none">↗ View</a>`:''}
+        <button onclick="event.stopPropagation();delArt('${a.id}')" style="background:none;border:none;color:var(--white3);cursor:pointer;font-size:9px;padding:0;font-family:'DM Mono',monospace;transition:color 0.15s" onmouseover="this.style.color='var(--bear)'" onmouseout="this.style.color='var(--white3)'">🗑 Delete</button>
       </div>
     </div>`).join('');
 }
 
-function newArticle() {
-  editingId = null;
-  document.getElementById('eTitle').value = '';
-  document.getElementById('eSlug').value = '';
-  document.getElementById('eCategory').value = 'Market Update';
-  document.getElementById('eExcerpt').value = '';
-  document.getElementById('eCover').value = '';
-  document.getElementById('eTags').value = '';
-  document.getElementById('eContent').value = '';
-  setSaveStatus('');
-  renderList();
+function newArticle(){
+  editingId=null;
+  ['eTitle','eSlug','eExcerpt','eCover','eTags','eContent'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('eCategory').value='Market Update';
+  document.getElementById('eAuthor').value=_user.user_metadata?.full_name||_user.email?.split('@')[0]||'EaglePips';
+  keynotes=[];renderKeynotes();addKeynote();
+  setSaveStatus('');renderList();
 }
 
-function editArticle(id) {
-  const a = articles.find(x => x.id === id);
-  if (!a) return;
-  editingId = id;
-  document.getElementById('eTitle').value = a.title || '';
-  document.getElementById('eSlug').value = a.slug || '';
-  document.getElementById('eCategory').value = a.category || 'Market Update';
-  document.getElementById('eExcerpt').value = a.excerpt || '';
-  document.getElementById('eCover').value = a.cover_url || '';
-  document.getElementById('eTags').value = a.tags ? a.tags.join(', ') : '';
-  document.getElementById('eContent').value = a.content || '';
-  setSaveStatus('');
-  renderList();
-  // Close preview
-  showPreview = false;
-  document.getElementById('previewPanel').classList.remove('active');
-  document.getElementById('editorPanel').style.display = '';
+function loadArt(id){
+  const a=articles.find(x=>x.id===id);if(!a)return;
+  editingId=id;
+  document.getElementById('eTitle').value=a.title||'';
+  document.getElementById('eSlug').value=a.slug||'';
+  document.getElementById('eCategory').value=a.category||'Market Update';
+  document.getElementById('eExcerpt').value=a.excerpt||'';
+  document.getElementById('eCover').value=a.cover_url||'';
+  document.getElementById('eTags').value=a.tags?a.tags.join(', '):'';
+  document.getElementById('eContent').value=a.content||'';
+  document.getElementById('eAuthor').value=a.author_name||'EaglePips';
+  keynotes=[...(a.keynotes||[])];renderKeynotes();
+  if(!keynotes.length)addKeynote();
+  setSaveStatus('');renderList();
+  previewOpen=false;
+  document.getElementById('previewWrap').classList.remove('open');
+  document.getElementById('editorWrap').style.display='';
 }
 
-function autoSlug() {
-  if (editingId) return; // Don't auto-change slug when editing existing
-  const title = document.getElementById('eTitle').value;
-  const slug = title.toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .slice(0, 60);
-  document.getElementById('eSlug').value = slug;
+function renderKeynotes(){
+  const w=document.getElementById('keynotesWrap');
+  if(!w)return;
+  w.innerHTML=keynotes.map((k,i)=>`
+    <div class="kn-row">
+      <input type="text" class="et-form-input keynote-input" value="${(k||'').replace(/"/g,'&quot;')}" placeholder="Key point #${i+1}" oninput="keynotes[${i}]=this.value">
+      <button class="kn-del" onclick="keynotes.splice(${i},1);renderKeynotes()">✕</button>
+    </div>`).join('');
+}
+function addKeynote(){
+  keynotes.push('');renderKeynotes();
+  setTimeout(()=>{const els=document.querySelectorAll('.keynote-input');els[els.length-1]?.focus();},50);
 }
 
-async function saveArticle(publish) {
-  const title   = document.getElementById('eTitle').value.trim();
-  const slug    = document.getElementById('eSlug').value.trim();
-  const content = document.getElementById('eContent').value;
+function autoSlug(){
+  if(editingId)return;
+  document.getElementById('eSlug').value=document.getElementById('eTitle').value.toLowerCase().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').slice(0,60);
+}
 
-  if (!title || !slug) { alert('Title and slug are required.'); return; }
+function ins(b,a){
+  const ta=document.getElementById('eContent');
+  const s=ta.selectionStart,e=ta.selectionEnd,sel=ta.value.substring(s,e);
+  const bf=b.replace(/\\n/g,'\n'),af=a.replace(/\\n/g,'\n');
+  ta.value=ta.value.substring(0,s)+bf+sel+af+ta.value.substring(e);
+  ta.focus();ta.setSelectionRange(s+bf.length,s+bf.length+sel.length);
+}
 
-  const tags = document.getElementById('eTags').value
-    .split(',').map(t => t.trim()).filter(Boolean);
+function insertImg(){
+  const url=prompt('Image URL:');if(!url)return;
+  const alt=prompt('Alt text:','Chart')||'Image';
+  ins(`\n![${alt}](${url})\n`,'');
+}
 
-  const payload = {
-    title,
-    slug,
-    category:  document.getElementById('eCategory').value,
-    excerpt:   document.getElementById('eExcerpt').value.trim() || null,
-    cover_url: document.getElementById('eCover').value.trim() || null,
-    tags: tags.length ? tags : null,
-    content,
-    published: publish,
-    published_at: publish ? new Date().toISOString() : null,
-    updated_at: new Date().toISOString()
+async function saveArticle(publish){
+  const title=document.getElementById('eTitle').value.trim();
+  const slug=document.getElementById('eSlug').value.trim();
+  if(!title||!slug){alert('Title and slug are required.');return;}
+  const kn=keynotes.filter(k=>(k||'').trim());
+  const tags=document.getElementById('eTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const payload={
+    title,slug,
+    category:document.getElementById('eCategory').value,
+    excerpt:document.getElementById('eExcerpt').value.trim()||null,
+    cover_url:document.getElementById('eCover').value.trim()||null,
+    tags:tags.length?tags:null,
+    keynotes:kn.length?kn:null,
+    author_name:document.getElementById('eAuthor').value.trim()||'EaglePips',
+    content:document.getElementById('eContent').value,
+    published:publish,
+    published_at:publish?new Date().toISOString():null,
+    updated_at:new Date().toISOString()
   };
-
   setSaveStatus('Saving...');
-
-  let error;
-  if (editingId) {
-    const res = await _sb.from('articles').update(payload).eq('id', editingId);
-    error = res.error;
+  let err;
+  if(editingId){
+    const r=await _sb.from('articles').update(payload).eq('id',editingId);err=r.error;
   } else {
-    const res = await _sb.from('articles').insert({ ...payload });
-    error = res.error;
-    if (!error) {
-      // Get the new article id
-      const { data } = await _sb.from('articles').select('id').eq('slug', slug).single();
-      if (data) editingId = data.id;
-    }
+    const r=await _sb.from('articles').insert(payload).select().single();
+    err=r.error;if(!err&&r.data)editingId=r.data.id;
   }
-
-  if (error) {
-    alert(error.message);
-    setSaveStatus('Error saving');
-    return;
-  }
-
-  setSaveStatus(publish ? '✓ Published' : '✓ Saved as draft');
+  if(err){alert(err.message);setSaveStatus('Error saving');return;}
+  setSaveStatus(publish?'✓ Published':'✓ Saved as draft');
   await loadArticles();
 }
 
-async function deleteArticle(id) {
-  const a = articles.find(x => x.id === id);
-  if (!confirm(`Delete "${a?.title}"?
-
-This cannot be undone.`)) return;
-  await _sb.from('articles').delete().eq('id', id);
-  if (editingId === id) newArticle();
+async function delArt(id){
+  if(!confirm('Delete this article permanently?'))return;
+  await _sb.from('articles').delete().eq('id',id);
+  if(editingId===id)newArticle();
   await loadArticles();
-  setSaveStatus('Article deleted');
 }
 
-async function unpublishArticle(id, isPublished) {
-  const newState = isPublished === 'true' || isPublished === true ? false : true;
-  await _sb.from('articles').update({ published: newState, published_at: newState ? new Date().toISOString() : null }).eq('id', id);
-  await loadArticles();
-  setSaveStatus(newState ? '✓ Published' : '✓ Unpublished');
+function parseContent(c){
+  if(!c)return'';
+  return c
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^---$/gm,'<hr>')
+    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g,'<img src="$2" alt="$1">')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" style="color:var(--gold)">$1</a>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>[\s\S]+?<\/li>)/g,'<ul>$1</ul>')
+    .replace(/\[SPLIT\]([\s\S]+?)\[\/SPLIT\]/g,'<div class="img-split">$1</div>')
+    .replace(/\[BULL\]([\s\S]+?)\[\/BULL\]/g,'<div class="cb cb-bull">$1</div>')
+    .replace(/\[BEAR\]([\s\S]+?)\[\/BEAR\]/g,'<div class="cb cb-bear">$1</div>')
+    .replace(/\[NOTE\]([\s\S]+?)\[\/NOTE\]/g,'<div class="cb cb-note">$1</div>')
+    .split('\n\n').map(b=>{b=b.trim();if(!b||b.startsWith('<'))return b;return'<p>'+b.replace(/\n/g,'<br>')+'</p>';}).join('');
 }
 
-function togglePreview() {
-  showPreview = !showPreview;
-  const pp = document.getElementById('previewPanel');
-  const ep = document.getElementById('editorPanel');
-  if (showPreview) {
-    pp.classList.add('active');
-    ep.style.display = 'none';
-    pp.innerHTML = renderPreview();
+function togglePreview(){
+  previewOpen=!previewOpen;
+  if(previewOpen){
+    document.getElementById('previewContent').innerHTML=parseContent(document.getElementById('eContent').value);
+    document.getElementById('previewWrap').classList.add('open');
+    document.getElementById('editorWrap').style.display='none';
   } else {
-    pp.classList.remove('active');
-    ep.style.display = '';
+    document.getElementById('previewWrap').classList.remove('open');
+    document.getElementById('editorWrap').style.display='';
   }
 }
 
-function renderPreview() {
-  const content = document.getElementById('eContent').value;
-  const title   = document.getElementById('eTitle').value || 'Untitled';
-  const parsed  = content
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/^---$/gm, '<hr>')
-    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
-    .replace(/\[BULL\]([\s\S]+?)\[\/BULL\]/g, '<div style="padding:12px 16px;border-left:3px solid #4caf7d;background:rgba(76,175,125,0.06);margin:16px 0;border-radius:0 4px 4px 0">$1</div>')
-    .replace(/\[BEAR\]([\s\S]+?)\[\/BEAR\]/g, '<div style="padding:12px 16px;border-left:3px solid #e05c5c;background:rgba(224,92,92,0.06);margin:16px 0;border-radius:0 4px 4px 0">$1</div>')
-    .replace(/\[NOTE\]([\s\S]+?)\[\/NOTE\]/g, '<div style="padding:12px 16px;border-left:3px solid var(--gold);background:rgba(200,169,110,0.06);margin:16px 0;border-radius:0 4px 4px 0">$1</div>')
-    .split('\n\n').map(b => {
-      b = b.trim();
-      if (!b || b.startsWith('<')) return b;
-      return '<p>' + b.replace(/\n/g, '<br>') + '</p>';
-    }).join('');
-
-  return `
-    <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:16px">Preview</div>
-    <h1 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--white);margin-bottom:20px;line-height:1.1">${title}</h1>
-    ${parsed}`;
-}
-
-function insertMd(before, after) {
-  const ta = document.getElementById('eContent');
-  const start = ta.selectionStart, end = ta.selectionEnd;
-  const selected = ta.value.substring(start, end);
-  const b = before.replace(/\\n/g, '\n');
-  const a = after.replace(/\\n/g, '\n');
-  ta.value = ta.value.substring(0, start) + b + selected + a + ta.value.substring(end);
-  ta.focus();
-  ta.setSelectionRange(start + b.length, start + b.length + selected.length);
-}
-
-function setSaveStatus(msg) {
-  const el = document.getElementById('saveStatus');
-  if (el) el.textContent = msg;
-}
-
-document.addEventListener('keydown', e => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-    e.preventDefault();
-    saveArticle(false);
-  }
-});
-
+function setSaveStatus(m){const el=document.getElementById('saveStatus');if(el)el.textContent=m;}
 main();
 </script>
 </body>

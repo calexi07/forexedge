@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EaglePips — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="hub.css">
+</head>
+<body class="et-loading">
+<div id="et-loader">
+  <div class="et-loader-logo"><div class="et-loader-eagle">🦅</div><div class="et-loader-name">Eagle<span>Pips</span></div></div>
+  <div class="et-loader-bar"><div class="et-loader-bar-fill"></div></div>
+  <div class="et-loader-text">Loading admin...</div>
+</div>
+<div id="etSidebarMount"></div>
+<div class="hub-main">
+  <div class="hub-topbar">
+    <div class="hub-topbar-title">⚙️ <strong>Admin Panel</strong></div>
+  </div>
+  <div class="hub-content" id="adminContent">
+    <div style="text-align:center;padding:60px"><div class="et-spinner"></div></div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="hub-sidebar.js"></script>
+<script>
+async function main() {
+  const res = await initEtSidebar('admin');
+  if (!res) return;
+  const user = res.user;
+  if (!user.user_metadata?.is_admin) {
+    document.getElementById('adminContent').innerHTML = `<div style="text-align:center;padding:80px"><div style="font-size:48px;opacity:0.2;margin-bottom:16px">🔒</div><div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--white);margin-bottom:8px">Access Denied</div><a href="hub.html" class="et-btn-ghost">← Back to Hub</a></div>`;
+    return;
+  }
+  renderHub(res);
+}
+
+async function renderHub(res) {
+  const _sb = res.sb;
+  // Load counts
+  const [art, usr, wid] = await Promise.all([
+    _sb.from('articles').select('id,published', {count:'exact'}),
+    _sb.from('auth.users').select('id', {count:'exact'}).catch(()=>({count:0})),
+    _sb.from('sidebar_widgets').select('id', {count:'exact'})
+  ]);
+  const artTotal = art.data?.length || 0;
+  const artLive  = art.data?.filter(a=>a.published).length || 0;
+  const widTotal = wid.data?.length || 0;
+
+  document.getElementById('adminContent').innerHTML = `
+    <div style="margin-bottom:28px">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">// Admin Panel</div>
+      <h1 style="font-family:'Playfair Display',serif;font-size:clamp(24px,3vw,38px);font-weight:700;color:var(--white)">What would you like to <em style="color:var(--gold)">manage?</em></h1>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
+      <a href="admin-articles.html" style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:28px;text-decoration:none;transition:all 0.2s;display:block" onmouseover="this.style.borderColor='var(--gold-border)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border2)';this.style.transform=''">
+        <div style="font-size:36px;margin-bottom:14px">✍️</div>
+        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:6px">Articles</div>
+        <div style="font-size:13px;color:var(--white2);margin-bottom:14px;line-height:1.6">Write, edit and publish market updates and analysis.</div>
+        <div style="display:flex;gap:10px">
+          <span style="font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:100px">${artTotal} total</span>
+          <span style="font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;background:var(--bull-bg);border:1px solid rgba(76,175,125,0.2);color:var(--bull);border-radius:100px">${artLive} live</span>
+        </div>
+      </a>
+      <a href="admin-sidebar.html" style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:28px;text-decoration:none;transition:all 0.2s;display:block" onmouseover="this.style.borderColor='var(--gold-border)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border2)';this.style.transform=''">
+        <div style="font-size:36px;margin-bottom:14px">🗂</div>
+        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:6px">Sidebar</div>
+        <div style="font-size:13px;color:var(--white2);margin-bottom:14px;line-height:1.6">Manage sidebar widgets shown on article pages.</div>
+        <span style="font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:100px">${widTotal} widgets</span>
+      </a>
+      <a href="admin-users.html" style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:28px;text-decoration:none;transition:all 0.2s;display:block" onmouseover="this.style.borderColor='var(--gold-border)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border2)';this.style.transform=''">
+        <div style="font-size:36px;margin-bottom:14px">👥</div>
+        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:6px">Users</div>
+        <div style="font-size:13px;color:var(--white2);margin-bottom:14px;line-height:1.6">Manage registered users, assign admin or mentor roles.</div>
+        <span style="font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:100px">Manage roles</span>
+      </a>
+      <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:28px;opacity:0.5;cursor:default">
+        <div style="font-size:36px;margin-bottom:14px">⚙️</div>
+        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:6px">Settings</div>
+        <div style="font-size:13px;color:var(--white2);margin-bottom:14px;line-height:1.6">Site settings and configuration.</div>
+        <span style="font-family:'DM Mono',monospace;font-size:9px;padding:3px 10px;background:rgba(255,255,255,0.04);border:1px solid var(--border2);color:var(--white3);border-radius:100px">Coming soon</span>
+      </div>
+    </div>`;
+}
+main();
+</script>
+</body>
+</html>

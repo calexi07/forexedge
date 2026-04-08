@@ -8,168 +8,86 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <style>
-.article-page { max-width: 760px; margin: 0 auto; padding: 80px 24px 100px; }
-.article-back {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-family: 'DM Mono', monospace; font-size: 11px;
-  color: #7a7570; text-decoration: none; letter-spacing: 0.05em;
-  margin-bottom: 40px; transition: color 0.2s;
-}
-.article-back:hover { color: var(--gold); }
-.article-header { margin-bottom: 32px; }
-.article-tag {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase;
-  padding: 3px 10px; border-radius: 100px;
-  display: inline-flex; margin-bottom: 16px;
-}
-.article-tag.technical   { background: rgba(74,158,255,0.12); color: #6ba3ff; border: 1px solid rgba(74,158,255,0.2); }
-.article-tag.fundamental { background: rgba(200,169,110,0.1); color: var(--gold); border: 1px solid rgba(200,169,110,0.2); }
-.article-tag.market      { background: rgba(76,175,125,0.12); color: #4caf7d; border: 1px solid rgba(76,175,125,0.2); }
-.article-tag.default     { background: rgba(255,255,255,0.05); color: #a09880; border: 1px solid rgba(255,255,255,0.08); }
-.article-h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(28px, 4vw, 48px);
-  font-weight: 900; line-height: 1.1;
-  color: #ffffff; margin-bottom: 16px;
-  letter-spacing: -0.01em;
-}
-.article-meta-row {
-  display: flex; align-items: center; gap: 16px;
-  padding: 14px 0; border-top: 1px solid rgba(255,255,255,0.06);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  margin-bottom: 32px;
-}
-.article-meta-item {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px; color: #7a7570;
-  display: flex; align-items: center; gap: 5px;
-}
-.article-cover {
-  width: 100%; height: 360px;
-  background: linear-gradient(135deg, #0c0e13, #161b24);
-  border-radius: 4px; overflow: hidden;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 64px; margin-bottom: 40px;
-  border: 1px solid rgba(255,255,255,0.06);
-}
-.article-cover img { width: 100%; height: 100%; object-fit: cover; }
-
-/* Article content typography */
-.article-content { color: #c8c4bc; font-size: 16px; line-height: 1.85; }
-.article-content h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: 26px; font-weight: 700; color: #ffffff;
-  margin: 40px 0 16px; line-height: 1.2;
-}
-.article-content h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 20px; font-weight: 700; color: #ffffff;
-  margin: 32px 0 12px;
-}
-.article-content p { margin-bottom: 20px; }
-.article-content strong { color: #ffffff; font-weight: 600; }
-.article-content em { color: var(--gold); font-style: italic; }
-.article-content ul, .article-content ol {
-  padding-left: 24px; margin-bottom: 20px;
-}
-.article-content li { margin-bottom: 8px; }
-.article-content blockquote {
-  border-left: 3px solid var(--gold);
-  padding: 12px 20px; margin: 24px 0;
-  background: rgba(200,169,110,0.06);
-  border-radius: 0 4px 4px 0;
-  font-style: italic; color: #a09880;
-}
-.article-content img {
-  width: 100%; border-radius: 4px; margin: 24px 0;
-  border: 1px solid rgba(255,255,255,0.06);
-}
-.article-content hr {
-  border: none; border-top: 1px solid rgba(255,255,255,0.06);
-  margin: 40px 0;
-}
-.article-content a { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
-.article-content code {
-  font-family: 'DM Mono', monospace; font-size: 13px;
-  background: rgba(255,255,255,0.06); padding: 2px 6px;
-  border-radius: 3px; color: #c8c4bc;
-}
-.article-content pre {
-  background: #0c0e13; border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 4px; padding: 16px; overflow-x: auto;
-  margin-bottom: 20px;
-}
-.article-content pre code { background: none; padding: 0; }
-
-/* Callout boxes */
-.article-content .callout {
-  padding: 14px 18px; border-radius: 4px; margin: 24px 0;
-  border-left: 3px solid var(--gold);
-  background: rgba(200,169,110,0.06);
-}
-.article-content .callout-bull {
-  border-left-color: #4caf7d;
-  background: rgba(76,175,125,0.06);
-}
-.article-content .callout-bear {
-  border-left-color: #e05c5c;
-  background: rgba(224,92,92,0.06);
-}
-
-/* Bottom nav */
-.article-nav {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 14px; margin-top: 60px; padding-top: 40px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-}
-.article-nav-item {
-  background: #0c0e13; border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 4px; padding: 16px; text-decoration: none;
-  transition: border-color 0.2s; display: block;
-}
-.article-nav-item:hover { border-color: rgba(200,169,110,0.25); }
-.article-nav-label {
-  font-family: 'DM Mono', monospace; font-size: 9px;
-  color: #5a5648; letter-spacing: 0.12em; text-transform: uppercase;
-  margin-bottom: 6px;
-}
-.article-nav-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 14px; font-weight: 700; color: #c8c4bc; line-height: 1.3;
-}
-.article-nav-item.next { text-align: right; }
-
-.loading-center { text-align: center; padding: 80px; color: #5a5648; }
-.spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(200,169,110,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+.art-page-wrap{max-width:1200px;margin:0 auto;padding:80px 24px 100px;display:grid;grid-template-columns:160px 1fr 260px;gap:32px;align-items:start}
+.art-left-col{position:sticky;top:90px}
+.art-main-col{}
+.art-right-col{position:sticky;top:90px;display:flex;flex-direction:column;gap:16px}
+.art-back{display:inline-flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:11px;color:#7a7570;text-decoration:none;letter-spacing:0.05em;margin-bottom:28px;transition:color 0.2s;white-space:nowrap}
+.art-back:hover{color:var(--gold)}
+.art-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;padding:3px 10px;border-radius:100px;display:inline-flex;margin-bottom:14px}
+.art-tag.technical{background:rgba(74,158,255,0.12);color:#6ba3ff;border:1px solid rgba(74,158,255,0.2)}
+.art-tag.fundamental{background:rgba(200,169,110,0.1);color:var(--gold);border:1px solid rgba(200,169,110,0.2)}
+.art-tag.market{background:rgba(76,175,125,0.12);color:#4caf7d;border:1px solid rgba(76,175,125,0.2)}
+.art-tag.default{background:rgba(255,255,255,0.05);color:#a09880;border:1px solid rgba(255,255,255,0.08)}
+.art-h1{font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,46px);font-weight:900;line-height:1.08;color:#fff;margin-bottom:14px;letter-spacing:-0.01em}
+.art-excerpt{font-size:17px;color:#a09880;line-height:1.7;margin-bottom:20px}
+/* Meta row */
+.art-meta{display:flex;align-items:center;gap:16px;padding:14px 0;border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:24px;flex-wrap:wrap}
+.art-meta-item{font-family:'DM Mono',monospace;font-size:11px;color:#7a7570;display:flex;align-items:center;gap:5px}
+.art-author{display:flex;align-items:center;gap:8px}
+.art-author-av{width:26px;height:26px;border-radius:50%;background:rgba(200,169,110,0.12);border:1px solid rgba(200,169,110,0.2);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);font-weight:500}
+.art-author-name{font-size:12px;font-weight:500;color:#c8c4bc}
+/* Keynotes */
+.art-keynotes{background:rgba(200,169,110,0.05);border:1px solid rgba(200,169,110,0.15);border-left:3px solid var(--gold);border-radius:0 4px 4px 0;padding:18px 20px;margin-bottom:28px}
+.art-keynotes-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.art-keynotes ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:7px}
+.art-keynotes li{font-size:14px;color:#c8c4bc;line-height:1.6;display:flex;align-items:flex-start;gap:8px}
+.art-keynotes li::before{content:'→';color:var(--gold);font-family:'DM Mono',monospace;font-size:11px;margin-top:2px;flex-shrink:0}
+/* Cover */
+.art-cover{width:100%;height:340px;background:linear-gradient(135deg,#0c0e13,#161b24);border-radius:4px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:52px;margin-bottom:32px;border:1px solid rgba(255,255,255,0.06)}
+.art-cover img{width:100%;height:100%;object-fit:cover}
+/* Content */
+.art-content{color:#c8c4bc;font-size:16px;line-height:1.9}
+.art-content h2{font-family:'Playfair Display',serif;font-size:25px;font-weight:700;color:#fff;margin:36px 0 14px;line-height:1.2}
+.art-content h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;margin:28px 0 10px}
+.art-content p{margin-bottom:18px}
+.art-content strong{color:#fff;font-weight:600}
+.art-content em{color:var(--gold);font-style:italic}
+.art-content ul,.art-content ol{padding-left:22px;margin-bottom:18px}
+.art-content li{margin-bottom:7px;line-height:1.7}
+.art-content blockquote{border-left:3px solid var(--gold);padding:12px 18px;margin:22px 0;background:rgba(200,169,110,0.06);border-radius:0 4px 4px 0;font-style:italic;color:#a09880}
+.art-content img{max-width:100%;border-radius:4px;margin:22px 0;border:1px solid rgba(255,255,255,0.06);display:block}
+.art-content hr{border:none;border-top:1px solid rgba(255,255,255,0.06);margin:36px 0}
+.art-content a{color:var(--gold);text-decoration:underline;text-underline-offset:3px}
+.art-content .cb{padding:14px 18px;border-radius:0 4px 4px 0;margin:22px 0;font-size:15px;line-height:1.75}
+.art-content .cb-bull{border-left:3px solid #4caf7d;background:rgba(76,175,125,0.07)}
+.art-content .cb-bear{border-left:3px solid #e05c5c;background:rgba(224,92,92,0.07)}
+.art-content .cb-note{border-left:3px solid var(--gold);background:rgba(200,169,110,0.07)}
+.art-content .img-split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
+.art-content .img-split img{margin:0}
+/* Sidebar widgets */
+.sw{background:#0c0e13;border:1px solid rgba(255,255,255,0.06);border-radius:4px;overflow:hidden}
+.sw-hdr{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.06);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold)}
+.sw-body{padding:14px}
+.sw-text{font-size:13px;color:#a09880;line-height:1.7}
+.sw-cta-btn{display:block;width:100%;margin-top:12px;padding:9px;background:var(--gold);border:none;color:#08090c;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:3px;text-align:center;text-decoration:none;transition:background 0.2s}
+.sw-cta-btn:hover{background:#e8cc94}
+.sw-img{width:100%;display:block}
+.sw-ad{width:100%;min-height:140px;background:linear-gradient(135deg,rgba(200,169,110,0.06),rgba(200,169,110,0.02));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-family:'DM Mono',monospace;font-size:10px;color:#5a5648;letter-spacing:0.1em;text-transform:uppercase;border:1px dashed rgba(200,169,110,0.12);border-radius:4px;padding:20px;text-align:center}
+/* Nav between articles */
+.art-nav{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:52px;padding-top:36px;border-top:1px solid rgba(255,255,255,0.06)}
+.art-nav-item{background:#0c0e13;border:1px solid rgba(255,255,255,0.06);border-radius:4px;padding:14px;text-decoration:none;transition:border-color 0.2s;display:block}
+.art-nav-item:hover{border-color:rgba(200,169,110,0.25)}
+.art-nav-lbl{font-family:'DM Mono',monospace;font-size:9px;color:#5a5648;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:5px}
+.art-nav-ttl{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#c8c4bc;line-height:1.3}
+.art-nav-item.right{text-align:right}
+/* Left ad column */
+.art-ad-wrap{display:flex;flex-direction:column;gap:14px;align-items:flex-end}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid rgba(200,169,110,0.2);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:1100px){.art-page-wrap{grid-template-columns:1fr 260px}}
+@media(max-width:860px){.art-page-wrap{grid-template-columns:1fr;padding:60px 16px 80px}.art-right-col,.art-left-col{position:relative;top:auto}.art-left-col{display:none}}
+@media(max-width:600px){.art-content .img-split{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<nav style="position:fixed;top:0;left:0;right:0;z-index:100;height:60px;padding:0 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,8,12,0.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.04)">
-  <a href="index.html" style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#fff;display:flex;align-items:center;gap:10px;text-decoration:none">
-    <div style="width:28px;height:28px;background:linear-gradient(135deg,#c8a96e,#8a6a32);clip-path:polygon(50% 0%,85% 15%,100% 50%,85% 85%,50% 100%,15% 85%,0% 50%,15% 15%);display:flex;align-items:center;justify-content:center;font-size:13px">🦅</div>
-    Eagle<span style="color:#c8a96e;font-style:italic">Pips</span>
-  </a>
-  <div style="display:flex;align-items:center;gap:20px">
-    <a href="index.html" style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#7a7570;text-decoration:none">Home</a>
-    <a href="market-updates.html" style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#c8a96e;text-decoration:none">Market Updates</a>
-    <a href="tools.html" style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#7a7570;text-decoration:none">Tools</a>
-  </div>
-  <div id="navCta" style="display:flex;align-items:center;gap:10px">
-    <a href="auth.html" style="padding:7px 18px;border:1px solid rgba(200,169,110,0.2);color:#a09880;font-size:12px;text-decoration:none;border-radius:3px;transition:all 0.2s">Sign In</a>
-    <a href="hub.html" style="padding:7px 18px;background:#c8a96e;border:1px solid #c8a96e;color:#08090c;font-size:12px;font-weight:700;text-decoration:none;border-radius:3px">Get Access →</a>
-  </div>
-</nav>
-<div style="height:60px"></div>
-
-<div class="article-page" id="articlePage">
-  <div class="loading-center">
+<div id="navMount"></div>
+<div id="articlePageWrap">
+  <div style="text-align:center;padding:120px 24px">
     <div class="spinner"></div>
-    <div style="margin-top:12px;font-size:13px">Loading article...</div>
+    <div style="margin-top:14px;font-size:13px;color:#5a5648">Loading article...</div>
   </div>
 </div>
-
 <footer>
   <div class="footer-logo">Eagle<span>Pips</span></div>
   <ul class="footer-links">
@@ -180,176 +98,171 @@
   <div class="footer-copy">© 2026 EaglePips. All rights reserved.</div>
 </footer>
 
-
 <script>
-const SB_URL = 'https://vaimxhgqcdhjhdiaampa.supabase.co';
-const SB_KEY = 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
+const SB_URL='https://vaimxhgqcdhjhdiaampa.supabase.co';
+const SB_KEY='sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
 
-function tagClass(cat) {
-  if (!cat) return 'default';
-  const c = cat.toLowerCase();
-  if (c.includes('technical'))   return 'technical';
-  if (c.includes('fundamental')) return 'fundamental';
-  if (c.includes('market'))      return 'market';
-  return 'default';
+function tagClass(cat){
+  if(!cat)return'default';const c=cat.toLowerCase();
+  if(c.includes('technical'))return'technical';
+  if(c.includes('fundamental'))return'fundamental';
+  if(c.includes('market'))return'market';
+  return'default';
+}
+function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long',year:'numeric'});}
+function fmtDateShort(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'});}
+
+function parseContent(c){
+  if(!c)return'';
+  return c
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^---$/gm,'<hr>')
+    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g,'<img src="$2" alt="$1">')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank">$1</a>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>[\s\S]+?<\/li>)/g,'<ul>$1</ul>')
+    .replace(/\[SPLIT\]([\s\S]+?)\[\/SPLIT\]/g,'<div class="img-split">$1</div>')
+    .replace(/\[BULL\]([\s\S]+?)\[\/BULL\]/g,'<div class="cb cb-bull">$1</div>')
+    .replace(/\[BEAR\]([\s\S]+?)\[\/BEAR\]/g,'<div class="cb cb-bear">$1</div>')
+    .replace(/\[NOTE\]([\s\S]+?)\[\/NOTE\]/g,'<div class="cb cb-note">$1</div>')
+    .split('\n\n').map(b=>{b=b.trim();if(!b||b.startsWith('<'))return b;return'<p>'+b.replace(/\n/g,'<br>')+'</p>';}).join('');
 }
 
-function fmtDate(d) {
-  if (!d) return '—';
-  return new Date(d).toLocaleDateString('en-US', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+function renderSidebarWidget(w){
+  const body=`<div class="sw-body">
+    ${w.type==='ad'?
+      (w.image_url?`<a href="${w.link_url||'#'}" target="_blank"><img src="${w.image_url}" class="sw-img" alt="${w.title||'Ad'}"></a>`:
+      `<div class="sw-ad"><span>📢</span><span>Advertisement</span>${w.link_url?`<a href="${w.link_url}" target="_blank" style="color:var(--gold);font-size:10px;text-decoration:none">${w.link_label||'Visit'}</a>`:''}</div>`)
+    :w.type==='image'?
+      (w.image_url?`<img src="${w.image_url}" class="sw-img" alt="${w.title||''}">`:'')+
+      (w.content?`<div class="sw-text" style="margin-top:10px">${w.content}</div>`:'')
+    :`<div class="sw-text">${w.content||''}</div>
+     ${w.link_url?`<a href="${w.link_url}" class="sw-cta-btn" target="_blank">${w.link_label||'Learn More'}</a>`:''}`}
+  </div>`;
+  return`<div class="sw">${w.title?`<div class="sw-hdr">${w.title}</div>`:''} ${body}</div>`;
 }
 
-// Convert markdown-like content to HTML
-function parseContent(content) {
-  if (!content) return '';
-  let html = content
-    // Headers
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    // Bold + italic
-    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Horizontal rule
-    .replace(/^---$/gm, '<hr>')
-    // Blockquote
-    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
-    // Unordered list
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
-    // Links
-    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank">$1</a>')
-    // Callouts
-    .replace(/\[BULL\]([\s\S]+?)\[\/BULL\]/g, '<div class="callout callout-bull">$1</div>')
-    .replace(/\[BEAR\]([\s\S]+?)\[\/BEAR\]/g, '<div class="callout callout-bear">$1</div>')
-    .replace(/\[NOTE\]([\s\S]+?)\[\/NOTE\]/g, '<div class="callout">$1</div>')
-    // Paragraphs - wrap lines that aren't already in tags
-    .split('\n\n')
-    .map(block => {
-      block = block.trim();
-      if (!block) return '';
-      if (block.startsWith('<h') || block.startsWith('<ul') || block.startsWith('<blockquote') || block.startsWith('<hr') || block.startsWith('<div')) return block;
-      return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
-    })
-    .join('');
-  return html;
-}
+async function initPage(){
+  // renderNav defined inline below
+  renderNav('updates');
+  const slug=new URLSearchParams(window.location.search).get('slug');
+  if(!slug){window.location.href='market-updates.html';return;}
+  const _sb=window.supabase.createClient(SB_URL,SB_KEY);
 
-async function adminDelete(id) {
-  if (!confirm('Delete this article permanently?')) return;
-  const _sb = window.supabase.createClient(SB_URL, SB_KEY);
-  await _sb.from('articles').delete().eq('id', id);
-  window.location.href = 'market-updates.html';
-}
+  const[artRes,widRes]=await Promise.all([
+    _sb.from('articles').select('*').eq('slug',slug).eq('published',true).single(),
+    _sb.from('sidebar_widgets').select('*').eq('active',true).order('sort_order',{ascending:true})
+  ]);
 
-async function initPage() {
-  // Update nav auth state
-  try {
-    const _sbNav = window.supabase.createClient('https://vaimxhgqcdhjhdiaampa.supabase.co','sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH');
-    const { data: { session } } = await _sbNav.auth.getSession();
-    if (session?.user) {
-      const u = session.user;
-      const name = u.user_metadata?.full_name || u.email?.split('@')[0] || 'Trader';
-      const ini = name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
-      const av = localStorage.getItem('et_av_'+u.id);
-      const avHtml = av ? `<img src="${av}" style="width:24px;height:24px;border-radius:50%;object-fit:cover">` : `<span style="font-family:'DM Mono',monospace;font-size:10px;color:#c8a96e">${ini}</span>`;
-      const isAdmin = u.user_metadata?.is_admin === true;
-      const cta = document.getElementById('navCta');
-      if (cta) cta.innerHTML = `
-        <a href="hub.html" style="padding:7px 16px;border:1px solid rgba(200,169,110,0.2);color:#a09880;font-size:12px;text-decoration:none;border-radius:3px;display:inline-flex;align-items:center;gap:7px">
-          <div style="width:24px;height:24px;border-radius:50%;background:rgba(200,169,110,0.1);border:1px solid rgba(200,169,110,0.2);display:flex;align-items:center;justify-content:center;overflow:hidden">${avHtml}</div>
-          My Hub
-        </a>
-        ${isAdmin ? '<a href="admin-articles.html" style="padding:7px 12px;border:1px solid rgba(200,169,110,0.2);color:#a09880;font-size:11px;text-decoration:none;border-radius:3px">⚙️ Admin</a>' : ''}
-        <button onclick="(async()=>{await window.supabase.createClient('https://vaimxhgqcdhjhdiaampa.supabase.co','sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH').auth.signOut();window.location.reload()})()" style="padding:7px 14px;background:#c8a96e;border:1px solid #c8a96e;color:#08090c;font-size:12px;font-weight:700;border-radius:3px;cursor:pointer">Sign Out</button>`;
-    }
-  } catch(e) {}
-  const slug = new URLSearchParams(window.location.search).get('slug');
-  if (!slug) { window.location.href = 'market-updates.html'; return; }
+  const article=artRes.data;
+  const widgets=widRes.data||[];
 
-  const _sb = window.supabase.createClient(SB_URL, SB_KEY);
-  const { data: article, error } = await _sb
-    .from('articles')
-    .select('*')
-    .eq('slug', slug)
-    .eq('published', true)
-    .single();
-
-  if (error || !article) {
-    document.getElementById('articlePage').innerHTML = `
-      <a href="market-updates.html" class="article-back">← Back to Market Updates</a>
-      <div style="text-align:center;padding:60px;color:#7a7570">
-        <div style="font-size:40px;opacity:0.2;margin-bottom:14px">📄</div>
-        <div style="font-size:18px;color:#c8c4bc;margin-bottom:8px">Article not found</div>
+  if(!article){
+    document.getElementById('articlePageWrap').innerHTML=`
+      <div style="max-width:760px;margin:0 auto;padding:80px 24px;text-align:center">
+        <a href="market-updates.html" class="art-back">← Back to Market Updates</a>
+        <div style="font-size:40px;opacity:0.15;margin:20px 0 14px">📄</div>
+        <div style="font-family:'Playfair Display',serif;font-size:24px;color:#fff;margin-bottom:8px">Article not found</div>
         <a href="market-updates.html" style="color:var(--gold);font-size:13px">← Back to Market Updates</a>
       </div>`;
     return;
   }
 
-  // Update page title
-  document.title = `EaglePips — ${article.title}`;
-
-  // Check if admin
-  const { data: { session } } = await _sb.auth.getSession();
-  const isAdmin = session?.user?.user_metadata?.is_admin === true;
+  document.title=`EaglePips — ${article.title}`;
 
   // Fetch adjacent articles
-  const { data: allArticles } = await _sb
-    .from('articles').select('id,title,slug,published_at')
-    .eq('published', true).order('published_at', { ascending: false });
+  const{data:all}=await _sb.from('articles').select('id,title,slug,published_at').eq('published',true).order('published_at',{ascending:false});
+  const idx=all?.findIndex(a=>a.slug===slug)??-1;
+  const prevArt=idx>0?all[idx-1]:null;
+  const nextArt=idx<(all?.length-1)?all[idx+1]:null;
 
-  const idx = allArticles?.findIndex(a => a.slug === slug) ?? -1;
-  const prev = idx > 0 ? allArticles[idx - 1] : null;
-  const next = idx < (allArticles?.length - 1) ? allArticles[idx + 1] : null;
+  const rightWidgets=widgets.filter(w=>w.position==='right');
+  const leftWidgets=widgets.filter(w=>w.position==='left');
 
-  const coverHtml = article.cover_url
-    ? `<img src="${article.cover_url}" alt="${article.title}" onerror="this.style.display='none'">`
-    : `📊`;
+  const authorIni=(article.author_name||'E').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+  const pubDate=fmtDate(article.published_at||article.created_at);
+  const pubDateShort=fmtDateShort(article.published_at||article.created_at);
 
-  document.getElementById('articlePage').innerHTML = `
-    <a href="market-updates.html" class="article-back">← Back to Market Updates</a>
-    ${isAdmin ? `<div style="background:rgba(200,169,110,0.08);border:1px solid rgba(200,169,110,0.2);border-radius:4px;padding:10px 16px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-      <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);letter-spacing:0.08em">⚙️ ADMIN</span>
-      <div style="display:flex;gap:8px">
-        <a href="admin-articles.html" onclick="localStorage.setItem('ep_edit_slug','${article.slug}')" style="padding:5px 12px;background:transparent;border:1px solid rgba(200,169,110,0.3);color:var(--gold);font-family:'Syne',sans-serif;font-size:11px;cursor:pointer;border-radius:3px;text-decoration:none">✏️ Edit</a>
-        <button onclick="adminDelete('${article.id}')" style="padding:5px 12px;background:transparent;border:1px solid rgba(224,92,92,0.3);color:#e05c5c;font-family:'Syne',sans-serif;font-size:11px;cursor:pointer;border-radius:3px">🗑 Delete</button>
+  const coverHtml=article.cover_url
+    ?`<img src="${article.cover_url}" alt="${article.title}" onerror="this.style.display='none'">`
+    :`📊`;
+
+  const keynotesHtml=article.keynotes?.length?`
+    <div class="art-keynotes">
+      <div class="art-keynotes-title">Key Points</div>
+      <ul>${article.keynotes.map(k=>`<li>${k}</li>`).join('')}</ul>
+    </div>`:'';
+
+  const leftColHtml=leftWidgets.length?leftWidgets.map(renderSidebarWidget).join(''):`
+    <div class="sw-ad"><span>📢</span><span>Ad Space</span><span style="font-size:9px;margin-top:4px">Contact us to advertise</span></div>`;
+
+  const rightColHtml=rightWidgets.length?rightWidgets.map(renderSidebarWidget).join(''):`
+    <div class="sw"><div class="sw-hdr">About EaglePips</div><div class="sw-body"><div class="sw-text">Professional trading analysis — technical and fundamental insights updated regularly.</div><a href="auth.html?tab=register" class="sw-cta-btn">Get Access →</a></div></div>`;
+
+  document.getElementById('articlePageWrap').innerHTML=`
+    <div class="art-page-wrap">
+
+      <!-- Left col (ads) -->
+      <div class="art-left-col">
+        <div class="art-ad-wrap">${leftColHtml}</div>
       </div>
-    </div>` : ''}
-    <div class="article-header">
-      <span class="article-tag ${tagClass(article.category)}">${article.category || 'Market Update'}</span>
-      <h1 class="article-h1">${article.title}</h1>
-      ${article.excerpt ? `<p style="font-size:17px;color:#a09880;line-height:1.7;margin-bottom:16px">${article.excerpt}</p>` : ''}
-      <div class="article-meta-row">
-        <div class="article-meta-item">📅 ${fmtDate(article.published_at || article.created_at)}</div>
-        ${article.tags?.length ? `<div class="article-meta-item">🏷 ${article.tags.join(', ')}</div>` : ''}
+
+      <!-- Main content -->
+      <div class="art-main-col">
+        <a href="market-updates.html" class="art-back">← Market Updates</a>
+
+        <div class="art-header">
+          <span class="art-tag ${tagClass(article.category)}">${article.category||'Market Update'}</span>
+          <h1 class="art-h1">${article.title}</h1>
+          ${article.excerpt?`<p class="art-excerpt">${article.excerpt}</p>`:''}
+
+          <!-- Published date + author -->
+          <div class="art-meta">
+            <div class="art-meta-item">📅 Published ${pubDate}</div>
+            <div class="art-author">
+              <div class="art-author-av">${authorIni}</div>
+              <div class="art-author-name">${article.author_name||'EaglePips'}</div>
+            </div>
+            ${article.tags?.length?`<div class="art-meta-item">🏷 ${article.tags.join(' · ')}</div>`:''}
+          </div>
+        </div>
+
+        <!-- Keynotes -->
+        ${keynotesHtml}
+
+        <!-- Cover -->
+        ${article.cover_url?`<div class="art-cover">${coverHtml}</div>`:''}
+
+        <!-- Content -->
+        <div class="art-content">${parseContent(article.content)}</div>
+
+        <!-- Article nav -->
+        ${(prevArt||nextArt)?`
+        <div class="art-nav">
+          ${nextArt?`<a href="article.html?slug=${nextArt.slug}" class="art-nav-item"><div class="art-nav-lbl">← Previous Article</div><div class="art-nav-ttl">${nextArt.title}</div></a>`:'<div></div>'}
+          ${prevArt?`<a href="article.html?slug=${prevArt.slug}" class="art-nav-item right"><div class="art-nav-lbl">Next Article →</div><div class="art-nav-ttl">${prevArt.title}</div></a>`:'<div></div>'}
+        </div>`:''}
       </div>
-    </div>
-    ${article.cover_url ? `<div class="article-cover">${coverHtml}</div>` : ''}
-    <div class="article-content">${parseContent(article.content)}</div>
-    ${(prev || next) ? `
-    <div class="article-nav">
-      ${next ? `<a href="article.html?slug=${next.slug}" class="article-nav-item"><div class="article-nav-label">← Previous</div><div class="article-nav-title">${next.title}</div></a>` : '<div></div>'}
-      ${prev ? `<a href="article.html?slug=${prev.slug}" class="article-nav-item next"><div class="article-nav-label">Next →</div><div class="article-nav-title">${prev.title}</div></a>` : '<div></div>'}
-    </div>` : ''}
-  `;
+
+      <!-- Right sidebar -->
+      <div class="art-right-col">${rightColHtml}</div>
+
+    </div>`;
 }
 </script>
 <script>
-const _NAV_URL = 'https://vaimxhgqcdhjhdiaampa.supabase.co';
-const _NAV_KEY = 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
-
-function renderNav(activePage) {
-  const pages = [
-    { id: 'index',   label: 'Home',          href: 'index.html' },
-    { id: 'updates', label: 'Market Updates', href: 'market-updates.html' },
-    { id: 'journal', label: 'Journal',        href: 'journal.html' },
-    { id: 'tools',   label: 'Tools',          href: 'tools.html' },
-  ];
-  const links = pages.map(p =>
-    `<li><a href="${p.href}" class="nav-link ${activePage===p.id?'active':''}">${p.label}</a></li>`
-  ).join('');
-
-  document.getElementById('navMount').innerHTML = `
+// nav.js inline
+const _NAV_URL='https://vaimxhgqcdhjhdiaampa.supabase.co';
+const _NAV_KEY='sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
+function renderNav(activePage){
+  const pages=[{id:'index',label:'Home',href:'index.html'},{id:'updates',label:'Market Updates',href:'market-updates.html'},{id:'tools',label:'Tools',href:'tools.html'}];
+  const links=pages.map(p=>`<li><a href="${p.href}" class="nav-link ${activePage===p.id?'active':''}">${p.label}</a></li>`).join('');
+  document.getElementById('navMount').innerHTML=`
     <nav>
       <a href="index.html" class="nav-logo">
         <div style="width:28px;height:28px;background:linear-gradient(135deg,#c8a96e,#8a6a32);clip-path:polygon(50% 0%,85% 15%,100% 50%,85% 85%,50% 100%,15% 85%,0% 50%,15% 15%);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">🦅</div>
@@ -360,79 +273,33 @@ function renderNav(activePage) {
         <a href="auth.html" class="btn-ghost">Sign In</a>
         <a href="auth.html?tab=register" class="btn-gold">Get Access →</a>
       </div>
-      <button class="nav-burger" onclick="toggleMobileNav()" id="burger">☰</button>
-    </nav>
-    <div class="mobile-nav" id="mobileNav">
-      ${pages.map(p=>`<a href="${p.href}" class="${activePage===p.id?'active':''}">${p.label}</a>`).join('')}
-      <a href="auth.html?tab=register" style="color:var(--gold)" id="mobileAuthLink">Get Access →</a>
-    </div>`;
-
-  // Wait for Supabase to be ready then check auth
-  waitForSupabase(checkNavAuthState);
+    </nav>`;
+  waitForSb(checkAuth);
 }
-
-function toggleMobileNav() {
-  document.getElementById('mobileNav')?.classList.toggle('open');
+function waitForSb(cb,n=0){if(window.supabase?.createClient)cb();else if(n<20)setTimeout(()=>waitForSb(cb,n+1),100);}
+async function checkAuth(){
+  try{
+    const _sb=window.supabase.createClient(_NAV_URL,_NAV_KEY);
+    const{data:{session}}=await _sb.auth.getSession();
+    if(!session?.user)return;
+    const user=session.user;
+    const name=user.user_metadata?.full_name||user.email?.split('@')[0]||'Trader';
+    const ini=name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+    const av=localStorage.getItem('et_av_'+user.id);
+    const avHtml=av?`<img src="${av}" style="width:26px;height:26px;border-radius:50%;object-fit:cover">`:`<span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold)">${ini}</span>`;
+    const isAdmin=user.user_metadata?.is_admin===true;
+    const el=document.getElementById('navCta');
+    if(el)el.innerHTML=`
+      <a href="hub.html" class="btn-ghost" style="display:inline-flex;align-items:center;gap:8px">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">${avHtml}</div>My Hub
+      </a>
+      ${isAdmin?'<a href="admin.html" class="btn-ghost" style="font-size:11px;padding:6px 12px">⚙️ Admin</a>':''}
+      <button class="btn-gold" onclick="navSO()">Sign Out</button>`;
+  }catch(e){}
 }
-
-// Retry until window.supabase is available (CDN might still be loading)
-function waitForSupabase(callback, attempts=0) {
-  if (window.supabase && window.supabase.createClient) {
-    callback();
-  } else if (attempts < 20) {
-    setTimeout(() => waitForSupabase(callback, attempts + 1), 100);
-  }
-}
-
-async function checkNavAuthState() {
-  try {
-    const _sb = window.supabase.createClient(_NAV_URL, _NAV_KEY);
-    const { data: { session } } = await _sb.auth.getSession();
-    if (!session?.user) return;
-
-    const user = session.user;
-    const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Trader';
-    const initials = name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
-
-    // Check both avatar key variants
-    const savedAvatar = localStorage.getItem('et_av_'+user.id) || localStorage.getItem('fe_avatar_'+user.id);
-    const avatarHtml = savedAvatar
-      ? `<img src="${savedAvatar}" style="width:26px;height:26px;border-radius:50%;object-fit:cover">`
-      : `<span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold)">${initials}</span>`;
-
-    const isAdmin = user.user_metadata?.is_admin === true;
-    const ctaEl = document.getElementById('navCta');
-    if (ctaEl) {
-      ctaEl.innerHTML = `
-        <a href="hub.html" class="btn-ghost" style="display:inline-flex;align-items:center;gap:8px">
-          <div style="width:26px;height:26px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">${avatarHtml}</div>
-          My Hub
-        </a>
-        ${isAdmin ? '<a href="admin-articles.html" class="btn-ghost" style="font-size:11px;padding:6px 12px">⚙️ Admin</a>' : ''}
-        <button class="btn-gold" onclick="navSignOut()">Sign Out</button>`;
-    }
-    const ml = document.getElementById('mobileAuthLink');
-    if (ml) { ml.href='hub.html'; ml.textContent='My Hub →'; }
-  } catch(e) {
-    console.warn('Nav auth check failed:', e);
-  }
-}
-
-async function navSignOut() {
-  try {
-    const _sb = window.supabase.createClient(_NAV_URL, _NAV_KEY);
-    await _sb.auth.signOut();
-  } catch(e) {}
-  window.location.href = 'index.html';
-}
-
-function openModal(view) { window.location.href = view==='register' ? 'auth.html?tab=register' : 'auth.html'; }
-function closeModal(){} function switchModal(){} function renderModal(){} function updateNavAuth(){}
-
-window._navReady = true;
-if (window._sbReady) initPage();
+async function navSO(){try{const _sb=window.supabase.createClient(_NAV_URL,_NAV_KEY);await _sb.auth.signOut();}catch(e){}window.location.href='index.html';}
+window._navReady=true;if(window._sbReady)initPage();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="window._sbReady=true;if(window._navReady)initPage()"></script>
-
 </body>
 </html>

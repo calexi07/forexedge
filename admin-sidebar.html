@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EaglePips — Sidebar Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="hub.css">
+<style>
+.sidebar-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.widget-card{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:12px;transition:border-color 0.2s}
+.widget-card:hover{border-color:var(--gold-border)}
+.widget-card.inactive{opacity:0.5}
+.wc-header{padding:12px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border2);background:var(--bg3)}
+.wc-drag{color:var(--white3);cursor:grab;font-size:14px}
+.wc-title{font-size:13px;font-weight:600;color:var(--white);flex:1}
+.wc-type{font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:100px;letter-spacing:0.06em;text-transform:uppercase}
+.wc-body{padding:14px}
+.wc-actions{display:flex;gap:8px;margin-top:10px}
+.toggle-btn{padding:5px 12px;font-family:'DM Mono',monospace;font-size:10px;border-radius:3px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--white3);transition:all 0.15s}
+.toggle-btn:hover{border-color:var(--gold-border);color:var(--gold)}
+.toggle-btn.active-btn{background:var(--bull-bg);border-color:rgba(76,175,125,0.3);color:var(--bull)}
+.section-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--white3);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+</style>
+</head>
+<body class="et-loading">
+<div id="et-loader">
+  <div class="et-loader-logo"><div class="et-loader-eagle">🦅</div><div class="et-loader-name">Eagle<span>Pips</span></div></div>
+  <div class="et-loader-bar"><div class="et-loader-bar-fill"></div></div>
+  <div class="et-loader-text">Loading sidebar manager...</div>
+</div>
+<div id="etSidebarMount"></div>
+<div class="hub-main">
+  <div class="hub-topbar">
+    <a href="admin.html" style="background:none;border:1px solid var(--border2);color:var(--white3);padding:5px 12px;border-radius:3px;font-family:'DM Mono',monospace;font-size:11px;text-decoration:none;transition:all 0.2s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">← Admin</a>
+    <div class="hub-topbar-title" style="flex:1;margin-left:14px">🗂 <strong>Sidebar Manager</strong></div>
+    <button class="et-btn-gold" onclick="etOpenModal('addWidgetModal')" style="padding:6px 14px;font-size:11px">+ Add Widget</button>
+  </div>
+  <div class="hub-content" id="adminContent">
+    <div style="text-align:center;padding:60px"><div class="et-spinner"></div></div>
+  </div>
+</div>
+
+<!-- Add/Edit Widget Modal -->
+<div class="et-modal-overlay" id="addWidgetModal">
+  <div class="et-modal" style="max-width:500px">
+    <button class="et-modal-close" onclick="etCloseModal('addWidgetModal')">✕</button>
+    <div class="et-modal-title" id="wModalTitle">Add Widget</div>
+    <input type="hidden" id="wId">
+    <div class="et-form-group"><label class="et-form-label">Position</label>
+      <select class="et-form-input" id="wPosition">
+        <option value="right">Right Sidebar</option>
+        <option value="left">Left (Ad Space)</option>
+      </select>
+    </div>
+    <div class="et-form-group"><label class="et-form-label">Type</label>
+      <select class="et-form-input" id="wType" onchange="toggleWidgetFields()">
+        <option value="text">Text / About</option>
+        <option value="cta">Call to Action</option>
+        <option value="ad">Advertisement</option>
+        <option value="image">Image</option>
+        <option value="links">Links List</option>
+      </select>
+    </div>
+    <div class="et-form-group"><label class="et-form-label">Title</label><input type="text" class="et-form-input" id="wTitle" placeholder="Widget title"></div>
+    <div class="et-form-group" id="wContentWrap"><label class="et-form-label">Content</label><textarea class="et-form-input" id="wContent" rows="3" style="resize:none" placeholder="Widget content text..."></textarea></div>
+    <div class="et-form-group" id="wImageWrap"><label class="et-form-label">Image URL</label><input type="url" class="et-form-input" id="wImage" placeholder="https://..."></div>
+    <div class="et-form-group" id="wLinkWrap">
+      <label class="et-form-label">Button Link URL</label><input type="url" class="et-form-input" id="wLinkUrl" placeholder="https://...">
+    </div>
+    <div class="et-form-group" id="wLinkLabelWrap">
+      <label class="et-form-label">Button Label</label><input type="text" class="et-form-input" id="wLinkLabel" placeholder="Get Started →">
+    </div>
+    <div class="et-form-group"><label class="et-form-label">Sort Order (lower = higher)</label><input type="number" class="et-form-input" id="wOrder" value="1" min="1" max="99"></div>
+    <button class="et-form-submit" onclick="saveWidget()">Save Widget →</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="hub-sidebar.js"></script>
+<script>
+let _user,_sb,widgets=[];
+
+async function main(){
+  const res=await initEtSidebar('admin');
+  if(!res)return;
+  _user=res.user;_sb=res.sb;
+  if(!_user.user_metadata?.is_admin){document.getElementById('adminContent').innerHTML='<div style="text-align:center;padding:60px;color:var(--white3)">Access denied.</div>';return;}
+  await loadWidgets();
+}
+
+async function loadWidgets(){
+  const{data}=await _sb.from('sidebar_widgets').select('*').order('sort_order',{ascending:true});
+  widgets=data||[];
+  renderWidgets();
+}
+
+function renderWidgets(){
+  const right=widgets.filter(w=>w.position==='right');
+  const left=widgets.filter(w=>w.position==='left');
+  document.getElementById('adminContent').innerHTML=`
+    <div class="sidebar-layout">
+      <div>
+        <div class="section-label">
+          <span>Right Sidebar (Article Pages)</span>
+          <span style="font-size:10px;color:var(--white3)">${right.length} widget${right.length!==1?'s':''}</span>
+        </div>
+        <div id="rightWidgets">${right.length?right.map(renderWidget).join(''):emptyState('No right sidebar widgets yet.')}</div>
+      </div>
+      <div>
+        <div class="section-label">
+          <span>Left — Ad Space</span>
+          <span style="font-size:10px;color:var(--white3)">${left.length} widget${left.length!==1?'s':''}</span>
+        </div>
+        <div id="leftWidgets">${left.length?left.map(renderWidget).join(''):emptyState('No left sidebar widgets yet.')}</div>
+      </div>
+    </div>
+    <div style="margin-top:20px;padding:14px 18px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:10px">Widget Types</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;font-size:12px;color:var(--white2)">
+        <div><strong style="color:var(--gold)">text</strong> — About box with text</div>
+        <div><strong style="color:var(--gold)">cta</strong> — Call to action with button</div>
+        <div><strong style="color:var(--gold)">ad</strong> — Advertisement image/banner</div>
+        <div><strong style="color:var(--gold)">image</strong> — Full image widget</div>
+        <div><strong style="color:var(--gold)">links</strong> — List of links</div>
+      </div>
+    </div>`;
+}
+
+function renderWidget(w){
+  const typeIcon={text:'📝',cta:'🎯',ad:'📢',image:'🖼',links:'🔗'}[w.type]||'📦';
+  return `<div class="widget-card ${w.active?'':'inactive'}">
+    <div class="wc-header">
+      <span class="wc-drag">⠿</span>
+      <span class="wc-title">${w.title||'Untitled'}</span>
+      <span class="wc-type">${typeIcon} ${w.type}</span>
+    </div>
+    <div class="wc-body">
+      ${w.content?`<div style="font-size:12px;color:var(--white2);line-height:1.6;margin-bottom:8px">${w.content.substring(0,120)}${w.content.length>120?'...':''}</div>`:''}
+      ${w.image_url?`<div style="font-size:11px;color:var(--white3);font-family:'DM Mono',monospace">Image: ${w.image_url.substring(0,50)}...</div>`:''}
+      ${w.link_url?`<div style="font-size:11px;color:var(--gold);font-family:'DM Mono',monospace">→ ${w.link_label||w.link_url}</div>`:''}
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);margin-top:6px">Order: ${w.sort_order}</div>
+      <div class="wc-actions">
+        <button class="toggle-btn ${w.active?'active-btn':''}" onclick="toggleWidget('${w.id}',${!w.active})">${w.active?'✓ Active':'Inactive'}</button>
+        <button class="toggle-btn" onclick="editWidget('${w.id}')">✏️ Edit</button>
+        <button class="toggle-btn" onclick="delWidget('${w.id}')" style="transition:all 0.15s" onmouseover="this.style.borderColor='var(--bear)';this.style.color='var(--bear)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">🗑</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function emptyState(msg){return`<div style="text-align:center;padding:32px 20px;border:1px dashed rgba(200,169,110,0.15);border-radius:4px;color:var(--white3);font-size:13px">${msg}</div>`;}
+
+function toggleWidgetFields(){
+  const t=document.getElementById('wType').value;
+  document.getElementById('wContentWrap').style.display=['text','cta','links'].includes(t)?'':'none';
+  document.getElementById('wImageWrap').style.display=['ad','image'].includes(t)?'':'none';
+  document.getElementById('wLinkWrap').style.display=['cta','ad'].includes(t)?'':'none';
+  document.getElementById('wLinkLabelWrap').style.display=['cta'].includes(t)?'':'none';
+}
+
+function editWidget(id){
+  const w=widgets.find(x=>x.id===id);if(!w)return;
+  document.getElementById('wId').value=w.id;
+  document.getElementById('wPosition').value=w.position||'right';
+  document.getElementById('wType').value=w.type||'text';
+  document.getElementById('wTitle').value=w.title||'';
+  document.getElementById('wContent').value=w.content||'';
+  document.getElementById('wImage').value=w.image_url||'';
+  document.getElementById('wLinkUrl').value=w.link_url||'';
+  document.getElementById('wLinkLabel').value=w.link_label||'';
+  document.getElementById('wOrder').value=w.sort_order||1;
+  document.getElementById('wModalTitle').textContent='Edit Widget';
+  toggleWidgetFields();
+  etOpenModal('addWidgetModal');
+}
+
+async function saveWidget(){
+  const id=document.getElementById('wId').value;
+  const payload={
+    position:document.getElementById('wPosition').value,
+    type:document.getElementById('wType').value,
+    title:document.getElementById('wTitle').value.trim()||null,
+    content:document.getElementById('wContent').value.trim()||null,
+    image_url:document.getElementById('wImage').value.trim()||null,
+    link_url:document.getElementById('wLinkUrl').value.trim()||null,
+    link_label:document.getElementById('wLinkLabel').value.trim()||null,
+    sort_order:parseInt(document.getElementById('wOrder').value)||1,
+    active:true
+  };
+  let err;
+  if(id){
+    const r=await _sb.from('sidebar_widgets').update(payload).eq('id',id);err=r.error;
+  } else {
+    const r=await _sb.from('sidebar_widgets').insert(payload);err=r.error;
+  }
+  if(err){alert(err.message);return;}
+  document.getElementById('wId').value='';
+  document.getElementById('wModalTitle').textContent='Add Widget';
+  etCloseModal('addWidgetModal');
+  await loadWidgets();
+}
+
+async function toggleWidget(id,active){
+  await _sb.from('sidebar_widgets').update({active}).eq('id',id);
+  await loadWidgets();
+}
+
+async function delWidget(id){
+  if(!confirm('Delete this widget?'))return;
+  await _sb.from('sidebar_widgets').delete().eq('id',id);
+  await loadWidgets();
+}
+
+document.addEventListener('click',e=>{if(e.target.classList.contains('et-modal-overlay'))etCloseModal(e.target.id);});
+main();
+</script>
+</body>
+</html>
