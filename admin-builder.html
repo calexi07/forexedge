@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EaglePips — Page Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="hub.css">
+<style>
+/* ── Builder layout ── */
+.builder-wrap{display:flex;height:calc(100vh - 58px);overflow:hidden}
+.builder-left{width:260px;min-width:260px;background:var(--bg2);border-right:1px solid var(--border2);display:flex;flex-direction:column;overflow:hidden}
+.builder-canvas{flex:1;overflow-y:auto;background:#0a0b0f;position:relative}
+.builder-right{width:280px;min-width:280px;background:var(--bg2);border-left:1px solid var(--border2);display:flex;flex-direction:column;overflow:hidden}
+
+/* ── Left panel — pages + widgets ── */
+.bl-section{border-bottom:1px solid var(--border2)}
+.bl-section-hdr{padding:10px 14px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--white3);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;transition:background 0.15s}
+.bl-section-hdr:hover{background:var(--gold-dim)}
+.bl-section-body{padding:10px}
+.bl-section-body.collapsed{display:none}
+
+/* Pages list */
+.page-item{padding:8px 10px;border-radius:3px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
+.page-item:hover{background:var(--gold-dim)}
+.page-item.active{background:var(--gold-dim);border-left:2px solid var(--gold)}
+.page-item-name{font-size:12px;font-weight:500;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.page-item-slug{font-family:'DM Mono',monospace;font-size:9px;color:var(--white3)}
+.pi-status{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.pi-status.live{background:var(--bull)}
+.pi-status.draft{background:var(--white3)}
+
+/* Widget palette */
+.widget-palette{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.wpal-item{padding:10px 8px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;cursor:grab;transition:all 0.15s;text-align:center;user-select:none}
+.wpal-item:hover{border-color:var(--gold-border);background:var(--gold-dim)}
+.wpal-item:active{cursor:grabbing;opacity:0.7}
+.wpal-icon{font-size:18px;margin-bottom:4px}
+.wpal-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--white2);letter-spacing:0.05em}
+
+/* ── Canvas ── */
+.canvas-inner{min-height:100%;padding:20px}
+.canvas-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:calc(100vh - 120px);gap:14px;color:var(--white3);text-align:center;pointer-events:none}
+.canvas-empty-icon{font-size:48px;opacity:0.1}
+
+/* Section (row) */
+.c-section{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:4px;margin-bottom:14px;position:relative;transition:border-color 0.15s}
+.c-section:hover{border-color:rgba(200,169,110,0.2)}
+.c-section.selected{border-color:var(--gold) !important;box-shadow:0 0 0 2px rgba(200,169,110,0.12)}
+.c-section-bar{padding:6px 10px;background:rgba(0,0,0,0.3);display:flex;align-items:center;gap:6px;border-bottom:1px solid rgba(255,255,255,0.04);border-radius:4px 4px 0 0}
+.c-section-bar-lbl{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;flex:1}
+.c-section-actions{display:flex;gap:3px}
+.c-btn{width:20px;height:20px;background:none;border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.3);cursor:pointer;border-radius:2px;font-size:10px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0}
+.c-btn:hover{border-color:var(--gold-border);color:var(--gold)}
+.c-btn.del:hover{border-color:var(--bear);color:var(--bear)}
+
+/* Columns */
+.c-cols{display:grid;gap:10px;padding:10px}
+.c-col{min-height:60px;border:1px dashed rgba(255,255,255,0.06);border-radius:3px;position:relative;transition:all 0.15s;padding:4px}
+.c-col.drag-over{border-color:var(--gold);background:rgba(200,169,110,0.05)}
+.c-col-lbl{font-family:'DM Mono',monospace;font-size:8px;color:rgba(255,255,255,0.15);text-align:center;padding:8px;pointer-events:none;letter-spacing:0.1em;text-transform:uppercase}
+
+/* Widget instances */
+.c-widget{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:3px;padding:8px;margin-bottom:6px;cursor:pointer;position:relative;transition:all 0.15s;user-select:none}
+.c-widget:last-child{margin-bottom:0}
+.c-widget:hover{border-color:rgba(200,169,110,0.3);background:rgba(200,169,110,0.04)}
+.c-widget.selected{border-color:var(--gold);background:rgba(200,169,110,0.06)}
+.c-widget-bar{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.c-widget-type{font-family:'DM Mono',monospace;font-size:8px;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase}
+.c-widget-actions{display:flex;gap:2px;margin-left:auto}
+.c-widget-preview{font-size:12px;color:rgba(255,255,255,0.5);line-height:1.4;pointer-events:none;overflow:hidden;max-height:60px;text-overflow:ellipsis}
+.c-widget-drag{cursor:grab;color:rgba(255,255,255,0.2);font-size:12px}
+.c-widget-drag:active{cursor:grabbing}
+
+/* Add row button */
+.add-row-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border:1px dashed rgba(200,169,110,0.15);border-radius:4px;background:transparent;color:rgba(200,169,110,0.4);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;cursor:pointer;transition:all 0.15s;margin-bottom:14px}
+.add-row-btn:hover{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
+
+/* Column layout picker */
+.col-picker{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.col-opt{padding:6px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;color:var(--white2);transition:all 0.15s;white-space:nowrap}
+.col-opt:hover,.col-opt.active{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
+
+/* ── Right panel — properties ── */
+.props-panel{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+.props-empty{text-align:center;padding:40px 20px;color:var(--white3);font-size:12px}
+.prop-group{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:2px}
+.prop-group-hdr{padding:8px 12px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--white3);background:rgba(0,0,0,0.2);cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.prop-group-hdr:hover{background:var(--gold-dim);color:var(--gold)}
+.prop-group-body{padding:12px;display:flex;flex-direction:column;gap:10px}
+.prop-group-body.collapsed{display:none}
+.prop-row{display:flex;flex-direction:column;gap:4px}
+.prop-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.08em;text-transform:uppercase}
+.prop-input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--white);font-family:'Syne',sans-serif;font-size:12px;padding:7px 10px;border-radius:3px;outline:none;transition:border-color 0.2s}
+.prop-input:focus{border-color:var(--gold-border)}
+.prop-input option{background:var(--bg3)}
+.prop-textarea{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--white);font-family:'Syne',sans-serif;font-size:12px;padding:7px 10px;border-radius:3px;outline:none;resize:vertical;min-height:80px;line-height:1.6;transition:border-color 0.2s}
+.prop-textarea:focus{border-color:var(--gold-border)}
+.prop-color-row{display:flex;gap:6px}
+.prop-color{width:36px;height:32px;border:1px solid var(--border2);border-radius:3px;cursor:pointer;padding:2px}
+.prop-row-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+/* Color swatches */
+.color-swatches{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.swatch{width:20px;height:20px;border-radius:3px;cursor:pointer;transition:transform 0.15s;border:1px solid rgba(255,255,255,0.1)}
+.swatch:hover{transform:scale(1.2)}
+.swatch.active{border-color:var(--white);border-width:2px}
+/* Topbar */
+.builder-topbar{height:58px;background:var(--bg2);border-bottom:1px solid var(--border2);display:flex;align-items:center;padding:0 16px;gap:10px;position:sticky;top:0;z-index:100;flex-shrink:0}
+.bt-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--white)}
+.bt-slug{font-family:'DM Mono',monospace;font-size:10px;color:var(--white3);padding:3px 8px;background:var(--bg3);border:1px solid var(--border2);border-radius:100px}
+/* Device toggle */
+.device-btns{display:flex;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;overflow:hidden}
+.dev-btn{padding:5px 10px;background:none;border:none;color:var(--white3);cursor:pointer;font-size:13px;transition:all 0.15s}
+.dev-btn.active{background:var(--gold-dim);color:var(--gold)}
+/* Canvas device modes */
+.canvas-inner.tablet{max-width:768px;margin:0 auto}
+.canvas-inner.mobile{max-width:375px;margin:0 auto}
+/* Section highlight on hover */
+.c-section:hover .c-section-bar{background:rgba(200,169,110,0.08)}
+/* Drag indicator */
+.drop-indicator{height:3px;background:var(--gold);border-radius:2px;margin:4px 0;opacity:0;transition:opacity 0.15s}
+.drop-indicator.visible{opacity:1}
+</style>
+</head>
+<body class="et-loading">
+<div id="et-loader">
+  <div class="et-loader-logo"><div class="et-loader-eagle">🦅</div><div class="et-loader-name">Eagle<span>Pips</span></div></div>
+  <div class="et-loader-bar"><div class="et-loader-bar-fill"></div></div>
+  <div class="et-loader-text">Loading builder...</div>
+</div>
+<div id="etSidebarMount"></div>
+<div class="hub-main" style="overflow:hidden">
+
+  <!-- Topbar -->
+  <div class="builder-topbar">
+    <a href="admin.html" style="background:none;border:1px solid var(--border2);color:var(--white3);padding:5px 10px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px;text-decoration:none;transition:all 0.2s;white-space:nowrap" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">← Admin</a>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <div class="bt-title" id="btTitle">New Page</div>
+      <div class="bt-slug" id="btSlug">/page</div>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <!-- Device -->
+      <div class="device-btns">
+        <button class="dev-btn active" onclick="setDevice('desktop',this)" title="Desktop">🖥</button>
+        <button class="dev-btn" onclick="setDevice('tablet',this)" title="Tablet">📱</button>
+        <button class="dev-btn" onclick="setDevice('mobile',this)" title="Mobile">📲</button>
+      </div>
+      <button class="et-btn-ghost" onclick="previewPage()" style="padding:5px 12px;font-size:11px">👁 Preview</button>
+      <span id="saveStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)"></span>
+      <button class="et-btn-ghost" onclick="savePage(false)" style="padding:5px 12px;font-size:11px">💾 Draft</button>
+      <button class="et-btn-gold" onclick="savePage(true)" style="padding:5px 14px;font-size:11px">🚀 Publish</button>
+    </div>
+  </div>
+
+  <!-- Builder body -->
+  <div class="builder-wrap">
+
+    <!-- LEFT: Pages + Widgets -->
+    <div class="builder-left">
+      <!-- Pages -->
+      <div class="bl-section">
+        <div class="bl-section-hdr" onclick="toggleBL(this)">
+          <span>Pages</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button onclick="event.stopPropagation();newPage()" style="background:none;border:1px solid var(--border2);color:var(--white3);padding:2px 7px;border-radius:2px;font-family:'DM Mono',monospace;font-size:9px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">+ New</button>
+            <span>▾</span>
+          </div>
+        </div>
+        <div class="bl-section-body" id="pagesList" style="max-height:200px;overflow-y:auto;padding:8px">
+          <div style="text-align:center;padding:12px"><div class="et-spinner"></div></div>
+        </div>
+      </div>
+      <!-- Widgets palette -->
+      <div class="bl-section" style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+        <div class="bl-section-hdr" onclick="toggleBL(this)">
+          <span>Widgets</span><span>▾</span>
+        </div>
+        <div class="bl-section-body" style="overflow-y:auto;flex:1;padding:10px">
+          <div class="widget-palette">
+            <div class="wpal-item" draggable="true" ondragstart="palDragStart(event,'heading')"><div class="wpal-icon">H</div><div class="wpal-label">Heading</div></div>
+            <div class="wpal-item" draggable="true" ondragstart="palDragStart(event,'text')"><div class="wpal-icon">T</div><div class="wpal-label">Text</div></div>
+            <div class="wpal-item" draggable="true" ondragstart="palDragStart(event,'image')"><div class="wpal-icon">🖼</div><div class="wpal-label">Image</div></div>
+            <div class="wpal-item" draggable="true" ondragstart="palDragStart(event,'button')"><div class="wpal-icon">⬜</div><div class="wpal-label">Button</div></div>
+            <div class="wpal-item" draggable="true" ondragstart="palDragStart(event,'html')"><div class="wpal-icon">&lt;/&gt;</div><div class="wpal-label">HTML</div></div>
+            <div class="wpal-item" draggable="true" ondragstart="palDragStart(event,'divider')"><div class="wpal-icon">—</div><div class="wpal-label">Divider</div></div>
+            <div class="wpal-item" draggable="true" ondragstart="palDragStart(event,'spacer')"><div class="wpal-icon">↕</div><div class="wpal-label">Spacer</div></div>
+            <div class="wpal-item" draggable="true" ondragstart="palDragStart(event,'video')"><div class="wpal-icon">▶</div><div class="wpal-label">Video</div></div>
+            <div class="wpal-item" draggable="true" ondragstart="palDragStart(event,'icon')"><div class="wpal-icon">★</div><div class="wpal-label">Icon</div></div>
+            <div class="wpal-item" draggable="true" ondragstart="palDragStart(event,'badge')"><div class="wpal-icon">🏷</div><div class="wpal-label">Badge</div></div>
+            <div class="wpal-item" draggable="true" ondragstart="palDragStart(event,'card')"><div class="wpal-icon">▭</div><div class="wpal-label">Card</div></div>
+            <div class="wpal-item" draggable="true" ondragstart="palDragStart(event,'alert')"><div class="wpal-icon">⚡</div><div class="wpal-label">Alert</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CANVAS -->
+    <div class="builder-canvas" id="builderCanvas" onclick="deselectAll()">
+      <div class="canvas-inner" id="canvasInner">
+        <div class="canvas-empty" id="canvasEmpty">
+          <div class="canvas-empty-icon">🦅</div>
+          <div style="font-size:15px;font-weight:600;color:rgba(255,255,255,0.2)">Start Building</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.1)">Add a row below or select a page</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Properties -->
+    <div class="builder-right">
+      <div style="padding:10px 14px;border-bottom:1px solid var(--border2);background:var(--bg3);flex-shrink:0">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--white3)" id="propsTitle">Properties</div>
+      </div>
+      <div class="props-panel" id="propsPanel">
+        <div class="props-empty">
+          <div style="font-size:28px;opacity:0.15;margin-bottom:8px">✏️</div>
+          Click a widget or section to edit its properties
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- New/Edit Page Modal -->
+<div class="et-modal-overlay" id="pageModal">
+  <div class="et-modal" style="max-width:420px">
+    <button class="et-modal-close" onclick="etCloseModal('pageModal')">✕</button>
+    <div class="et-modal-title" id="pmTitle">New Page</div>
+    <input type="hidden" id="pmId">
+    <div class="et-form-group"><label class="et-form-label">Page Title *</label><input type="text" class="et-form-input" id="pmPageTitle" placeholder="e.g. About Us" oninput="pmAutoSlug()"></div>
+    <div class="et-form-group"><label class="et-form-label">Slug * (URL: /page.html?slug=...)</label><input type="text" class="et-form-input" id="pmSlug" placeholder="about"></div>
+    <div class="et-form-group"><label class="et-form-label">Meta Description (SEO)</label><input type="text" class="et-form-input" id="pmMeta" placeholder="Brief description for search engines..."></div>
+    <button class="et-form-submit" onclick="createPage()">Create Page →</button>
+  </div>
+</div>
+
+<!-- Row layout picker modal -->
+<div class="et-modal-overlay" id="rowModal">
+  <div class="et-modal" style="max-width:480px">
+    <button class="et-modal-close" onclick="etCloseModal('rowModal')">✕</button>
+    <div class="et-modal-title">Add Row</div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px">Choose column layout</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="layoutPicker">
+      ${[
+        {cols:[1],label:'Full Width'},
+        {cols:[1,1],label:'Two Equal'},
+        {cols:[1,2],label:'1/3 + 2/3'},
+        {cols:[2,1],label:'2/3 + 1/3'},
+        {cols:[1,1,1],label:'Three Equal'},
+        {cols:[1,1,1,1],label:'Four Equal'},
+      ].map(l=>`<div onclick="addRow(${JSON.stringify(l.cols)})" style="padding:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;cursor:pointer;text-align:center;transition:all 0.15s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.background='var(--gold-dim)'" onmouseout="this.style.borderColor='var(--border2)';this.style.background='var(--bg3)'">
+        <div style="display:flex;gap:3px;height:24px;margin-bottom:8px">${l.cols.map(w=>`<div style="flex:${w};background:rgba(200,169,110,0.2);border-radius:2px"></div>`).join('')}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white2)">${l.label}</div>
+      </div>`).join('')}
+    </div>
+    <div style="margin-top:16px;padding:12px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px">Or custom columns</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="number" id="customCols" min="1" max="6" value="2" class="et-form-input" style="width:70px;padding:7px 10px">
+        <button class="et-btn-gold" onclick="addCustomRow()" style="padding:7px 14px;font-size:11px">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let _user,_sb,pages=[],currentPageId=null,rows=[],selectedWidget=null,selectedSection=null,draggingWidget=null,draggingFrom=null,palDragType=null;
+
+// ── State ──────────────────────────────────────────
+// rows = [{id, cols:[{id,widgets:[{id,type,props}]}], sectionProps:{bg,pad,etc}}]
+
+const WIDGET_DEFAULTS = {
+  heading: {text:'Your Heading Here',level:'h2',align:'left',color:'#ffffff',size:'36'},
+  text:    {content:'Add your text here. Click to edit.',align:'left',color:'#c8c4bc',size:'15'},
+  image:   {src:'',alt:'',width:'100%',radius:'4',caption:'',link:''},
+  button:  {text:'Click Here →',url:'#',style:'gold',size:'md',align:'left',new_tab:false},
+  html:    {code:'<p>Custom HTML here</p>'},
+  divider: {style:'line',color:'rgba(255,255,255,0.08)',width:'100%',height:'1'},
+  spacer:  {height:'40'},
+  video:   {url:'',type:'youtube',ratio:'16:9'},
+  icon:    {emoji:'🦅',size:'32',align:'center'},
+  badge:   {text:'New',color:'gold',align:'left'},
+  card:    {title:'Card Title',text:'Card description text.',icon:'',link:'',bg:'rgba(255,255,255,0.03)'},
+  alert:   {text:'Alert message here',type:'info'},
+};
+
+async function main(){
+  const res=await initEtSidebar('builder');
+  if(!res)return;
+  _user=res.user;_sb=res.sb;
+  if(!_user.user_metadata?.is_admin){document.querySelector('.builder-wrap').innerHTML='<div style="text-align:center;padding:60px;color:var(--white3)">Access denied.</div>';return;}
+  await loadPages();
+}
+
+// ── Pages ───────────────────────────────────────────
+async function loadPages(){
+  const{data}=await _sb.from('pages').select('id,title,slug,published').order('created_at',{ascending:false});
+  pages=data||[];
+  renderPagesList();
+}
+
+function renderPagesList(){
+  const el=document.getElementById('pagesList');
+  if(!pages.length){el.innerHTML='<div style="font-size:11px;color:var(--white3);text-align:center;padding:10px">No pages yet.</div>';return;}
+  el.innerHTML=pages.map(p=>`
+    <div class="page-item ${currentPageId===p.id?'active':''}" onclick="openPage('${p.id}')">
+      <div class="pi-status ${p.published?'live':'draft'}"></div>
+      <div>
+        <div class="page-item-name">${p.title}</div>
+        <div class="page-item-slug">/${p.slug}</div>
+      </div>
+      <button onclick="event.stopPropagation();deletePage('${p.id}')" style="background:none;border:none;color:rgba(255,255,255,0.2);cursor:pointer;font-size:11px;padding:2px;transition:color 0.15s" onmouseover="this.style.color='var(--bear)'" onmouseout="this.style.color='rgba(255,255,255,0.2)'">✕</button>
+    </div>`).join('');
+}
+
+function newPage(){etOpenModal('pageModal');document.getElementById('pmId').value='';document.getElementById('pmPageTitle').value='';document.getElementById('pmSlug').value='';document.getElementById('pmMeta').value='';}
+function pmAutoSlug(){if(document.getElementById('pmId').value)return;document.getElementById('pmSlug').value=document.getElementById('pmPageTitle').value.toLowerCase().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').slice(0,60);}
+
+async function createPage(){
+  const title=document.getElementById('pmPageTitle').value.trim();
+  const slug=document.getElementById('pmSlug').value.trim();
+  if(!title||!slug){alert('Title and slug required.');return;}
+  const{data,error}=await _sb.from('pages').insert({title,slug,meta_description:document.getElementById('pmMeta').value||null,template:'builder',sections:[],published:false}).select().single();
+  if(error){alert(error.message);return;}
+  etCloseModal('pageModal');
+  await loadPages();
+  openPage(data.id);
+}
+
+async function openPage(id){
+  const{data,error}=await _sb.from('pages').select('*').eq('id',id).single();
+  if(error||!data)return;
+  currentPageId=id;
+  rows=Array.isArray(data.sections)?data.sections:[];
+  document.getElementById('btTitle').textContent=data.title;
+  document.getElementById('btSlug').textContent='/'+data.slug;
+  renderPagesList();
+  renderCanvas();
+  deselectAll();
+}
+
+async function deletePage(id){
+  if(!confirm('Delete this page?'))return;
+  await _sb.from('pages').delete().eq('id',id);
+  if(currentPageId===id){currentPageId=null;rows=[];renderCanvas();document.getElementById('btTitle').textContent='New Page';document.getElementById('btSlug').textContent='/page';}
+  await loadPages();
+}
+
+// ── Canvas ──────────────────────────────────────────
+function renderCanvas(){
+  const ci=document.getElementById('canvasInner');
+  const empty=document.getElementById('canvasEmpty');
+  if(empty)empty.style.display=rows.length?'none':'flex';
+
+  // Remove old rows
+  document.querySelectorAll('.c-section').forEach(e=>e.remove());
+  document.querySelector('.add-row-btn')?.remove();
+
+  // Render rows
+  rows.forEach((row,ri)=>{
+    const sec=createSectionEl(row,ri);
+    ci.appendChild(sec);
+  });
+
+  // Add row button
+  const addBtn=document.createElement('button');
+  addBtn.className='add-row-btn';
+  addBtn.innerHTML='<span style="font-size:14px">＋</span> Add Row';
+  addBtn.onclick=()=>etOpenModal('rowModal');
+  ci.appendChild(addBtn);
+}
+
+function createSectionEl(row,ri){
+  const el=document.createElement('div');
+  el.className='c-section';
+  el.id='row-'+row.id;
+  el.dataset.ri=ri;
+  el.onclick=e=>{e.stopPropagation();selectSection(row.id);};
+
+  const bg=row.sectionProps?.bg||'transparent';
+  const pad=row.sectionProps?.padding||'20px';
+  if(bg!=='transparent')el.style.background=bg;
+
+  const colFr=row.cols.map(c=>c.flex||'1fr').join(' ');
+
+  el.innerHTML=`
+    <div class="c-section-bar">
+      <span class="c-section-bar-lbl">Row — ${row.cols.length} col${row.cols.length>1?'s':''}</span>
+      <div class="c-section-actions">
+        ${ri>0?`<button class="c-btn" onclick="event.stopPropagation();moveRow('${row.id}',-1)" title="Move up">↑</button>`:''}
+        ${ri<rows.length-1?`<button class="c-btn" onclick="event.stopPropagation();moveRow('${row.id}',1)" title="Move down">↓</button>`:''}
+        <button class="c-btn" onclick="event.stopPropagation();duplicateRow('${row.id}')" title="Duplicate">⧉</button>
+        <button class="c-btn del" onclick="event.stopPropagation();deleteRow('${row.id}')" title="Delete">✕</button>
+      </div>
+    </div>
+    <div class="c-cols" style="grid-template-columns:${colFr};padding:${pad}">
+      ${row.cols.map((col,ci2)=>`
+        <div class="c-col" id="col-${col.id}" data-ri="${ri}" data-ci="${ci2}"
+          ondragover="colDragOver(event,'${col.id}')"
+          ondragleave="colDragLeave(event,'${col.id}')"
+          ondrop="colDrop(event,'${col.id}','${row.id}')">
+          ${col.widgets?.length?col.widgets.map((w,wi)=>createWidgetHTML(w,wi,col.id,row.id)).join(''):`<div class="c-col-lbl">Drop widgets here</div>`}
+        </div>`).join('')}
+    </div>`;
+  return el;
+}
+
+function createWidgetHTML(w,wi,colId,rowId){
+  const preview=getWidgetPreview(w);
+  return`<div class="c-widget ${selectedWidget===w.id?'selected':''}" id="w-${w.id}"
+    draggable="true"
+    ondragstart="widgetDragStart(event,'${w.id}','${colId}','${rowId}')"
+    ondragend="widgetDragEnd(event)"
+    onclick="event.stopPropagation();selectWidget('${w.id}','${colId}','${rowId}')">
+    <div class="c-widget-bar">
+      <span class="c-widget-drag">⠿</span>
+      <span class="c-widget-type">${w.type}</span>
+      <div class="c-widget-actions">
+        <button class="c-btn" onclick="event.stopPropagation();duplicateWidget('${w.id}','${colId}','${rowId}')" title="Duplicate" style="width:18px;height:18px;font-size:9px">⧉</button>
+        <button class="c-btn del" onclick="event.stopPropagation();deleteWidget('${w.id}','${colId}','${rowId}')" title="Delete" style="width:18px;height:18px;font-size:9px">✕</button>
+      </div>
+    </div>
+    <div class="c-widget-preview">${preview}</div>
+  </div>`;
+}
+
+function getWidgetPreview(w){
+  const p=w.props||{};
+  switch(w.type){
+    case'heading': return`<div style="font-family:'Playfair Display',serif;font-size:${Math.min(parseInt(p.size)||24,24)}px;font-weight:700;color:${p.color||'#fff'};text-align:${p.align||'left'}">${p.text||'Heading'}</div>`;
+    case'text':    return`<div style="font-size:13px;color:${p.color||'#c8c4bc'};line-height:1.6;text-align:${p.align||'left'}">${(p.content||'').substring(0,120)}</div>`;
+    case'image':   return p.src?`<img src="${p.src}" style="max-width:100%;max-height:60px;border-radius:3px;object-fit:cover" onerror="this.style.display='none'">`:`<div style="background:rgba(255,255,255,0.05);border-radius:3px;padding:12px;text-align:center;font-size:11px;color:rgba(255,255,255,0.3)">🖼 Image</div>`;
+    case'button':  return`<div style="display:inline-flex;padding:6px 14px;background:${p.style==='gold'?'#c8a96e':p.style==='outline'?'transparent':'rgba(255,255,255,0.1)'};border:1px solid ${p.style==='gold'?'#c8a96e':'rgba(255,255,255,0.2)'};color:${p.style==='gold'?'#08090c':'#fff'};font-size:11px;border-radius:3px">${p.text||'Button'}</div>`;
+    case'html':    return`<div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);opacity:0.7">&lt;HTML&gt; ${(p.code||'').substring(0,50)}</div>`;
+    case'divider': return`<div style="height:1px;background:${p.color||'rgba(255,255,255,0.08)'};margin:8px 0"></div>`;
+    case'spacer':  return`<div style="text-align:center;font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,0.2)">${p.height||40}px spacer</div>`;
+    case'video':   return`<div style="background:rgba(255,255,255,0.05);border-radius:3px;padding:12px;text-align:center;font-size:11px;color:rgba(255,255,255,0.3)">▶ ${p.url?'Video':'Add URL'}</div>`;
+    case'icon':    return`<div style="font-size:${p.size||24}px;text-align:${p.align||'center'}">${p.emoji||'★'}</div>`;
+    case'badge':   return`<span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;background:rgba(200,169,110,0.12);border:1px solid rgba(200,169,110,0.2);color:#c8a96e;border-radius:100px">${p.text||'Badge'}</span>`;
+    case'card':    return`<div style="background:${p.bg||'rgba(255,255,255,0.03)'};border:1px solid rgba(255,255,255,0.06);border-radius:4px;padding:10px"><div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:3px">${p.title||'Card'}</div><div style="font-size:11px;color:#a09880">${(p.text||'').substring(0,60)}</div></div>`;
+    case'alert':   const ac={info:'rgba(74,158,255,0.1)',success:'rgba(76,175,125,0.1)',warning:'rgba(255,193,7,0.1)',danger:'rgba(224,92,92,0.1)'};return`<div style="padding:8px 12px;background:${ac[p.type]||ac.info};border-radius:3px;font-size:12px;color:#c8c4bc">${p.text||'Alert'}</div>`;
+    default:       return`<div style="font-size:11px;color:rgba(255,255,255,0.3)">${w.type}</div>`;
+  }
+}
+
+// ── Row operations ─────────────────────────────────
+function addRow(cols){
+  etCloseModal('rowModal');
+  if(!currentPageId){alert('Select or create a page first.');return;}
+  const row={id:uid(),cols:cols.map(flex=>({id:uid(),flex:flex+'fr',widgets:[]})),sectionProps:{bg:'transparent',padding:'20px'}};
+  rows.push(row);
+  renderCanvas();
+}
+
+function addCustomRow(){
+  const n=parseInt(document.getElementById('customCols').value)||2;
+  addRow(Array(n).fill(1));
+}
+
+function moveRow(id,dir){
+  const i=rows.findIndex(r=>r.id===id);
+  const ni=i+dir;if(ni<0||ni>=rows.length)return;
+  [rows[i],rows[ni]]=[rows[ni],rows[i]];
+  renderCanvas();
+}
+
+function duplicateRow(id){
+  const i=rows.findIndex(r=>r.id===id);
+  if(i<0)return;
+  const copy=JSON.parse(JSON.stringify(rows[i]));
+  copy.id=uid();copy.cols.forEach(c=>{c.id=uid();c.widgets.forEach(w=>w.id=uid());});
+  rows.splice(i+1,0,copy);
+  renderCanvas();
+}
+
+function deleteRow(id){
+  if(!confirm('Delete this row?'))return;
+  rows=rows.filter(r=>r.id!==id);
+  renderCanvas();
+}
+
+// ── Widget operations ──────────────────────────────
+function addWidget(type,colId,rowId){
+  const row=rows.find(r=>r.id===rowId);
+  const col=row?.cols.find(c=>c.id===colId);
+  if(!col)return;
+  col.widgets.push({id:uid(),type,props:{...WIDGET_DEFAULTS[type]}});
+  renderCanvas();
+}
+
+function deleteWidget(wId,colId,rowId){
+  const row=rows.find(r=>r.id===rowId);
+  const col=row?.cols.find(c=>c.id===colId);
+  if(!col)return;
+  col.widgets=col.widgets.filter(w=>w.id!==wId);
+  if(selectedWidget===wId){selectedWidget=null;renderProps(null,null,null);}
+  renderCanvas();
+}
+
+function duplicateWidget(wId,colId,rowId){
+  const row=rows.find(r=>r.id===rowId);
+  const col=row?.cols.find(c=>c.id===colId);
+  if(!col)return;
+  const wi=col.widgets.findIndex(w=>w.id===wId);
+  if(wi<0)return;
+  const copy={...JSON.parse(JSON.stringify(col.widgets[wi])),id:uid()};
+  col.widgets.splice(wi+1,0,copy);
+  renderCanvas();
+}
+
+// ── Selection ──────────────────────────────────────
+function selectWidget(wId,colId,rowId){
+  selectedWidget=wId;selectedSection=null;
+  document.querySelectorAll('.c-widget').forEach(e=>e.classList.remove('selected'));
+  document.querySelectorAll('.c-section').forEach(e=>e.classList.remove('selected'));
+  document.getElementById('w-'+wId)?.classList.add('selected');
+  const row=rows.find(r=>r.id===rowId);
+  const col=row?.cols.find(c=>c.id===colId);
+  const w=col?.widgets.find(x=>x.id===wId);
+  if(w)renderProps(w,colId,rowId);
+}
+
+function selectSection(rowId){
+  selectedSection=rowId;selectedWidget=null;
+  document.querySelectorAll('.c-section').forEach(e=>e.classList.remove('selected'));
+  document.querySelectorAll('.c-widget').forEach(e=>e.classList.remove('selected'));
+  document.getElementById('row-'+rowId)?.classList.add('selected');
+  const row=rows.find(r=>r.id===rowId);
+  if(row)renderSectionProps(row);
+}
+
+function deselectAll(){selectedWidget=null;selectedSection=null;document.querySelectorAll('.c-widget,.c-section').forEach(e=>e.classList.remove('selected'));renderProps(null,null,null);}
+
+// ── Properties panel ───────────────────────────────
+function renderProps(w,colId,rowId){
+  const el=document.getElementById('propsPanel');
+  document.getElementById('propsTitle').textContent=w?`${w.type.toUpperCase()} Properties`:'Properties';
+  if(!w){el.innerHTML='<div class="props-empty"><div style="font-size:28px;opacity:0.15;margin-bottom:8px">✏️</div>Click a widget or row to edit</div>';return;}
+  const p=w.props||{};
+  let html='';
+
+  switch(w.type){
+    case'heading':
+      html=propGroup('Content',[
+        propTA('text','Text',p.text||'',`updateProp('${w.id}','${colId}','${rowId}','text',this.value)`,3),
+        propSel('level','Level',[['h1','H1'],['h2','H2'],['h3','H3'],['h4','H4']],p.level||'h2',`updateProp('${w.id}','${colId}','${rowId}','level',this.value)`),
+      ])+propGroup('Style',[
+        propRow2(propIn('size','Size (px)',p.size||'36',`updateProp('${w.id}','${colId}','${rowId}','size',this.value)`,'number'),propSel('align','Align',[['left','Left'],['center','Center'],['right','Right']],p.align||'left',`updateProp('${w.id}','${colId}','${rowId}','align',this.value)`)),
+        propColor('color','Color',p.color||'#ffffff',`updateProp('${w.id}','${colId}','${rowId}','color',this.value)`),
+      ]);
+      break;
+    case'text':
+      html=propGroup('Content',[
+        propTA('content','Content',p.content||'',`updateProp('${w.id}','${colId}','${rowId}','content',this.value)`,5),
+      ])+propGroup('Style',[
+        propRow2(propIn('size','Size (px)',p.size||'15',`updateProp('${w.id}','${colId}','${rowId}','size',this.value)`,'number'),propSel('align','Align',[['left','Left'],['center','Center'],['right','Right']],p.align||'left',`updateProp('${w.id}','${colId}','${rowId}','align',this.value)`)),
+        propColor('color','Color',p.color||'#c8c4bc',`updateProp('${w.id}','${colId}','${rowId}','color',this.value)`),
+      ]);
+      break;
+    case'image':
+      html=propGroup('Image',[
+        propIn('src','Image URL',p.src||'',`updateProp('${w.id}','${colId}','${rowId}','src',this.value)`,'url'),
+        propIn('alt','Alt Text',p.alt||'',`updateProp('${w.id}','${colId}','${rowId}','alt',this.value)`),
+        propIn('caption','Caption',p.caption||'',`updateProp('${w.id}','${colId}','${rowId}','caption',this.value)`),
+        propIn('link','Link URL',p.link||'',`updateProp('${w.id}','${colId}','${rowId}','link',this.value)`,'url'),
+      ])+propGroup('Style',[
+        propIn('width','Width',p.width||'100%',`updateProp('${w.id}','${colId}','${rowId}','width',this.value)`),
+        propIn('radius','Border Radius (px)',p.radius||'4',`updateProp('${w.id}','${colId}','${rowId}','radius',this.value)`,'number'),
+      ]);
+      break;
+    case'button':
+      html=propGroup('Button',[
+        propIn('text','Label',p.text||'Click Here',`updateProp('${w.id}','${colId}','${rowId}','text',this.value)`),
+        propIn('url','URL',p.url||'#',`updateProp('${w.id}','${colId}','${rowId}','url',this.value)`,'url'),
+        propSel('style','Style',[['gold','Gold (Primary)'],['outline','Outline'],['ghost','Ghost'],['white','White']],p.style||'gold',`updateProp('${w.id}','${colId}','${rowId}','style',this.value)`),
+        propRow2(propSel('size','Size',[['sm','Small'],['md','Medium'],['lg','Large']],p.size||'md',`updateProp('${w.id}','${colId}','${rowId}','size',this.value)`),propSel('align','Align',[['left','Left'],['center','Center'],['right','Right']],p.align||'left',`updateProp('${w.id}','${colId}','${rowId}','align',this.value)`)),
+      ]);
+      break;
+    case'html':
+      html=propGroup('HTML Code',[
+        propTA('code','HTML',p.code||'',`updateProp('${w.id}','${colId}','${rowId}','code',this.value)`,6,'code'),
+      ]);
+      break;
+    case'divider':
+      html=propGroup('Divider',[
+        propColor('color','Color',p.color||'rgba(255,255,255,0.08)',`updateProp('${w.id}','${colId}','${rowId}','color',this.value)`),
+        propIn('height','Height (px)',p.height||'1',`updateProp('${w.id}','${colId}','${rowId}','height',this.value)`,'number'),
+        propIn('width','Width',p.width||'100%',`updateProp('${w.id}','${colId}','${rowId}','width',this.value)`),
+      ]);
+      break;
+    case'spacer':
+      html=propGroup('Spacer',[propIn('height','Height (px)',p.height||'40',`updateProp('${w.id}','${colId}','${rowId}','height',this.value)`,'number')]);
+      break;
+    case'video':
+      html=propGroup('Video',[
+        propIn('url','Video URL / Embed ID',p.url||'',`updateProp('${w.id}','${colId}','${rowId}','url',this.value)`,'url'),
+        propSel('type','Type',[['youtube','YouTube'],['vimeo','Vimeo'],['direct','Direct MP4']],p.type||'youtube',`updateProp('${w.id}','${colId}','${rowId}','type',this.value)`),
+        propSel('ratio','Aspect Ratio',[['16:9','16:9'],['4:3','4:3'],['1:1','1:1']],p.ratio||'16:9',`updateProp('${w.id}','${colId}','${rowId}','ratio',this.value)`),
+      ]);
+      break;
+    case'icon':
+      html=propGroup('Icon',[
+        propIn('emoji','Emoji / Icon',p.emoji||'🦅',`updateProp('${w.id}','${colId}','${rowId}','emoji',this.value)`),
+        propRow2(propIn('size','Size (px)',p.size||'32',`updateProp('${w.id}','${colId}','${rowId}','size',this.value)`,'number'),propSel('align','Align',[['left','Left'],['center','Center'],['right','Right']],p.align||'center',`updateProp('${w.id}','${colId}','${rowId}','align',this.value)`)),
+      ]);
+      break;
+    case'badge':
+      html=propGroup('Badge',[
+        propIn('text','Text',p.text||'New',`updateProp('${w.id}','${colId}','${rowId}','text',this.value)`),
+        propSel('color','Color',[['gold','Gold'],['green','Green'],['red','Red'],['blue','Blue'],['purple','Purple']],p.color||'gold',`updateProp('${w.id}','${colId}','${rowId}','color',this.value)`),
+        propSel('align','Align',[['left','Left'],['center','Center'],['right','Right']],p.align||'left',`updateProp('${w.id}','${colId}','${rowId}','align',this.value)`),
+      ]);
+      break;
+    case'card':
+      html=propGroup('Card',[
+        propIn('title','Title',p.title||'',`updateProp('${w.id}','${colId}','${rowId}','title',this.value)`),
+        propTA('text','Description',p.text||'',`updateProp('${w.id}','${colId}','${rowId}','text',this.value)`,3),
+        propIn('icon','Icon (emoji)',p.icon||'',`updateProp('${w.id}','${colId}','${rowId}','icon',this.value)`),
+        propIn('link','Link URL',p.link||'',`updateProp('${w.id}','${colId}','${rowId}','link',this.value)`,'url'),
+      ]);
+      break;
+    case'alert':
+      html=propGroup('Alert',[
+        propTA('text','Message',p.text||'',`updateProp('${w.id}','${colId}','${rowId}','text',this.value)`,2),
+        propSel('type','Type',[['info','Info (Blue)'],['success','Success (Green)'],['warning','Warning (Yellow)'],['danger','Danger (Red)']],p.type||'info',`updateProp('${w.id}','${colId}','${rowId}','type',this.value)`),
+      ]);
+      break;
+  }
+
+  // Delete widget button
+  html+=`<button onclick="deleteWidget('${w.id}','${colId}','${rowId}')" style="width:100%;padding:8px;background:transparent;border:1px solid rgba(224,92,92,0.2);color:var(--bear);font-family:'Syne',sans-serif;font-size:11px;cursor:pointer;border-radius:3px;transition:all 0.2s;margin-top:4px" onmouseover="this.style.background='var(--bear-bg)'" onmouseout="this.style.background='transparent'">🗑 Remove Widget</button>`;
+  el.innerHTML=html;
+}
+
+function renderSectionProps(row){
+  const p=row.sectionProps||{};
+  document.getElementById('propsTitle').textContent='ROW Properties';
+  const el=document.getElementById('propsPanel');
+  el.innerHTML=propGroup('Layout',[
+    `<div class="prop-row"><div class="prop-label">Columns</div><div style="display:flex;gap:5px;flex-wrap:wrap">${row.cols.map((c,i)=>`<div style="display:flex;align-items:center;gap:4px"><span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3)">Col ${i+1}</span><input type="number" value="${parseInt(c.flex)||1}" min="1" max="6" class="prop-input" style="width:50px;padding:5px 7px" onchange="updateColFlex('${row.id}',${i},this.value)"></div>`).join('')}</div></div>`,
+    propIn('padding','Padding',p.padding||'20px',`updateRowProp('${row.id}','padding',this.value)`),
+  ])+propGroup('Background',[
+    propColor('bg','Background Color',p.bg==='transparent'?'#08090c':(p.bg||'#08090c'),`updateRowProp('${row.id}','bg',this.value)`),
+    `<div style="font-size:11px;color:var(--white3);margin-top:-4px">Set to #08090c for transparent</div>`,
+  ])+`<button onclick="deleteRow('${row.id}')" style="width:100%;padding:8px;background:transparent;border:1px solid rgba(224,92,92,0.2);color:var(--bear);font-family:'Syne',sans-serif;font-size:11px;cursor:pointer;border-radius:3px;transition:all 0.2s;margin-top:4px" onmouseover="this.style.background='var(--bear-bg)'" onmouseout="this.style.background='transparent'">🗑 Delete Row</button>`;
+}
+
+// Prop builders
+function propGroup(title,fields){return`<div class="prop-group"><div class="prop-group-hdr" onclick="this.nextElementSibling.classList.toggle('collapsed')">${title}<span style="font-size:10px">▾</span></div><div class="prop-group-body">${fields.join('')}</div></div>`;}
+function propIn(key,label,val,handler,type='text'){return`<div class="prop-row"><div class="prop-label">${label}</div><input type="${type}" class="prop-input" value="${String(val||'').replace(/"/g,'&quot;')}" oninput="${handler}"></div>`;}
+function propTA(key,label,val,handler,rows=3,fontClass=''){return`<div class="prop-row"><div class="prop-label">${label}</div><textarea class="prop-textarea" rows="${rows}" style="${fontClass==='code'?'font-family:\'DM Mono\',monospace;font-size:11px;':''}" oninput="${handler}">${String(val||'').replace(/</g,'&lt;')}</textarea></div>`;}
+function propSel(key,label,opts,val,handler){return`<div class="prop-row"><div class="prop-label">${label}</div><select class="prop-input" onchange="${handler}">${opts.map(([v,l])=>`<option value="${v}" ${val===v?'selected':''}>${l}</option>`).join('')}</select></div>`;}
+function propColor(key,label,val,handler){return`<div class="prop-row"><div class="prop-label">${label}</div><div class="prop-color-row"><input type="color" class="prop-color" value="${val&&val.startsWith('#')?val:'#c8a96e'}" oninput="${handler}"><input type="text" class="prop-input" style="flex:1" value="${val||''}" oninput="${handler}"></div></div>`;}
+function propRow2(a,b){return`<div class="prop-row-2">${a}${b}</div>`;}
+
+function updateProp(wId,colId,rowId,key,val){
+  const row=rows.find(r=>r.id===rowId);
+  const col=row?.cols.find(c=>c.id===colId);
+  const w=col?.widgets.find(x=>x.id===wId);
+  if(!w)return;
+  w.props={...w.props,[key]:val};
+  // Update preview in canvas
+  const wEl=document.getElementById('w-'+wId);
+  if(wEl){const prev=wEl.querySelector('.c-widget-preview');if(prev)prev.innerHTML=getWidgetPreview(w);}
+}
+
+function updateRowProp(rowId,key,val){
+  const row=rows.find(r=>r.id===rowId);
+  if(!row)return;
+  row.sectionProps={...row.sectionProps,[key]:val};
+  const el=document.getElementById('row-'+rowId);
+  if(el&&key==='bg')el.style.background=val==='#08090c'?'transparent':val;
+  if(el&&key==='padding'){const cols=el.querySelector('.c-cols');if(cols)cols.style.padding=val;}
+}
+
+function updateColFlex(rowId,ci,val){
+  const row=rows.find(r=>r.id===rowId);
+  if(!row||!row.cols[ci])return;
+  row.cols[ci].flex=val+'fr';
+  const el=document.getElementById('row-'+rowId);
+  if(el){const cols=el.querySelector('.c-cols');if(cols)cols.style.gridTemplateColumns=row.cols.map(c=>c.flex||'1fr').join(' ');}
+}
+
+// ── Drag & Drop ─────────────────────────────────────
+function palDragStart(e,type){palDragType=type;e.dataTransfer.effectAllowed='copy';}
+
+function colDragOver(e,colId){
+  e.preventDefault();e.dataTransfer.dropEffect=palDragType?'copy':'move';
+  document.getElementById('col-'+colId)?.classList.add('drag-over');
+}
+function colDragLeave(e,colId){document.getElementById('col-'+colId)?.classList.remove('drag-over');}
+
+function colDrop(e,colId,rowId){
+  e.preventDefault();e.stopPropagation();
+  document.getElementById('col-'+colId)?.classList.remove('drag-over');
+  if(palDragType){
+    // New widget from palette
+    addWidget(palDragType,colId,rowId);
+    palDragType=null;
+  } else if(draggingWidget){
+    // Move existing widget
+    const{wId,fromColId,fromRowId}=draggingWidget;
+    if(fromColId===colId)return;
+    const fromRow=rows.find(r=>r.id===fromRowId);
+    const fromCol=fromRow?.cols.find(c=>c.id===fromColId);
+    const toRow=rows.find(r=>r.id===rowId);
+    const toCol=toRow?.cols.find(c=>c.id===colId);
+    if(!fromCol||!toCol)return;
+    const wi=fromCol.widgets.findIndex(w=>w.id===wId);
+    if(wi<0)return;
+    const[w]=fromCol.widgets.splice(wi,1);
+    toCol.widgets.push(w);
+    renderCanvas();
+    draggingWidget=null;
+  }
+}
+
+function widgetDragStart(e,wId,colId,rowId){
+  draggingWidget={wId,fromColId:colId,fromRowId:rowId};
+  e.dataTransfer.effectAllowed='move';
+  e.stopPropagation();
+}
+function widgetDragEnd(e){draggingWidget=null;}
+
+// ── Save & Preview ──────────────────────────────────
+async function savePage(publish){
+  if(!currentPageId){alert('Select or create a page first.');return;}
+  setSaveStatus('Saving...');
+  const{error}=await _sb.from('pages').update({sections:rows,published:publish,updated_at:new Date().toISOString()}).eq('id',currentPageId);
+  if(error){alert(error.message);setSaveStatus('Error');return;}
+  if(publish){
+    // Update published_at
+    const pg=pages.find(p=>p.id===currentPageId);
+    if(pg&&!pg.published)await _sb.from('pages').update({published_at:new Date().toISOString()}).eq('id',currentPageId);
+  }
+  setSaveStatus(publish?'✓ Published — live now':'✓ Draft saved');
+  await loadPages();
+}
+
+function previewPage(){
+  if(!currentPageId)return;
+  const pg=pages.find(p=>p.id===currentPageId);
+  if(pg)window.open(`page.html?slug=${pg.slug}&preview=1`,'_blank');
+}
+
+// ── Device toggle ────────────────────────────────────
+function setDevice(mode,btn){
+  document.querySelectorAll('.dev-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const ci=document.getElementById('canvasInner');
+  ci.className='canvas-inner';
+  if(mode!=='desktop')ci.classList.add(mode);
+}
+
+// ── Helpers ──────────────────────────────────────────
+function uid(){return Math.random().toString(36).slice(2,10);}
+function setSaveStatus(m){const el=document.getElementById('saveStatus');if(el)el.textContent=m;}
+function toggleBL(hdr){const b=hdr.nextElementSibling;b?.classList.toggle('collapsed');const a=hdr.querySelector('span:last-child');if(a)a.textContent=b?.classList.contains('collapsed')?'▸':'▾';}
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();savePage(false);}if(e.key==='Delete'&&selectedWidget&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){/* handled by delete button */}});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="hub-sidebar.js" onload="main()"></script>
+</body>
+</html>

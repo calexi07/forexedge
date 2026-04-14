@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EaglePips</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+/* ── Page renderer styles ── */
+.pg-section{padding:0}
+.pg-cols{display:grid;gap:0}
+.pg-col{min-width:0}
+
+/* Widget render styles */
+.w-heading{margin:0}
+.w-text{margin:0}
+.w-image img{display:block;border-radius:var(--r,4px);width:var(--w,100%);max-width:100%}
+.w-image figcaption{font-family:'DM Mono',monospace;font-size:11px;color:#7a7570;text-align:center;margin-top:6px}
+.w-button{display:flex}
+.w-button.center{justify-content:center}
+.w-button.right{justify-content:flex-end}
+.btn-gold{display:inline-flex;padding:11px 28px;background:#c8a96e;color:#08090c;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;border-radius:3px;transition:background 0.2s}
+.btn-gold:hover{background:#e8cc94}
+.btn-outline{display:inline-flex;padding:10px 28px;background:transparent;color:#c8c4bc;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.06em;text-decoration:none;border:1px solid rgba(255,255,255,0.15);border-radius:3px;transition:all 0.2s}
+.btn-outline:hover{border-color:#c8a96e;color:#c8a96e}
+.btn-white{display:inline-flex;padding:10px 28px;background:#fff;color:#08090c;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.06em;text-decoration:none;border-radius:3px;transition:all 0.2s}
+.btn-ghost{display:inline-flex;padding:10px 28px;background:transparent;color:rgba(255,255,255,0.6);font-family:'Syne',sans-serif;font-size:13px;letter-spacing:0.06em;text-decoration:none;transition:all 0.2s}
+.btn-ghost:hover{color:#fff}
+.btn-sm{padding:7px 18px;font-size:11px}
+.btn-lg{padding:14px 36px;font-size:15px}
+.w-divider{line-height:0}
+.w-html{}
+.w-video{position:relative;overflow:hidden;border-radius:4px}
+.w-video iframe,.w-video video{width:100%;height:100%;position:absolute;top:0;left:0;border:none}
+.w-badge{margin:0}
+.badge-gold{display:inline-flex;font-family:'DM Mono',monospace;font-size:10px;padding:3px 12px;background:rgba(200,169,110,0.1);border:1px solid rgba(200,169,110,0.2);color:#c8a96e;border-radius:100px;letter-spacing:0.08em;text-transform:uppercase}
+.badge-green{display:inline-flex;font-family:'DM Mono',monospace;font-size:10px;padding:3px 12px;background:rgba(76,175,125,0.1);border:1px solid rgba(76,175,125,0.2);color:#4caf7d;border-radius:100px;letter-spacing:0.08em;text-transform:uppercase}
+.badge-red{display:inline-flex;font-family:'DM Mono',monospace;font-size:10px;padding:3px 12px;background:rgba(224,92,92,0.1);border:1px solid rgba(224,92,92,0.2);color:#e05c5c;border-radius:100px;letter-spacing:0.08em;text-transform:uppercase}
+.badge-blue{display:inline-flex;font-family:'DM Mono',monospace;font-size:10px;padding:3px 12px;background:rgba(74,158,255,0.1);border:1px solid rgba(74,158,255,0.2);color:#6ba3ff;border-radius:100px;letter-spacing:0.08em;text-transform:uppercase}
+.badge-purple{display:inline-flex;font-family:'DM Mono',monospace;font-size:10px;padding:3px 12px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);color:#b87fff;border-radius:100px;letter-spacing:0.08em;text-transform:uppercase}
+.w-card-inner{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:4px;padding:20px;transition:border-color 0.2s}
+.w-card-inner:hover{border-color:rgba(200,169,110,0.2)}
+.w-card-inner.linked{cursor:pointer;text-decoration:none;display:block}
+.w-alert-info{padding:12px 16px;background:rgba(74,158,255,0.1);border-left:3px solid #6ba3ff;border-radius:0 4px 4px 0;font-size:14px;color:#c8c4bc}
+.w-alert-success{padding:12px 16px;background:rgba(76,175,125,0.1);border-left:3px solid #4caf7d;border-radius:0 4px 4px 0;font-size:14px;color:#c8c4bc}
+.w-alert-warning{padding:12px 16px;background:rgba(255,193,7,0.1);border-left:3px solid #ffc107;border-radius:0 4px 4px 0;font-size:14px;color:#c8c4bc}
+.w-alert-danger{padding:12px 16px;background:rgba(224,92,92,0.1);border-left:3px solid #e05c5c;border-radius:0 4px 4px 0;font-size:14px;color:#c8c4bc}
+
+/* Preview banner */
+.preview-banner{background:rgba(200,169,110,0.12);border-bottom:1px solid rgba(200,169,110,0.2);padding:10px 16px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:#c8a96e;letter-spacing:0.05em;position:sticky;top:60px;z-index:50}
+.page-loading{text-align:center;padding:120px 24px;color:#5a5648}
+.page-not-found{text-align:center;padding:120px 24px}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid rgba(200,169,110,0.2);border-top-color:#c8a96e;border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="navMount"></div>
+<div id="pageRoot">
+  <div class="page-loading">
+    <div class="spinner"></div>
+    <div style="margin-top:12px;font-size:13px">Loading page...</div>
+  </div>
+</div>
+<footer>
+  <div class="footer-logo">Eagle<span>Pips</span></div>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="market-updates.html">Market Updates</a></li>
+  </ul>
+  <div class="footer-copy" id="footerCopy">© 2026 EaglePips. All rights reserved.</div>
+</footer>
+
+<script>
+const SB_URL='https://vaimxhgqcdhjhdiaampa.supabase.co';
+const SB_KEY='sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
+const isPreview=new URLSearchParams(window.location.search).get('preview')==='1';
+
+function renderWidget(w){
+  const p=w.props||{};
+  switch(w.type){
+    case'heading':{
+      const tag=p.level||'h2';
+      const fs=p.size?`font-size:${p.size}px;`:'';
+      const al=p.align?`text-align:${p.align};`:'';
+      const col=p.color?`color:${p.color};`:'';
+      return`<${tag} class="w-heading" style="${fs}${al}${col}font-family:'Playfair Display',serif;font-weight:700;line-height:1.1;margin:0">${p.text||''}</${tag}>`;
+    }
+    case'text':{
+      const fs=p.size?`font-size:${p.size}px;`:'font-size:15px;';
+      const al=p.align?`text-align:${p.align};`:'';
+      const col=p.color?`color:${p.color};`:'color:#c8c4bc;';
+      // Parse basic markdown
+      const html=parseMd(p.content||'');
+      return`<div class="w-text" style="${fs}${al}${col}line-height:1.85">${html}</div>`;
+    }
+    case'image':{
+      if(!p.src)return'';
+      const linked=p.link?`<a href="${p.link}"${p.link.startsWith('http')?' target="_blank"':''}>`:'';
+      const linkedEnd=p.link?'</a>':'';
+      return`<figure class="w-image" style="margin:0;--w:${p.width||'100%'};--r:${p.radius||4}px">
+        ${linked}<img src="${p.src}" alt="${p.alt||''}" loading="lazy">${linkedEnd}
+        ${p.caption?`<figcaption>${p.caption}</figcaption>`:''}
+      </figure>`;
+    }
+    case'button':{
+      const sizes={sm:'btn-sm',md:'',lg:'btn-lg'};
+      const styles={gold:'btn-gold',outline:'btn-outline',white:'btn-white',ghost:'btn-ghost'};
+      const cls=`${styles[p.style]||'btn-gold'} ${sizes[p.size]||''}`;
+      const al=p.align||'left';
+      return`<div class="w-button ${al}"><a href="${p.url||'#'}" class="${cls}"${p.new_tab?' target="_blank"':''}>${p.text||'Button'}</a></div>`;
+    }
+    case'html':return`<div class="w-html">${p.code||''}</div>`;
+    case'divider':{
+      const h=p.height||1,c=p.color||'rgba(255,255,255,0.08)',w=p.width||'100%';
+      return`<div class="w-divider"><hr style="border:none;border-top:${h}px solid ${c};width:${w};margin:0 auto"></div>`;
+    }
+    case'spacer':return`<div class="w-spacer" style="height:${p.height||40}px"></div>`;
+    case'video':{
+      if(!p.url)return'';
+      const ratios={'16:9':'56.25%','4:3':'75%','1:1':'100%'};
+      const pad=ratios[p.ratio]||'56.25%';
+      let embed='';
+      if(p.type==='youtube'){
+        const vid=p.url.match(/(?:v=|youtu\.be\/)([^&\s]+)/)?.[1]||p.url;
+        embed=`<iframe src="https://www.youtube.com/embed/${vid}" allow="accelerometer;autoplay;encrypted-media;gyroscope" allowfullscreen></iframe>`;
+      } else if(p.type==='vimeo'){
+        const vid=p.url.match(/vimeo\.com\/(\d+)/)?.[1]||p.url;
+        embed=`<iframe src="https://player.vimeo.com/video/${vid}" allowfullscreen></iframe>`;
+      } else {
+        embed=`<video src="${p.url}" controls style="width:100%;height:100%;position:relative"></video>`;
+      }
+      return`<div class="w-video" style="padding-bottom:${pad}">${embed}</div>`;
+    }
+    case'icon':return`<div class="w-icon" style="font-size:${p.size||32}px;text-align:${p.align||'center'}">${p.emoji||'★'}</div>`;
+    case'badge':{
+      const al=p.align||'left';
+      return`<div style="text-align:${al}"><span class="badge-${p.color||'gold'}">${p.text||'Badge'}</span></div>`;
+    }
+    case'card':{
+      const inner=`${p.icon?`<div style="font-size:28px;margin-bottom:10px">${p.icon}</div>`:''}<div style="font-size:16px;font-weight:600;color:#fff;margin-bottom:6px">${p.title||''}</div><div style="font-size:14px;color:#a09880;line-height:1.7">${p.text||''}</div>`;
+      if(p.link)return`<a href="${p.link}" class="w-card-inner linked">${inner}</a>`;
+      return`<div class="w-card-inner">${inner}</div>`;
+    }
+    case'alert':return`<div class="w-alert-${p.type||'info'}">${p.text||''}</div>`;
+    default:return'';
+  }
+}
+
+function renderPage(rows){
+  if(!rows?.length)return'<div style="text-align:center;padding:80px;color:#5a5648">This page has no content yet.</div>';
+  return rows.map(row=>{
+    const p=row.sectionProps||{};
+    const bg=p.bg&&p.bg!=='transparent'&&p.bg!=='#08090c'?`background:${p.bg};`:'';
+    const pad=p.padding?`padding:${p.padding};`:'padding:20px;';
+    const colFr=row.cols.map(c=>c.flex||'1fr').join(' ');
+    const colsHTML=row.cols.map(col=>{
+      const widgets=(col.widgets||[]).map(w=>{
+        return`<div class="w-wrap" style="margin-bottom:12px">${renderWidget(w)}</div>`;
+      }).join('');
+      return`<div class="pg-col">${widgets}</div>`;
+    }).join('');
+    return`<div class="pg-section" style="${bg}"><div class="pg-cols" style="grid-template-columns:${colFr};${pad}gap:20px;max-width:1100px;margin:0 auto">${colsHTML}</div></div>`;
+  }).join('');
+}
+
+function parseMd(c){
+  if(!c)return'';
+  return c.replace(/^### (.+)$/gm,'<h3 style="font-family:\'Playfair Display\',serif;font-size:20px;font-weight:700;color:#fff;margin:20px 0 10px">$1</h3>').replace(/^## (.+)$/gm,'<h2 style="font-family:\'Playfair Display\',serif;font-size:25px;font-weight:700;color:#fff;margin:28px 0 12px">$1</h2>').replace(/\*\*(.+?)\*\*/g,'<strong style="color:#fff">$1</strong>').replace(/\*(.+?)\*/g,'<em style="color:#c8a96e">$1</em>').replace(/^---$/gm,'<hr style="border:none;border-top:1px solid rgba(255,255,255,0.07);margin:24px 0">').replace(/^> (.+)$/gm,'<blockquote style="border-left:3px solid #c8a96e;padding:10px 16px;background:rgba(200,169,110,0.06);margin:16px 0;font-style:italic;color:#a09880">$1</blockquote>').replace(/^- (.+)$/gm,'<li style="margin-bottom:6px">$1</li>').replace(/(<li[\s\S]+?<\/li>)/g,'<ul style="padding-left:20px;margin-bottom:14px">$1</ul>').replace(/\[(.+?)\]\((.+?)\)/g,'<a href="$2" style="color:#c8a96e;text-decoration:underline;text-underline-offset:3px">$1</a>').split('\n\n').map(b=>{b=b.trim();if(!b||b.startsWith('<'))return b;return'<p style="margin-bottom:14px">'+b.replace(/\n/g,'<br>')+'</p>';}).join('');
+}
+
+async function initPage(){
+  renderNav('');
+  const slug=new URLSearchParams(window.location.search).get('slug');
+  if(!slug){window.location.href='index.html';return;}
+  const _sb=window.supabase.createClient(SB_URL,SB_KEY);
+  const query=_sb.from('pages').select('*').eq('slug',slug);
+  if(!isPreview)query.eq('published',true);
+  const{data,error}=await query.single();
+  const root=document.getElementById('pageRoot');
+  if(error||!data){
+    root.innerHTML=`<div class="page-not-found"><div style="font-size:48px;opacity:0.1;margin-bottom:16px">📄</div><h1 style="font-family:'Playfair Display',serif;font-size:28px;color:#fff;margin-bottom:8px">Page not found</h1><a href="index.html" style="color:#c8a96e;font-size:13px">← Back to Home</a></div>`;
+    return;
+  }
+  document.title=`EaglePips — ${data.title}`;
+  if(data.meta_description){const m=document.createElement('meta');m.name='description';m.content=data.meta_description;document.head.appendChild(m);}
+  const rows=Array.isArray(data.sections)?data.sections:[];
+  root.innerHTML=(isPreview?`<div class="preview-banner">⚠️ Preview Mode — <a href="admin-builder.html" style="color:var(--gold);text-decoration:none;font-weight:600">← Back to Editor</a></div>`:'')+renderPage(rows);
+  // Load settings for footer
+  const{data:settings}=await _sb.from('site_settings').select('key,value').eq('key','footer_copy');
+  if(settings?.length)document.getElementById('footerCopy').textContent=settings[0].value;
+}
+</script>
+<script>
+const _NV='https://vaimxhgqcdhjhdiaampa.supabase.co';
+const _NK='sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
+function renderNav(a){
+  const pages=[{id:'index',label:'Home',href:'index.html'},{id:'updates',label:'Market Updates',href:'market-updates.html'}];
+  document.getElementById('navMount').innerHTML=`<nav><a href="index.html" class="nav-logo"><div style="width:28px;height:28px;background:linear-gradient(135deg,#c8a96e,#8a6a32);clip-path:polygon(50% 0%,85% 15%,100% 50%,85% 85%,50% 100%,15% 85%,0% 50%,15% 15%);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">🦅</div>Eagle<span>Pips</span></a><ul class="nav-links" id="navLinks">${pages.map(p=>`<li><a href="${p.href}" class="nav-link">${p.label}</a></li>`).join('')}</ul><div class="nav-cta" id="navCta"><a href="auth.html" class="btn-ghost">Sign In</a><a href="auth.html?tab=register" class="btn-gold">Get Access →</a></div></nav>`;
+  // Load nav from DB
+  window.supabase.createClient(_NV,_NK).from('nav_items').select('*').eq('active',true).order('sort_order',{ascending:true}).then(({data})=>{
+    if(data?.length){const roots=data.filter(n=>!n.parent_id).sort((a,b)=>a.sort_order-b.sort_order);document.getElementById('navLinks').innerHTML=roots.map(item=>`<li><a href="${item.url}" class="nav-link">${item.label}</a></li>`).join('');}
+  });
+}
+window._navReady=true;if(window._sbReady)initPage();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="window._sbReady=true;if(window._navReady)initPage()"></script>
+</body>
+</html>
