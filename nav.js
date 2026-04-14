@@ -3,12 +3,10 @@ const _NAV_KEY = 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
 
 function renderNav(activePage) {
   const pages = [
-    { id: 'index',   label: 'Home',    href: 'index.html' },
+    { id: 'index',   label: 'Home',          href: 'index.html' },
     { id: 'updates', label: 'Market Updates', href: 'market-updates.html' },
-    { id: 'news',    label: 'News',    href: 'news.html' },
-    { id: 'journal', label: 'Journal', href: 'journal.html' },
-    { id: 'academy', label: 'Academy', href: 'academy.html' },
-    { id: 'tools',   label: 'Tools',   href: 'tools.html' },
+    { id: 'journal', label: 'Journal',        href: 'journal.html' },
+    { id: 'tools',   label: 'Tools',          href: 'tools.html' },
   ];
   const links = pages.map(p =>
     `<li><a href="${p.href}" class="nav-link ${activePage===p.id?'active':''}">${p.label}</a></li>`
@@ -73,7 +71,7 @@ async function checkNavAuthState() {
           <div style="width:26px;height:26px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">${avatarHtml}</div>
           My Hub
         </a>
-        ${isAdmin ? '<a href="admin-articles.html" class="btn-ghost" style="font-size:11px;padding:6px 12px">⚙️ Admin</a>' : ''}
+        ${isAdmin ? '<a href="admin.html" class="btn-ghost" style="font-size:11px;padding:6px 12px">⚙️ Admin</a>' : ''}
         <button class="btn-gold" onclick="navSignOut()">Sign Out</button>`;
     }
     const ml = document.getElementById('mobileAuthLink');

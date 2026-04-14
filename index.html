@@ -978,9 +978,29 @@ function applySettings(s) {
 function applyNav(items) {
   const navLinks = document.getElementById('navLinks');
   if (!navLinks) return;
-  navLinks.innerHTML = items.map(item =>
-    `<li><a href="${item.url}" class="nav-link"${item.open_new_tab?' target="_blank"':''}>${item.label}</a></li>`
-  ).join('');
+  const roots = items.filter(n => !n.parent_id).sort((a,b) => a.sort_order - b.sort_order);
+  navLinks.innerHTML = roots.map(item => {
+    const children = items.filter(n => n.parent_id === item.id).sort((a,b) => a.sort_order - b.sort_order);
+    if (!children.length) {
+      return `<li><a href="${item.url}" class="nav-link"${item.open_new_tab?' target="_blank"':''}>${item.label}</a></li>`;
+    }
+    const grandStyle = `position:absolute;top:100%;left:0;background:#0c0e13;border:1px solid rgba(200,169,110,0.15);border-radius:4px;min-width:180px;padding:4px 0;display:none;z-index:200;box-shadow:0 16px 40px rgba(0,0,0,0.5)`;
+    const subStyle = `display:block;padding:9px 14px;font-family:'Syne',sans-serif;font-size:12px;font-weight:500;color:#a09880;text-decoration:none;white-space:nowrap;transition:all 0.15s`;
+    const subs = children.map(c => {
+      const gc = items.filter(n => n.parent_id === c.id).sort((a,b) => a.sort_order - b.sort_order);
+      if (!gc.length) return `<a href="${c.url}" style="${subStyle}" onmouseover="this.style.background='rgba(200,169,110,0.08)';this.style.color='#c8c4bc'" onmouseout="this.style.background='';this.style.color='#a09880'"${c.open_new_tab?' target="_blank"':''}>${c.label}</a>`;
+      const gcStyle = `position:absolute;left:100%;top:0;background:#0c0e13;border:1px solid rgba(200,169,110,0.15);border-radius:4px;min-width:160px;padding:4px 0;display:none;z-index:201;box-shadow:0 16px 40px rgba(0,0,0,0.5)`;
+      const gcSubs = gc.map(g => `<a href="${g.url}" style="${subStyle}" onmouseover="this.style.background='rgba(200,169,110,0.08)';this.style.color='#c8c4bc'" onmouseout="this.style.background='';this.style.color='#a09880'"${g.open_new_tab?' target="_blank"':''}>${g.label}</a>`).join('');
+      return `<div style="position:relative" onmouseover="this.querySelector('.gc-dd').style.display='block'" onmouseout="this.querySelector('.gc-dd').style.display='none'">
+        <a href="${c.url}" style="${subStyle};display:flex;align-items:center;justify-content:space-between;gap:8px" onmouseover="this.style.background='rgba(200,169,110,0.08)';this.style.color='#c8c4bc'" onmouseout="this.style.background='';this.style.color='#a09880'"${c.open_new_tab?' target="_blank"':''}>${c.label}<span style="font-size:9px;opacity:0.5">▸</span></a>
+        <div class="gc-dd" style="${gcStyle}">${gcSubs}</div>
+      </div>`;
+    }).join('');
+    return `<li style="position:relative" onmouseover="this.querySelector('.nav-dd').style.display='block'" onmouseout="this.querySelector('.nav-dd').style.display='none'">
+      <a href="${item.url}" class="nav-link"${item.open_new_tab?' target="_blank"':''}>${item.label} <span style="font-size:9px;opacity:0.5">▾</span></a>
+      <div class="nav-dd" style="${grandStyle}">${subs}</div>
+    </li>`;
+  }).join('');
 }
 
 /* ── Auth state check for nav ── */
@@ -1008,7 +1028,7 @@ async function checkIndexAuth() {
           <div style="width:26px;height:26px;border-radius:50%;background:rgba(200,169,110,0.15);border:1px solid rgba(200,169,110,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">${avatarHtml}</div>
           My Hub
         </a>
-        ${user.user_metadata?.is_admin ? '<a href="admin-articles.html" class="btn-nav btn-ghost-nav" style="font-size:11px;padding:6px 12px">⚙️ Admin</a>' : ''}
+        ${user.user_metadata?.is_admin ? '<a href="admin.html" class="btn-nav btn-ghost-nav" style="font-size:11px;padding:6px 12px">⚙️ Admin</a>' : ''}
         <button class="btn-nav btn-gold-nav" onclick="signOutIndex()">Sign Out</button>`;
     }
   } catch(e) { console.warn('Auth check:', e); }
