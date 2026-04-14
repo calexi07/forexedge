@@ -152,22 +152,7 @@
     <div class="et-form-group"><label class="et-form-label">Link to Analysis (optional)</label>
       <select class="et-form-input" id="atAnal"><option value="">— No analysis linked —</option></select>
     </div>
-    <div class="et-form-grid2">
-      <div class="et-form-group"><label class="et-form-label">Session</label>
-        <select class="et-form-input" id="atSession"><option value="">—</option><option>Asia</option><option>London</option><option>New York</option><option>Sydney</option></select>
-      </div>
-      <div class="et-form-group"><label class="et-form-label">Setup Tag</label>
-        <select class="et-form-input" id="atTag"><option>Disciplined</option><option>FOMO Entry</option><option>Revenge Trade</option><option>News Play</option><option>Breakout</option><option>Pullback</option><option>Fundamental Setup</option><option>Liquidity Grab</option><option>Order Block</option></select>
-      </div>
-    </div>
-    <div class="et-form-group"><label class="et-form-label">Notes</label><textarea class="et-form-input" id="atNotes" rows="2" style="resize:none"></textarea></div>
-    <div class="et-form-group"><label class="et-form-label">Emotion at Entry</label>
-      <div class="et-emo-row" id="emoRow">
-        <button class="et-emo-btn" onclick="setEmo(1,this)">😰</button><button class="et-emo-btn" onclick="setEmo(2,this)">😟</button>
-        <button class="et-emo-btn on" onclick="setEmo(3,this)">😐</button><button class="et-emo-btn" onclick="setEmo(4,this)">🙂</button>
-        <button class="et-emo-btn" onclick="setEmo(5,this)">😎</button>
-      </div>
-    </div>
+
     <button class="et-form-submit" id="atBtn" onclick="saveTrade()">Open Trade →</button>
   </div>
 </div>
@@ -218,7 +203,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="hub-sidebar.js"></script>
 <script>
-let _user,_sb,_j=null,trades=[],payouts=[],analyses=[],pairHist=[],emo=3,ctTrade=null;
+let _user,_sb,_j=null,trades=[],payouts=[],analyses=[],pairHist=[],ctTrade=null;
 let calY=new Date().getFullYear(),calM=new Date().getMonth();
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const EMO=['','😰','😟','😐','🙂','😎'];
@@ -301,15 +286,12 @@ function autoRR(){
 // Add trade
 function openAddTrade(){
   document.getElementById('atDate').value=new Date().toISOString().split('T')[0];
-  ['atPair','atEntry','atSL','atTP','atLot','atRisk','atNotes','atTV'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('atDir').value='long';document.getElementById('atSession').value='';
-  document.getElementById('atTag').value='Disciplined';document.getElementById('atAlert').style.display='none';
+  ['atPair','atEntry','atSL','atTP','atLot','atRisk','atTV'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('atDir').value='long';
+  document.getElementById('atAlert').style.display='none';
   document.getElementById('rrPrev').style.display='none';
-  emo=3;document.querySelectorAll('.et-emo-btn').forEach((b,i)=>b.classList.toggle('on',i===2));
   etOpenModal('addTradeModal');
 }
-function setEmo(v,el){emo=v;document.querySelectorAll('.et-emo-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
-
 async function saveTrade(){
   const pair=document.getElementById('atPair').value.trim().toUpperCase();
   const entry=parseFloat(document.getElementById('atEntry').value);
@@ -323,11 +305,7 @@ async function saveTrade(){
     lot_size:parseFloat(document.getElementById('atLot').value)||null,
     risk_amount:parseFloat(document.getElementById('atRisk').value)||null,
     r_multiple:r,status:'open',
-    session:document.getElementById('atSession').value||null,
     trade_date:document.getElementById('atDate').value,
-    tag:document.getElementById('atTag').value,
-    notes:document.getElementById('atNotes').value||null,
-    emotion:emo,
     tradingview_link:document.getElementById('atTV').value.trim()||null,
     analysis_id:document.getElementById('atAnal').value||null
   });
