@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EaglePips — Analyses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="hub.css">
+<style>
+.pair-wrap{position:relative}
+.pair-suggestions{position:absolute;top:100%;left:0;right:0;background:var(--bg3);border:1px solid var(--gold-border);border-top:none;border-radius:0 0 4px 4px;z-index:200;max-height:180px;overflow-y:auto;display:none}
+.pair-suggestions.open{display:block}
+.pair-sug-item{padding:8px 12px;font-family:'DM Mono',monospace;font-size:12px;color:var(--white2);cursor:pointer;transition:background 0.15s;display:flex;align-items:center;gap:8px}
+.pair-sug-item:hover,.pair-sug-item.hi{background:var(--gold-dim);color:var(--gold)}
+/* Analysis cards */
+.an-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.an-card{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;transition:border-color 0.2s;cursor:pointer}
+.an-card:hover{border-color:var(--gold-border)}
+.an-card-hdr{padding:14px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.an-pair{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--white)}
+.an-bias-bull{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(76,175,125,0.12);border:1px solid rgba(76,175,125,0.2);color:var(--bull);border-radius:100px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase}
+.an-bias-bear{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(224,92,92,0.12);border:1px solid rgba(224,92,92,0.2);color:var(--bear);border-radius:100px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase}
+.an-bias-neutral{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(200,169,110,0.08);border:1px solid rgba(200,169,110,0.2);color:var(--gold);border-radius:100px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase}
+.an-status-active{font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;background:var(--bull-bg);border:1px solid rgba(76,175,125,0.2);color:var(--bull);border-radius:100px;letter-spacing:0.06em;text-transform:uppercase}
+.an-status-old{font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;background:rgba(255,255,255,0.04);border:1px solid var(--border2);color:var(--white3);border-radius:100px;letter-spacing:0.06em;text-transform:uppercase}
+.an-status-outdated{font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;background:rgba(224,92,92,0.1);border:1px solid rgba(224,92,92,0.2);color:var(--bear);border-radius:100px;letter-spacing:0.06em;text-transform:uppercase}
+.an-card-body{padding:14px 16px}
+.an-tf-tabs{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap}
+.an-tf-tab{padding:4px 10px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--border2);color:var(--white3);border-radius:3px;cursor:pointer;transition:all 0.15s}
+.an-tf-tab:hover,.an-tf-tab.active{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
+/* Image preview in card */
+.an-img-thumb{width:100%;height:120px;object-fit:cover;border-radius:3px;border:1px solid var(--border2);display:block;cursor:pointer;transition:opacity 0.15s}
+.an-img-thumb:hover{opacity:0.85}
+/* Modal tabs for analysis detail */
+.modal-tf-tabs{display:flex;gap:0;border-bottom:1px solid var(--border2);margin:-4px -4px 16px;overflow-x:auto}
+.modal-tf-tab{padding:10px 14px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--white3);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none}
+.modal-tf-tab:hover{color:var(--white2)}
+.modal-tf-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.modal-tf-panel{display:none}
+.modal-tf-panel.active{display:block}
+/* Image lightbox */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;display:none;align-items:center;justify-content:center;cursor:zoom-out}
+.lightbox.open{display:flex}
+.lightbox img{max-width:95vw;max-height:92vh;object-fit:contain;border-radius:4px}
+/* Bias selector */
+.bias-btns{display:flex;gap:8px}
+.bias-btn{flex:1;padding:8px;border-radius:3px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;transition:all 0.15s;text-align:center;border:1px solid var(--border2);background:transparent;color:var(--white3)}
+.bias-btn.bull.on{background:var(--bull-bg);border-color:rgba(76,175,125,0.3);color:var(--bull)}
+.bias-btn.bear.on{background:var(--bear-bg);border-color:rgba(224,92,92,0.3);color:var(--bear)}
+.bias-btn.neutral.on{background:var(--gold-dim);border-color:var(--gold-border);color:var(--gold)}
+</style>
+</head>
+<body class="et-loading">
+<div id="et-loader">
+  <div class="et-loader-logo"><div class="et-loader-eagle">🦅</div><div class="et-loader-name">Eagle<span>Pips</span></div></div>
+  <div class="et-loader-bar"><div class="et-loader-bar-fill"></div></div>
+  <div class="et-loader-text">Loading analyses...</div>
+</div>
+<div id="etSidebarMount"></div>
+<div class="hub-main">
+  <div class="hub-topbar">
+    <div class="hub-topbar-title">📊 <strong>Analyses</strong></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input type="text" id="searchPair" class="et-form-input" style="width:160px;padding:6px 10px;font-size:12px" placeholder="Filter by pair..." oninput="filterAnalyses()">
+      <select id="filterBias" class="et-form-input" style="width:auto;padding:6px 10px;font-size:12px" onchange="filterAnalyses()">
+        <option value="">All biases</option><option value="bullish">Bullish</option><option value="bearish">Bearish</option><option value="neutral">Neutral</option>
+      </select>
+      <button class="et-btn-gold" onclick="openNewAnalysis()" style="padding:7px 16px;font-size:11px">+ New Analysis</button>
+    </div>
+  </div>
+  <div class="hub-content et-fade">
+    <div id="analysesContent">
+      <div style="text-align:center;padding:60px"><div class="et-spinner"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT ANALYSIS MODAL -->
+<div class="et-modal-overlay" id="analysisModal">
+  <div class="et-modal" style="max-width:620px;max-height:90vh;overflow-y:auto">
+    <button class="et-modal-close" onclick="etCloseModal('analysisModal')">✕</button>
+    <div class="et-modal-title" id="amTitle">New Analysis</div>
+    <input type="hidden" id="amId">
+    <div class="et-form-grid2">
+      <div class="et-form-group"><label class="et-form-label">Pair *</label>
+        <div class="pair-wrap">
+          <input type="text" class="et-form-input" id="amPair" placeholder="EUR/USD, XAU/USD..." autocomplete="off" oninput="pairInput(this,'amSug')" onkeydown="pairKey(event,'amSug','amPair')">
+          <div class="pair-suggestions" id="amSug"></div>
+        </div>
+      </div>
+      <div class="et-form-group"><label class="et-form-label">Date *</label>
+        <input type="date" class="et-form-input" id="amDate">
+      </div>
+    </div>
+    <div class="et-form-group"><label class="et-form-label">Overall Bias *</label>
+      <div class="bias-btns">
+        <button class="bias-btn bull" onclick="setBias('bullish',this)">🟢 Bullish</button>
+        <button class="bias-btn bear" onclick="setBias('bearish',this)">🔴 Bearish</button>
+        <button class="bias-btn neutral" onclick="setBias('neutral',this)">🟡 Neutral</button>
+      </div>
+      <input type="hidden" id="amBias" value="neutral">
+    </div>
+    <div class="et-form-group"><label class="et-form-label">Tags (optional, comma separated)</label>
+      <input type="text" class="et-form-input" id="amTags" placeholder="COT Data, NFP Week, Trend Following...">
+    </div>
+
+    <!-- Timeframe sections -->
+    <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:10px;margin-top:4px">Timeframe Analysis</div>
+
+    <!-- Daily -->
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:10px">
+      <div style="padding:8px 12px;background:rgba(0,0,0,0.2);font-family:'DM Mono',monospace;font-size:10px;color:var(--white2);letter-spacing:0.08em;cursor:pointer" onclick="toggleTF(this)">📅 Daily (D1) ▾</div>
+      <div class="tf-body" style="padding:12px;display:flex;flex-direction:column;gap:10px">
+        <div><label class="et-form-label">Analysis Notes</label>
+          <textarea class="et-form-input" id="amDailyText" rows="4" style="resize:vertical" placeholder="Daily timeframe analysis — key levels, trend direction, confluences..."></textarea>
+        </div>
+        <div><label class="et-form-label">Chart Image URL (from TradingView)</label>
+          <input type="url" class="et-form-input" id="amDailyImg" placeholder="https://www.tradingview.com/x/...">
+          <div id="amDailyImgPrev" style="margin-top:6px;display:none"><img id="amDailyImgEl" src="" style="max-width:100%;max-height:180px;border-radius:3px;border:1px solid var(--border2);cursor:pointer" onclick="openLightbox(this.src)"></div>
+        </div>
+        <script>document.getElementById('amDailyImg').addEventListener('input',function(){const p=document.getElementById('amDailyImgPrev');const i=document.getElementById('amDailyImgEl');if(this.value){p.style.display='block';i.src=this.value;}else{p.style.display='none';}});</script>
+      </div>
+    </div>
+
+    <!-- 4H -->
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:10px">
+      <div style="padding:8px 12px;background:rgba(0,0,0,0.2);font-family:'DM Mono',monospace;font-size:10px;color:var(--white2);letter-spacing:0.08em;cursor:pointer" onclick="toggleTF(this)">⏱ 4 Hour (H4) ▾</div>
+      <div class="tf-body" style="padding:12px;display:flex;flex-direction:column;gap:10px">
+        <div><label class="et-form-label">Analysis Notes</label>
+          <textarea class="et-form-input" id="amH4Text" rows="4" style="resize:vertical" placeholder="4H timeframe — structure, key zones, entry criteria..."></textarea>
+        </div>
+        <div><label class="et-form-label">Chart Image URL</label>
+          <input type="url" class="et-form-input" id="amH4Img" placeholder="https://www.tradingview.com/x/...">
+          <div id="amH4ImgPrev" style="margin-top:6px;display:none"><img id="amH4ImgEl" src="" style="max-width:100%;max-height:180px;border-radius:3px;border:1px solid var(--border2);cursor:pointer" onclick="openLightbox(this.src)"></div>
+        </div>
+        <script>document.getElementById('amH4Img').addEventListener('input',function(){const p=document.getElementById('amH4ImgPrev');const i=document.getElementById('amH4ImgEl');if(this.value){p.style.display='block';i.src=this.value;}else{p.style.display='none';}});</script>
+      </div>
+    </div>
+
+    <!-- 1H -->
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:10px">
+      <div style="padding:8px 12px;background:rgba(0,0,0,0.2);font-family:'DM Mono',monospace;font-size:10px;color:var(--white2);letter-spacing:0.08em;cursor:pointer" onclick="toggleTF(this)">⏰ 1 Hour (H1) ▾</div>
+      <div class="tf-body" style="padding:12px;display:flex;flex-direction:column;gap:10px">
+        <div><label class="et-form-label">Analysis Notes</label>
+          <textarea class="et-form-input" id="amH1Text" rows="3" style="resize:vertical" placeholder="1H timeframe — entry trigger, confirmation signals..."></textarea>
+        </div>
+        <div><label class="et-form-label">Chart Image URL</label>
+          <input type="url" class="et-form-input" id="amH1Img" placeholder="https://www.tradingview.com/x/...">
+          <div id="amH1ImgPrev" style="margin-top:6px;display:none"><img id="amH1ImgEl" src="" style="max-width:100%;max-height:180px;border-radius:3px;border:1px solid var(--border2);cursor:pointer" onclick="openLightbox(this.src)"></div>
+        </div>
+        <script>document.getElementById('amH1Img').addEventListener('input',function(){const p=document.getElementById('amH1ImgPrev');const i=document.getElementById('amH1ImgEl');if(this.value){p.style.display='block';i.src=this.value;}else{p.style.display='none';}});</script>
+      </div>
+    </div>
+
+    <!-- M15 -->
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:10px">
+      <div style="padding:8px 12px;background:rgba(0,0,0,0.2);font-family:'DM Mono',monospace;font-size:10px;color:var(--white2);letter-spacing:0.08em;cursor:pointer" onclick="toggleTF(this)">⚡ 15 Minutes (M15) ▾</div>
+      <div class="tf-body" style="padding:12px;display:flex;flex-direction:column;gap:10px">
+        <div><label class="et-form-label">Analysis Notes</label>
+          <textarea class="et-form-input" id="amM15Text" rows="3" style="resize:vertical" placeholder="M15 — precision entry, micro structure..."></textarea>
+        </div>
+        <div><label class="et-form-label">Chart Image URL</label>
+          <input type="url" class="et-form-input" id="amM15Img" placeholder="https://www.tradingview.com/x/...">
+          <div id="amM15ImgPrev" style="margin-top:6px;display:none"><img id="amM15ImgEl" src="" style="max-width:100%;max-height:180px;border-radius:3px;border:1px solid var(--border2);cursor:pointer" onclick="openLightbox(this.src)"></div>
+        </div>
+        <script>document.getElementById('amM15Img').addEventListener('input',function(){const p=document.getElementById('amM15ImgPrev');const i=document.getElementById('amM15ImgEl');if(this.value){p.style.display='block';i.src=this.value;}else{p.style.display='none';}});</script>
+      </div>
+    </div>
+
+    <div class="et-form-group"><label class="et-form-label">General Notes / Conclusion</label>
+      <textarea class="et-form-input" id="amNotes" rows="3" style="resize:vertical" placeholder="Overall conclusion, key levels to watch, trade plan..."></textarea>
+    </div>
+    <button class="et-form-submit" id="amBtn" onclick="saveAnalysis()">Save Analysis →</button>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" alt="Chart">
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="hub-sidebar.js"></script>
+<script>
+let _user,_sb,analyses=[],pairHist=[],activeBias='neutral';
+const COMMON=['EUR/USD','GBP/USD','USD/JPY','AUD/USD','USD/CAD','NZD/USD','USD/CHF','EUR/GBP','EUR/JPY','GBP/JPY','XAU/USD','XAG/USD','USD/MXN','EUR/AUD','GBP/CHF','EUR/CHF','GBP/NZD','AUD/JPY','CAD/JPY','USD/ZAR'];
+
+async function main(){
+  const res=await initEtSidebar('analyses');if(!res)return;
+  _user=res.user;_sb=res.sb;
+  await Promise.all([loadAnalyses(),loadPairHist()]);
+}
+
+async function loadAnalyses(){
+  const{data}=await _sb.from('analyses').select('*').eq('user_id',_user.id).order('date',{ascending:false}).order('created_at',{ascending:false});
+  analyses=data||[];
+  renderAnalyses();
+}
+
+async function loadPairHist(){
+  const{data}=await _sb.from('pair_history').select('*').eq('user_id',_user.id).order('count',{ascending:false});
+  pairHist=data||[];
+}
+
+function getStatus(a){
+  const now=new Date(),date=new Date(a.date);
+  const days=Math.floor((now-date)/(1000*60*60*24));
+  if(a.status==='active'&&days<=3)return'active';
+  if(days<=7)return'old';
+  return'outdated';
+}
+
+function biasBadge(b){
+  if(b==='bullish')return`<span class="an-bias-bull">🟢 Bullish</span>`;
+  if(b==='bearish')return`<span class="an-bias-bear">🔴 Bearish</span>`;
+  return`<span class="an-bias-neutral">🟡 Neutral</span>`;
+}
+
+function statusBadge(s){
+  if(s==='active')return`<span class="an-status-active">● Active</span>`;
+  if(s==='old')return`<span class="an-status-old">○ Recent</span>`;
+  return`<span class="an-status-outdated">⚠ Outdated</span>`;
+}
+
+function filterAnalyses(){
+  const q=document.getElementById('searchPair').value.trim().toUpperCase();
+  const b=document.getElementById('filterBias').value;
+  let filtered=analyses;
+  if(q)filtered=filtered.filter(a=>a.pair.includes(q));
+  if(b)filtered=filtered.filter(a=>a.bias===b);
+  renderGrid(filtered);
+}
+
+function renderAnalyses(){renderGrid(analyses);}
+
+function renderGrid(list){
+  const el=document.getElementById('analysesContent');
+  if(!list.length){
+    el.innerHTML=`<div style="text-align:center;padding:80px 20px">
+      <div style="font-size:48px;opacity:0.1;margin-bottom:16px">📊</div>
+      <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--white);margin-bottom:8px">No analyses yet</div>
+      <div style="font-size:14px;color:var(--white2);margin-bottom:24px;line-height:1.6">Create your first analysis to start building your edge</div>
+      <button class="et-btn-gold" onclick="openNewAnalysis()">+ New Analysis</button>
+    </div>`;
+    return;
+  }
+  el.innerHTML=`<div class="an-grid">${list.map(a=>{
+    const st=getStatus(a);
+    const hasImgs=[a.daily_image,a.h4_image,a.h1_image,a.m15_image].filter(Boolean);
+    const firstImg=hasImgs[0];
+    return`<div class="an-card" onclick="openEdit('${a.id}')">
+      <div class="an-card-hdr">
+        <div>
+          <div class="an-pair">${a.pair}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3);margin-top:2px">${a.date}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">
+          ${biasBadge(a.bias)}
+          ${statusBadge(st)}
+        </div>
+      </div>
+      ${firstImg?`<div style="padding:0 0 0 0;position:relative"><img src="${firstImg}" style="width:100%;height:100px;object-fit:cover;display:block" loading="lazy" onerror="this.style.display='none'"></div>`:''}
+      <div class="an-card-body">
+        ${a.daily_text?`<div style="font-size:12px;color:var(--white2);line-height:1.6;margin-bottom:8px">${a.daily_text.substring(0,120)}${a.daily_text.length>120?'...':''}</div>`:''}
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px">
+          ${a.daily_text?'<span style="font-family:\'DM Mono\',monospace;font-size:8px;padding:2px 6px;background:var(--bg3);border:1px solid var(--border2);color:var(--white3);border-radius:2px">D1</span>':''}
+          ${a.h4_text?'<span style="font-family:\'DM Mono\',monospace;font-size:8px;padding:2px 6px;background:var(--bg3);border:1px solid var(--border2);color:var(--white3);border-radius:2px">H4</span>':''}
+          ${a.h1_text?'<span style="font-family:\'DM Mono\',monospace;font-size:8px;padding:2px 6px;background:var(--bg3);border:1px solid var(--border2);color:var(--white3);border-radius:2px">H1</span>':''}
+          ${a.m15_text?'<span style="font-family:\'DM Mono\',monospace;font-size:8px;padding:2px 6px;background:var(--bg3);border:1px solid var(--border2);color:var(--white3);border-radius:2px">M15</span>':''}
+          ${a.tags?.map(t=>`<span style="font-family:'DM Mono',monospace;font-size:8px;padding:2px 6px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:2px">${t}</span>`).join('')||''}
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;color:var(--white3)">${hasImgs.length} chart${hasImgs.length!==1?'s':''}</span>
+          <button onclick="event.stopPropagation();delAnalysis('${a.id}')" style="background:none;border:none;color:var(--white3);cursor:pointer;font-size:12px;padding:2px 5px;transition:color 0.15s" onmouseover="this.style.color='var(--bear)'" onmouseout="this.style.color='var(--white3)'">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+// Pair autocomplete
+function pairInput(input,sugId){
+  const val=input.value.trim().toUpperCase();const sug=document.getElementById(sugId);
+  if(!val){sug.classList.remove('open');return;}
+  const hist=pairHist.map(p=>({pair:p.pair,count:p.count}));
+  const all=[...hist];COMMON.forEach(p=>{if(!all.find(x=>x.pair===p))all.push({pair:p,count:0});});
+  const filtered=all.filter(p=>p.pair.includes(val)).sort((a,b)=>b.count-a.count).slice(0,8);
+  if(!filtered.length){sug.classList.remove('open');return;}
+  sug.innerHTML=filtered.map((p,i)=>`<div class="pair-sug-item" onclick="selPair('${p.pair}','${input.id}','${sugId}')" data-i="${i}"><span>📊</span>${p.pair}${p.count>0?`<span class="pair-sug-count">×${p.count}</span>`:''}</div>`).join('');
+  sug.classList.add('open');
+}
+function selPair(pair,inp,sug){document.getElementById(inp).value=pair;document.getElementById(sug).classList.remove('open');}
+function pairKey(e,sugId,inpId){
+  const sug=document.getElementById(sugId);const items=[...sug.querySelectorAll('.pair-sug-item')];const hi=sug.querySelector('.hi');
+  if(e.key==='ArrowDown'){e.preventDefault();const n=hi?items[items.indexOf(hi)+1]:items[0];hi?.classList.remove('hi');n?.classList.add('hi');}
+  else if(e.key==='ArrowUp'){e.preventDefault();const n=hi?items[items.indexOf(hi)-1]:items[items.length-1];hi?.classList.remove('hi');n?.classList.add('hi');}
+  else if(e.key==='Enter'&&hi){e.preventDefault();selPair(hi.textContent.replace('📊','').trim().split('\n')[0].trim(),inpId,sugId);}
+  else if(e.key==='Escape')sug.classList.remove('open');
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.pair-wrap'))document.querySelectorAll('.pair-suggestions').forEach(s=>s.classList.remove('open'));});
+
+// Bias
+function setBias(bias,btn){
+  activeBias=bias;document.getElementById('amBias').value=bias;
+  document.querySelectorAll('.bias-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function toggleTF(hdr){const b=hdr.nextElementSibling;if(b)b.style.display=b.style.display==='none'?'':'none';}
+
+// New analysis
+function openNewAnalysis(){
+  document.getElementById('amId').value='';document.getElementById('amTitle').textContent='New Analysis';
+  document.getElementById('amDate').value=new Date().toISOString().split('T')[0];
+  ['amPair','amDailyText','amDailyImg','amH4Text','amH4Img','amH1Text','amH1Img','amM15Text','amM15Img','amNotes','amTags'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['amDailyImgPrev','amH4ImgPrev','amH1ImgPrev','amM15ImgPrev'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  activeBias='neutral';document.getElementById('amBias').value='neutral';
+  document.querySelectorAll('.bias-btn').forEach(b=>b.classList.remove('on'));
+  etOpenModal('analysisModal');
+}
+
+function openEdit(id){
+  const a=analyses.find(x=>x.id===id);if(!a)return;
+  document.getElementById('amId').value=a.id;document.getElementById('amTitle').textContent='Edit Analysis';
+  document.getElementById('amPair').value=a.pair||'';document.getElementById('amDate').value=a.date||'';
+  document.getElementById('amDailyText').value=a.daily_text||'';document.getElementById('amDailyImg').value=a.daily_image||'';
+  document.getElementById('amH4Text').value=a.h4_text||'';document.getElementById('amH4Img').value=a.h4_image||'';
+  document.getElementById('amH1Text').value=a.h1_text||'';document.getElementById('amH1Img').value=a.h1_image||'';
+  document.getElementById('amM15Text').value=a.m15_text||'';document.getElementById('amM15Img').value=a.m15_image||'';
+  document.getElementById('amNotes').value=a.notes||'';
+  document.getElementById('amTags').value=a.tags?a.tags.join(', '):'';
+  activeBias=a.bias||'neutral';document.getElementById('amBias').value=activeBias;
+  document.querySelectorAll('.bias-btn').forEach(b=>b.classList.remove('on'));
+  document.querySelector(`.bias-btn.${activeBias}`)?.classList.add('on');
+  // Show image previews
+  ['Daily','H4','H1','M15'].forEach(tf=>{
+    const img=document.getElementById(`am${tf}Img`)?.value;
+    const prev=document.getElementById(`am${tf}ImgPrev`);
+    const el=document.getElementById(`am${tf}ImgEl`);
+    if(img&&prev&&el){prev.style.display='block';el.src=img;}
+    else if(prev)prev.style.display='none';
+  });
+  etOpenModal('analysisModal');
+}
+
+async function saveAnalysis(){
+  const pair=document.getElementById('amPair').value.trim().toUpperCase();
+  const date=document.getElementById('amDate').value;
+  const bias=document.getElementById('amBias').value;
+  if(!pair||!date||!bias){alert('Pair, date and bias are required.');return;}
+  const btn=document.getElementById('amBtn');btn.disabled=true;btn.textContent='Saving...';
+  const tags=document.getElementById('amTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const payload={
+    user_id:_user.id,pair,date,bias,
+    daily_text:document.getElementById('amDailyText').value||null,
+    daily_image:document.getElementById('amDailyImg').value.trim()||null,
+    h4_text:document.getElementById('amH4Text').value||null,
+    h4_image:document.getElementById('amH4Img').value.trim()||null,
+    h1_text:document.getElementById('amH1Text').value||null,
+    h1_image:document.getElementById('amH1Img').value.trim()||null,
+    m15_text:document.getElementById('amM15Text').value||null,
+    m15_image:document.getElementById('amM15Img').value.trim()||null,
+    notes:document.getElementById('amNotes').value||null,
+    tags:tags.length?tags:null,
+    status:'active',
+    updated_at:new Date().toISOString()
+  };
+  const id=document.getElementById('amId').value;
+  let err;
+  if(id){const r=await _sb.from('analyses').update(payload).eq('id',id).eq('user_id',_user.id);err=r.error;}
+  else{const r=await _sb.from('analyses').insert(payload);err=r.error;}
+  btn.disabled=false;btn.textContent='Save Analysis →';
+  if(err){alert(err.message);return;}
+  // Save pair to history
+  const ex=pairHist.find(p=>p.pair===pair);
+  if(ex){await _sb.from('pair_history').update({count:ex.count+1,last_used:new Date().toISOString()}).eq('user_id',_user.id).eq('pair',pair);}
+  else{await _sb.from('pair_history').insert({user_id:_user.id,pair,count:1,last_used:new Date().toISOString()});}
+  etCloseModal('analysisModal');
+  await loadAnalyses();
+}
+
+async function delAnalysis(id){
+  if(!confirm('Delete this analysis?'))return;
+  await _sb.from('analyses').delete().eq('id',id).eq('user_id',_user.id);
+  await loadAnalyses();
+}
+
+function openLightbox(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('open');}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
+document.getElementById('lightbox').addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
+
+document.addEventListener('click',e=>{if(e.target.classList.contains('et-modal-overlay'))etCloseModal(e.target.id);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();document.querySelectorAll('.et-modal-overlay.active').forEach(m=>etCloseModal(m.id));}});
+main();
+</script>
+</body>
+</html>

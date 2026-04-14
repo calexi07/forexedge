@@ -43,6 +43,9 @@ function renderEtSidebar(activePage, userName, userId, journals=[]) {
       <a href="hub-journal.html" class="et-item${activePage==='journals'?' active':''}">
         <span class="et-icon">📒</span>My Journals
       </a>
+      <a href="hub-analyses.html" class="et-item${activePage==='analyses'?' active':''}">
+        <span class="et-icon">📊</span>Analyses
+      </a>
       ${journalItems}
       <a href="hub-payouts.html" class="et-item${activePage==='payouts'?' active':''}">
         <span class="et-icon">💸</span>Payouts
