@@ -2,7 +2,7 @@
 const _HUB_URL = 'https://vaimxhgqcdhjhdiaampa.supabase.co';
 const _HUB_KEY = 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
 
-function renderEtSidebar(activePage, userName, userId, journals=[]) {
+function renderEtSidebar(activePage, userName, userId, journals=[], activeAnalyses=[]) {
   const ini = (userName||'U').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
   const av = localStorage.getItem('et_av_'+userId);
   const avHtml = av ? `<img src="${av}">` : `<span>${ini}</span>`;
@@ -16,6 +16,21 @@ function renderEtSidebar(activePage, userName, userId, journals=[]) {
       journalItems += `<a href="hub-journal-detail.html?id=${j.id}" class="et-item et-sub${isActive}">
         <span class="et-icon" style="font-size:11px">${typeIcon[j.type]||'📒'}</span>
         <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${j.name}</span>
+      </a>`;
+    });
+  }
+
+  // Build active analyses sub-items
+  let analysisItems = '';
+  if (activeAnalyses.length) {
+    const biasIcon = {bullish:'🟢',bearish:'🔴',neutral:'🟡'};
+    activeAnalyses.slice(0, 8).forEach(a => {
+      const isActive = activePage === 'analysis-'+a.id ? ' active' : '';
+      const icon = biasIcon[a.bias] || '📊';
+      analysisItems += `<a href="hub-analyses.html" class="et-item et-sub${isActive}" onclick="event.preventDefault();history.pushState(null,'','hub-analyses.html');window.location.reload()">
+        <span class="et-icon" style="font-size:11px">${icon}</span>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px">${a.pair}</span>
+        <span style="font-family:\'DM Mono\',monospace;font-size:8px;color:var(--white3);margin-left:auto;white-space:nowrap">${a.date?.slice(5)||''}</span>
       </a>`;
     });
   }
@@ -43,12 +58,19 @@ function renderEtSidebar(activePage, userName, userId, journals=[]) {
       <a href="hub-journal.html" class="et-item${activePage==='journals'?' active':''}">
         <span class="et-icon">📒</span>My Journals
       </a>
-      <a href="hub-analyses.html" class="et-item${activePage==='analyses'?' active':''}">
-        <span class="et-icon">📊</span>Analyses
-      </a>
       ${journalItems}
+      <div class="et-divider"></div>
+
+      <span class="et-cat">Analyses</span>
+      <a href="hub-analyses.html" class="et-item${activePage==='analyses'?' active':''}">
+        <span class="et-icon">📊</span>All Analyses
+      </a>
+      ${analysisItems}
+      <div class="et-divider"></div>
+
+      <span class="et-cat">Payouts</span>
       <a href="hub-payouts.html" class="et-item${activePage==='payouts'?' active':''}">
-        <span class="et-icon">💸</span>Payouts
+        <span class="et-icon">💸</span>My Payouts
       </a>
       <div class="et-divider"></div>
 
@@ -104,7 +126,18 @@ async function initEtSidebar(activePage) {
   const { data: journals } = await _sb.from('journals').select('id,name,type').eq('user_id', user.id).order('created_at', { ascending: true });
   window._etJournals = journals || [];
 
-  renderEtSidebar(activePage, name, user.id, journals || []);
+  // Load active analyses for sidebar
+  const now = new Date();
+  const threeDaysAgo = new Date(now - 3*24*60*60*1000).toISOString().split('T')[0];
+  const { data: activeAnalyses } = await _sb.from('analyses')
+    .select('id,pair,bias,date')
+    .eq('user_id', user.id)
+    .gte('date', threeDaysAgo)
+    .eq('status', 'active')
+    .order('date', { ascending: false })
+    .limit(8);
+
+  renderEtSidebar(activePage, name, user.id, journals || [], activeAnalyses || []);
 
   const timeEl = document.getElementById('etTime');
   if (timeEl) { const t=()=>timeEl.textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); t(); setInterval(t,1000); }
@@ -119,7 +152,13 @@ async function refreshSidebarJournals() {
   window._etJournals = data || [];
   const activePage = document.body.dataset.activePage || '';
   const name = window._etUser.user_metadata?.full_name || window._etUser.email?.split('@')[0] || 'Trader';
-  renderEtSidebar(activePage, name, window._etUser.id, data || []);
+  const nowR = new Date();
+  const threeDaysAgoR = new Date(nowR - 3*24*60*60*1000).toISOString().split('T')[0];
+  const { data: activeAn } = await window._etSb.from('analyses')
+    .select('id,pair,bias,date').eq('user_id', window._etUser.id)
+    .gte('date', threeDaysAgoR).eq('status','active')
+    .order('date', { ascending: false }).limit(8);
+  renderEtSidebar(activePage, name, window._etUser.id, data || [], activeAn || []);
 }
 
 async function etSignOut() { await window._etSb?.auth.signOut(); window.location.href = 'index.html'; }
