@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EaglePips — Nav Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="hub.css">
+<style>
+.nav-layout{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+.nav-item-card{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;margin-bottom:10px;transition:all 0.15s;overflow:visible}
+.nav-item-card.dragging{opacity:0.5;border-color:var(--gold-border)}
+.nav-item-card.drag-over{border-color:var(--gold);background:var(--gold-dim)}
+.nic-row{display:flex;align-items:center;gap:10px;padding:12px 14px}
+.nic-drag{color:var(--white3);cursor:grab;font-size:18px;flex-shrink:0;user-select:none}
+.nic-drag:active{cursor:grabbing}
+.nic-label{font-size:14px;font-weight:500;color:var(--white);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nic-url{font-family:'DM Mono',monospace;font-size:10px;color:var(--white3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nic-badges{display:flex;gap:5px;flex-shrink:0}
+.nic-actions{display:flex;gap:5px;flex-shrink:0}
+.nav-preview-bar{background:rgba(8,9,12,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:14px 18px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.nav-preview-logo{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-right:8px}
+.nav-preview-logo span{color:#c8a96e;font-style:italic}
+.nav-preview-link{font-family:'Syne',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#7a7570;padding:4px 8px;border-radius:3px;transition:all 0.15s}
+.nav-preview-link.active-link{color:#c8c4bc}
+.drop-zone{height:36px;border:1px dashed rgba(200,169,110,0.15);border-radius:4px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;color:rgba(200,169,110,0.3);transition:all 0.15s}
+.drop-zone.drag-over{border-color:var(--gold);background:var(--gold-dim);color:var(--gold)}
+</style>
+</head>
+<body class="et-loading">
+<div id="et-loader">
+  <div class="et-loader-logo"><div class="et-loader-eagle">🦅</div><div class="et-loader-name">Eagle<span>Pips</span></div></div>
+  <div class="et-loader-bar"><div class="et-loader-bar-fill"></div></div>
+  <div class="et-loader-text">Loading nav manager...</div>
+</div>
+<div id="etSidebarMount"></div>
+<div class="hub-main">
+  <div class="hub-topbar">
+    <a href="admin.html" style="background:none;border:1px solid var(--border2);color:var(--white3);padding:5px 12px;border-radius:3px;font-family:'DM Mono',monospace;font-size:11px;text-decoration:none;transition:all 0.2s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">← Admin</a>
+    <div class="hub-topbar-title" style="flex:1;margin-left:14px">🧭 <strong>Navigation Manager</strong></div>
+    <span id="saveStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)"></span>
+    <button class="et-btn-ghost" onclick="window.open('index.html','_blank')" style="padding:6px 12px;font-size:11px">↗ View Live</button>
+    <button class="et-btn-gold" onclick="saveNav()" style="padding:6px 14px;font-size:11px">💾 Save Nav</button>
+  </div>
+  <div class="hub-content" id="adminContent">
+    <div style="text-align:center;padding:60px"><div class="et-spinner"></div></div>
+  </div>
+</div>
+
+<!-- Add/Edit modal -->
+<div class="et-modal-overlay" id="navItemModal">
+  <div class="et-modal" style="max-width:400px">
+    <button class="et-modal-close" onclick="etCloseModal('navItemModal')">✕</button>
+    <div class="et-modal-title" id="nimTitle">Add Nav Item</div>
+    <input type="hidden" id="nimId">
+    <div class="et-form-group"><label class="et-form-label">Label *</label><input type="text" class="et-form-input" id="nimLabel" placeholder="e.g. Market Updates" oninput="nimPreview()"></div>
+    <div class="et-form-group"><label class="et-form-label">URL *</label><input type="text" class="et-form-input" id="nimUrl" placeholder="e.g. market-updates.html or https://..." oninput="nimPreview()"></div>
+    <div class="et-form-group" style="display:flex;align-items:center;justify-content:space-between;background:var(--bg3);padding:12px 14px;border:1px solid var(--border2);border-radius:3px">
+      <div>
+        <div style="font-size:13px;font-weight:500;color:var(--white)">Open in new tab</div>
+        <div style="font-size:11px;color:var(--white3)">For external links</div>
+      </div>
+      <label style="position:relative;width:40px;height:22px;cursor:pointer;flex-shrink:0">
+        <input type="checkbox" id="nimNewTab" style="opacity:0;width:0;height:0">
+        <span style="position:absolute;inset:0;background:var(--bg);border:1px solid var(--border2);border-radius:11px;transition:all 0.2s" id="nimTabSlider"></span>
+        <span id="nimTabDot" style="position:absolute;width:16px;height:16px;left:2px;top:2px;background:var(--white3);border-radius:50%;transition:all 0.2s"></span>
+      </label>
+    </div>
+    <div style="padding:10px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;margin-top:2px" id="nimPreviewWrap">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px">Preview</div>
+      <span id="nimPreviewEl" style="font-family:'Syne',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#c8c4bc;padding:4px 8px;background:rgba(255,255,255,0.06);border-radius:3px"></span>
+    </div>
+    <button class="et-form-submit" onclick="saveItem()">Save Item →</button>
+  </div>
+</div>
+
+<script>
+let _user,_sb,navItems=[],dragSrc=null;
+
+async function main(){
+  const res=await initEtSidebar('admin');
+  if(!res)return;
+  _user=res.user;_sb=res.sb;
+  if(!_user.user_metadata?.is_admin){document.getElementById('adminContent').innerHTML='<div style="text-align:center;padding:60px;color:var(--white3)">Access denied.</div>';return;}
+  await loadNav();
+  renderPage();
+}
+
+async function loadNav(){
+  const{data}=await _sb.from('nav_items').select('*').order('sort_order',{ascending:true});
+  navItems=(data||[]).sort((a,b)=>a.sort_order-b.sort_order);
+}
+
+function renderPage(){
+  document.getElementById('adminContent').innerHTML=`
+    <div class="nav-layout">
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px">Nav Items — drag to reorder</div>
+            <div style="font-size:12px;color:var(--white2)">${navItems.length} items total</div>
+          </div>
+          <button class="et-btn-gold" onclick="openAdd()" style="padding:6px 14px;font-size:11px">+ Add Item</button>
+        </div>
+        <div id="navList"></div>
+        <div style="margin-top:14px;padding:14px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;font-size:12px;color:var(--white2);line-height:1.7">
+          <strong style="color:var(--white)">Tips:</strong><br>
+          • Drag ⠿ to reorder items<br>
+          • Toggle visibility with the Active button<br>
+          • Use full URL for external links (https://...)<br>
+          • Changes apply after clicking "Save Nav"
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:10px">Live Preview</div>
+        <div class="nav-preview-bar" id="navPreviewBar"></div>
+        <div style="font-size:12px;color:var(--white2);line-height:1.7;padding:12px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px">
+          The navigation above shows exactly how your menu will appear to visitors. Hidden items won't show.
+        </div>
+      </div>
+    </div>`;
+  renderList();
+  renderPreview();
+}
+
+function renderList(){
+  const el=document.getElementById('navList');
+  if(!navItems.length){el.innerHTML='<div style="text-align:center;padding:32px;border:1px dashed rgba(200,169,110,0.15);border-radius:4px;color:var(--white3);font-size:13px">No nav items yet.</div>';return;}
+  el.innerHTML=navItems.map((item,i)=>`
+    <div class="nav-item-card ${item.active?'':'opacity-50'}" id="nic-${item.id}" draggable="true"
+      ondragstart="dragStart(event,'${item.id}')"
+      ondragover="dragOver(event,'${item.id}')"
+      ondragleave="dragLeave(event,'${item.id}')"
+      ondrop="drop(event,'${item.id}')">
+      <div class="nic-row">
+        <span class="nic-drag" title="Drag to reorder">⠿</span>
+        <div style="flex:1;min-width:0">
+          <div class="nic-label">${item.label}</div>
+          <div class="nic-url">${item.url}${item.open_new_tab?' ↗':''}</div>
+        </div>
+        <div class="nic-badges">
+          ${item.active
+            ?'<span style="font-family:\'DM Mono\',monospace;font-size:8px;padding:2px 7px;background:var(--bull-bg);border:1px solid rgba(76,175,125,0.2);color:var(--bull);border-radius:100px">Visible</span>'
+            :'<span style="font-family:\'DM Mono\',monospace;font-size:8px;padding:2px 7px;background:rgba(255,255,255,0.04);border:1px solid var(--border2);color:var(--white3);border-radius:100px">Hidden</span>'}
+        </div>
+        <div class="nic-actions">
+          <button class="et-btn-icon" onclick="toggleActive('${item.id}')" title="${item.active?'Hide':'Show'}" style="font-size:12px">${item.active?'👁':'🚫'}</button>
+          <button class="et-btn-icon" onclick="openEdit('${item.id}')" title="Edit" style="font-size:12px">✏️</button>
+          <button class="et-btn-icon" onclick="deleteItem('${item.id}')" title="Delete" style="font-size:12px;color:var(--bear)" onmouseover="this.style.borderColor='var(--bear)'" onmouseout="this.style.borderColor=''">🗑</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderPreview(){
+  const el=document.getElementById('navPreviewBar');
+  if(!el)return;
+  const active=navItems.filter(n=>n.active);
+  el.innerHTML=`
+    <span class="nav-preview-logo">Eagle<span>Pips</span></span>
+    ${active.map(n=>`<span class="nav-preview-link">${n.label}</span>`).join('')}
+    <span style="margin-left:auto;display:flex;gap:6px">
+      <span style="padding:5px 10px;border:1px solid rgba(255,255,255,0.1);border-radius:3px;font-family:'DM Mono',monospace;font-size:9px;color:#7a7570">Sign In</span>
+      <span style="padding:5px 10px;background:#c8a96e;border-radius:3px;font-family:'DM Mono',monospace;font-size:9px;color:#08090c;font-weight:700">Get Access →</span>
+    </span>`;
+}
+
+// Drag and drop
+function dragStart(e,id){
+  dragSrc=id;
+  e.dataTransfer.effectAllowed='move';
+  document.getElementById('nic-'+id)?.classList.add('dragging');
+}
+function dragOver(e,id){
+  e.preventDefault();e.dataTransfer.dropEffect='move';
+  if(id!==dragSrc)document.getElementById('nic-'+id)?.classList.add('drag-over');
+}
+function dragLeave(e,id){document.getElementById('nic-'+id)?.classList.remove('drag-over');}
+function drop(e,id){
+  e.preventDefault();
+  document.querySelectorAll('.nav-item-card').forEach(c=>{c.classList.remove('dragging','drag-over');});
+  if(!dragSrc||dragSrc===id)return;
+  const srcIdx=navItems.findIndex(n=>n.id===dragSrc);
+  const tgtIdx=navItems.findIndex(n=>n.id===id);
+  if(srcIdx<0||tgtIdx<0)return;
+  const [moved]=navItems.splice(srcIdx,1);
+  navItems.splice(tgtIdx,0,moved);
+  navItems.forEach((n,i)=>n.sort_order=i+1);
+  renderList();renderPreview();
+  dragSrc=null;
+}
+
+// CRUD
+function openAdd(){
+  document.getElementById('nimId').value='';
+  document.getElementById('nimLabel').value='';
+  document.getElementById('nimUrl').value='';
+  document.getElementById('nimNewTab').checked=false;
+  document.getElementById('nimTitle').textContent='Add Nav Item';
+  nimPreview();
+  etOpenModal('navItemModal');
+}
+
+function openEdit(id){
+  const item=navItems.find(n=>n.id===id);if(!item)return;
+  document.getElementById('nimId').value=item.id;
+  document.getElementById('nimLabel').value=item.label;
+  document.getElementById('nimUrl').value=item.url;
+  document.getElementById('nimNewTab').checked=item.open_new_tab||false;
+  document.getElementById('nimTitle').textContent='Edit Nav Item';
+  nimPreview();
+  etOpenModal('navItemModal');
+}
+
+function nimPreview(){
+  const label=document.getElementById('nimLabel')?.value||'';
+  document.getElementById('nimPreviewEl').textContent=label||'Label';
+}
+
+async function saveItem(){
+  const id=document.getElementById('nimId').value;
+  const label=document.getElementById('nimLabel').value.trim();
+  const url=document.getElementById('nimUrl').value.trim();
+  if(!label||!url){alert('Label and URL are required.');return;}
+  if(id){
+    const idx=navItems.findIndex(n=>n.id===id);
+    if(idx>=0){navItems[idx]={...navItems[idx],label,url,open_new_tab:document.getElementById('nimNewTab').checked};}
+  } else {
+    navItems.push({id:'new-'+Date.now(),label,url,open_new_tab:document.getElementById('nimNewTab').checked,active:true,sort_order:navItems.length+1,_isNew:true});
+  }
+  etCloseModal('navItemModal');
+  renderList();renderPreview();
+}
+
+function toggleActive(id){
+  const item=navItems.find(n=>n.id===id);
+  if(item)item.active=!item.active;
+  renderList();renderPreview();
+}
+
+function deleteItem(id){
+  if(!confirm('Remove this nav item?'))return;
+  navItems=navItems.filter(n=>n.id!==id);
+  renderList();renderPreview();
+}
+
+async function saveNav(){
+  setSaveStatus('Saving...');
+  // Delete all and re-insert (simplest approach for reordering)
+  const existingIds=navItems.filter(n=>!n._isNew&&!n.id?.startsWith('new-')).map(n=>n.id);
+
+  // Upsert all items
+  for(let i=0;i<navItems.length;i++){
+    const item=navItems[i];
+    const payload={label:item.label,url:item.url,sort_order:i+1,active:item.active,open_new_tab:item.open_new_tab||false};
+    if(item._isNew||item.id?.startsWith('new-')){
+      const{data,error}=await _sb.from('nav_items').insert(payload).select().single();
+      if(!error&&data)navItems[i]={...item,...data,_isNew:false};
+    } else {
+      await _sb.from('nav_items').update(payload).eq('id',item.id);
+    }
+  }
+  // Delete removed items
+  const{data:dbItems}=await _sb.from('nav_items').select('id');
+  const currentIds=new Set(navItems.map(n=>n.id));
+  for(const dbItem of(dbItems||[])){
+    if(!currentIds.has(dbItem.id)){
+      await _sb.from('nav_items').delete().eq('id',dbItem.id);
+    }
+  }
+  setSaveStatus('✓ Saved — refresh homepage to see changes');
+  await loadNav();
+  renderList();renderPreview();
+}
+
+function setSaveStatus(m){const el=document.getElementById('saveStatus');if(el)el.textContent=m;}
+document.addEventListener('click',e=>{if(e.target.classList.contains('et-modal-overlay'))etCloseModal(e.target.id);});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="hub-sidebar.js" onload="main()"></script>
+</body>
+</html>

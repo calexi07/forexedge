@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EaglePips — Homepage Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="hub.css">
+<style>
+.hp-layout{display:grid;grid-template-columns:380px 1fr;gap:20px;align-items:start}
+.hp-panel{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;position:sticky;top:74px;max-height:calc(100vh - 90px);overflow-y:auto}
+.hp-section{border-bottom:1px solid var(--border2)}
+.hp-section-hdr{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background 0.15s;user-select:none}
+.hp-section-hdr:hover{background:var(--gold-dim)}
+.hp-section-hdr-title{font-size:13px;font-weight:600;color:var(--white);display:flex;align-items:center;gap:8px}
+.hp-section-body{padding:16px;display:flex;flex-direction:column;gap:12px}
+.hp-section-body.collapsed{display:none}
+.hp-preview{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;overflow:hidden;position:sticky;top:74px}
+.hp-preview-bar{padding:10px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;background:var(--bg3)}
+.hp-preview-dot{width:10px;height:10px;border-radius:50%}
+.preview-frame{width:100%;height:calc(100vh - 160px);border:none;background:var(--bg)}
+/* Banner preview */
+.banner-prev{padding:10px 16px;text-align:center;font-size:13px;font-weight:500;border-bottom:1px solid var(--border2)}
+.banner-prev.gold{background:rgba(200,169,110,0.12);color:var(--gold);border-color:rgba(200,169,110,0.2)}
+.banner-prev.green{background:rgba(76,175,125,0.12);color:var(--bull);border-color:rgba(76,175,125,0.2)}
+.banner-prev.red{background:rgba(224,92,92,0.12);color:var(--bear);border-color:rgba(224,92,92,0.2)}
+/* Toggle switch */
+.toggle-wrap{display:flex;align-items:center;justify-content:space-between}
+.toggle-switch{position:relative;width:40px;height:22px;cursor:pointer}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--bg3);border:1px solid var(--border2);border-radius:11px;transition:all 0.2s}
+.toggle-slider::before{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;background:var(--white3);border-radius:50%;transition:all 0.2s}
+.toggle-switch input:checked+.toggle-slider{background:rgba(76,175,125,0.2);border-color:var(--bull)}
+.toggle-switch input:checked+.toggle-slider::before{transform:translateX(18px);background:var(--bull)}
+@media(max-width:1000px){.hp-layout{grid-template-columns:1fr}.hp-preview{display:none}}
+</style>
+</head>
+<body class="et-loading">
+<div id="et-loader">
+  <div class="et-loader-logo"><div class="et-loader-eagle">🦅</div><div class="et-loader-name">Eagle<span>Pips</span></div></div>
+  <div class="et-loader-bar"><div class="et-loader-bar-fill"></div></div>
+  <div class="et-loader-text">Loading homepage editor...</div>
+</div>
+<div id="etSidebarMount"></div>
+<div class="hub-main">
+  <div class="hub-topbar">
+    <a href="admin.html" style="background:none;border:1px solid var(--border2);color:var(--white3);padding:5px 12px;border-radius:3px;font-family:'DM Mono',monospace;font-size:11px;text-decoration:none;transition:all 0.2s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">← Admin</a>
+    <div class="hub-topbar-title" style="flex:1;margin-left:14px">🏠 <strong>Homepage Editor</strong></div>
+    <span id="saveStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)"></span>
+    <button class="et-btn-ghost" onclick="window.open('index.html','_blank')" style="padding:6px 12px;font-size:11px">↗ View Live</button>
+    <button class="et-btn-gold" onclick="saveAll()" style="padding:6px 14px;font-size:11px">💾 Save All</button>
+  </div>
+  <div class="hub-content" id="adminContent">
+    <div style="text-align:center;padding:60px"><div class="et-spinner"></div></div>
+  </div>
+</div>
+
+<script>
+let _user,_sb,settings={};
+
+async function main(){
+  const res=await initEtSidebar('admin');
+  if(!res)return;
+  _user=res.user;_sb=res.sb;
+  if(!_user.user_metadata?.is_admin){document.getElementById('adminContent').innerHTML='<div style="text-align:center;padding:60px;color:var(--white3)">Access denied.</div>';return;}
+  await loadSettings();
+  renderEditor();
+}
+
+async function loadSettings(){
+  const{data}=await _sb.from('site_settings').select('*');
+  settings={};
+  (data||[]).forEach(r=>settings[r.key]=r.value);
+}
+
+function get(key,fallback=''){return settings[key]??fallback;}
+
+function renderEditor(){
+  document.getElementById('adminContent').innerHTML=`
+    <div class="hp-layout">
+      <div>
+        <div class="hp-panel">
+
+          <!-- Banner -->
+          <div class="hp-section">
+            <div class="hp-section-hdr" onclick="toggleSection(this)">
+              <span class="hp-section-hdr-title">📢 Announcement Banner</span>
+              <span style="font-size:10px;color:var(--white3)">▾</span>
+            </div>
+            <div class="hp-section-body">
+              <div class="toggle-wrap">
+                <span style="font-size:13px;color:var(--white2)">Show Banner</span>
+                <label class="toggle-switch"><input type="checkbox" id="sBannerActive" ${get('banner_active')==='true'?'checked':''} onchange="updatePreview()"><span class="toggle-slider"></span></label>
+              </div>
+              <div><label class="et-form-label">Banner Text</label><input type="text" class="et-form-input" id="sBannerText" value="${esc(get('banner_text'))}" oninput="updatePreview()"></div>
+              <div><label class="et-form-label">Banner Link (optional)</label><input type="url" class="et-form-input" id="sBannerLink" value="${esc(get('banner_link'))}" placeholder="https://..."></div>
+              <div><label class="et-form-label">Banner Color</label>
+                <select class="et-form-input" id="sBannerColor" onchange="updatePreview()">
+                  <option value="gold" ${get('banner_color')==='gold'?'selected':''}>Gold</option>
+                  <option value="green" ${get('banner_color')==='green'?'selected':''}>Green</option>
+                  <option value="red" ${get('banner_color')==='red'?'selected':''}>Red</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hero -->
+          <div class="hp-section">
+            <div class="hp-section-hdr" onclick="toggleSection(this)">
+              <span class="hp-section-hdr-title">🦅 Hero Section</span>
+              <span style="font-size:10px;color:var(--white3)">▾</span>
+            </div>
+            <div class="hp-section-body">
+              <div><label class="et-form-label">Badge Text</label><input type="text" class="et-form-input" id="sHeroBadge" value="${esc(get('hero_badge'))}" oninput="updatePreview()"></div>
+              <div><label class="et-form-label">Title Line 1 (white)</label><input type="text" class="et-form-input" id="sHeroL1" value="${esc(get('hero_title_line1'))}" oninput="updatePreview()"></div>
+              <div><label class="et-form-label">Title Line 2 (gold italic)</label><input type="text" class="et-form-input" id="sHeroL2" value="${esc(get('hero_title_line2'))}" oninput="updatePreview()"></div>
+              <div><label class="et-form-label">Title Line 3 (gold bold)</label><input type="text" class="et-form-input" id="sHeroL3" value="${esc(get('hero_title_line3'))}" oninput="updatePreview()"></div>
+              <div><label class="et-form-label">Subtitle</label><textarea class="et-form-input" id="sHeroSub" rows="3" style="resize:none" oninput="updatePreview()">${esc(get('hero_subtitle'))}</textarea></div>
+              <div><label class="et-form-label">CTA Button Text</label><input type="text" class="et-form-input" id="sHeroCta" value="${esc(get('hero_cta_primary'))}" oninput="updatePreview()"></div>
+              <div><label class="et-form-label">Note under form</label><input type="text" class="et-form-input" id="sHeroNote" value="${esc(get('hero_cta_note'))}" oninput="updatePreview()"></div>
+            </div>
+          </div>
+
+          <!-- Journal section -->
+          <div class="hp-section">
+            <div class="hp-section-hdr" onclick="toggleSection(this)">
+              <span class="hp-section-hdr-title">📒 Journal Section</span>
+              <span style="font-size:10px;color:var(--white3)">▾</span>
+            </div>
+            <div class="hp-section-body">
+              <div><label class="et-form-label">Eyebrow</label><input type="text" class="et-form-input" id="sJEyebrow" value="${esc(get('journal_eyebrow','// Trading Journal'))}"></div>
+              <div><label class="et-form-label">Title</label><input type="text" class="et-form-input" id="sJTitle" value="${esc(get('journal_title','Know your edge.'))}"></div>
+              <div><label class="et-form-label">Title (gold italic line)</label><input type="text" class="et-form-input" id="sJTitle2" value="${esc(get('journal_title2','Fix your leaks.'))}"></div>
+              <div><label class="et-form-label">Description</label><textarea class="et-form-input" id="sJDesc" rows="3" style="resize:none">${esc(get('journal_desc','A professional multi-account journal that turns your trade history into actionable insights — automatically.'))}</textarea></div>
+            </div>
+          </div>
+
+          <!-- CTA section -->
+          <div class="hp-section">
+            <div class="hp-section-hdr" onclick="toggleSection(this)">
+              <span class="hp-section-hdr-title">📣 Bottom CTA</span>
+              <span style="font-size:10px;color:var(--white3)">▾</span>
+            </div>
+            <div class="hp-section-body">
+              <div><label class="et-form-label">Title</label><input type="text" class="et-form-input" id="sCtaTitle" value="${esc(get('cta_title','Ready to trade'))}"></div>
+              <div><label class="et-form-label">Title (gold italic line)</label><input type="text" class="et-form-input" id="sCtaTitle2" value="${esc(get('cta_title2','with an edge?'))}"></div>
+              <div><label class="et-form-label">Subtitle</label><textarea class="et-form-input" id="sCtaSub" rows="2" style="resize:none">${esc(get('cta_subtitle','Join traders who want to see what others miss. Be the first to access EaglePips when we launch.'))}</textarea></div>
+              <div><label class="et-form-label">CTA Button Text</label><input type="text" class="et-form-input" id="sCtaBtn" value="${esc(get('cta_button','Get Early Access'))}"></div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="hp-section" style="border-bottom:none">
+            <div class="hp-section-hdr" onclick="toggleSection(this)">
+              <span class="hp-section-hdr-title">📝 Footer</span>
+              <span style="font-size:10px;color:var(--white3)">▾</span>
+            </div>
+            <div class="hp-section-body">
+              <div><label class="et-form-label">Copyright Text</label><input type="text" class="et-form-input" id="sFooterCopy" value="${esc(get('footer_copy','© 2026 EaglePips. All rights reserved.'))}"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Live Preview -->
+      <div class="hp-preview" id="previewCol">
+        <div class="hp-preview-bar">
+          <div class="hp-preview-dot" style="background:#ff5f57"></div>
+          <div class="hp-preview-dot" style="background:#febc2e"></div>
+          <div class="hp-preview-dot" style="background:#28c840"></div>
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3);margin-left:8px">eaglepips.com — Preview</span>
+          <button onclick="refreshPreview()" style="margin-left:auto;background:none;border:none;color:var(--white3);cursor:pointer;font-size:12px;transition:color 0.15s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--white3)'">↻</button>
+        </div>
+        <div id="livePreview" style="padding:20px;background:#08090c;min-height:400px;overflow-y:auto;max-height:calc(100vh - 200px)">
+          <div id="previewBanner"></div>
+          <div id="previewHero" style="text-align:center;padding:40px 20px"></div>
+        </div>
+      </div>
+    </div>`;
+
+  updatePreview();
+}
+
+function esc(str){return(str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function toggleSection(hdr){
+  const body=hdr.nextElementSibling;
+  const arrow=hdr.querySelector('span:last-child');
+  body.classList.toggle('collapsed');
+  arrow.textContent=body.classList.contains('collapsed')?'▸':'▾';
+}
+
+function updatePreview(){
+  const bannerActive=document.getElementById('sBannerActive')?.checked;
+  const bannerText=document.getElementById('sBannerText')?.value||'';
+  const bannerColor=document.getElementById('sBannerColor')?.value||'gold';
+  const l1=document.getElementById('sHeroL1')?.value||'';
+  const l2=document.getElementById('sHeroL2')?.value||'';
+  const l3=document.getElementById('sHeroL3')?.value||'';
+  const sub=document.getElementById('sHeroSub')?.value||'';
+  const badge=document.getElementById('sHeroBadge')?.value||'';
+  const cta=document.getElementById('sHeroCta')?.value||'Notify Me';
+  const note=document.getElementById('sHeroNote')?.value||'';
+
+  const colorMap={gold:'rgba(200,169,110,0.12)',green:'rgba(76,175,125,0.12)',red:'rgba(224,92,92,0.12)'};
+  const textMap={gold:'#c8a96e',green:'#4caf7d',red:'#e05c5c'};
+
+  document.getElementById('previewBanner').innerHTML=bannerActive&&bannerText?
+    `<div style="padding:10px 16px;text-align:center;font-size:13px;font-weight:500;background:${colorMap[bannerColor]};color:${textMap[bannerColor]};border-bottom:1px solid ${textMap[bannerColor]}22">${bannerText}</div>`:
+    '';
+
+  document.getElementById('previewHero').innerHTML=`
+    <div style="display:inline-flex;align-items:center;gap:7px;padding:5px 14px;background:rgba(200,169,110,0.08);border:1px solid rgba(200,169,110,0.2);border-radius:100px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#c8a96e;margin-bottom:20px">
+      <div style="width:5px;height:5px;border-radius:50%;background:#c8a96e"></div>${badge}
+    </div>
+    <div style="font-family:'Playfair Display',serif;font-size:clamp(32px,5vw,56px);font-weight:900;line-height:0.95;letter-spacing:-0.02em;color:#fff;margin-bottom:18px">
+      ${l1}<br><em style="color:#c8a96e;font-style:italic">${l2}</em><br><span style="color:#e8cc94">${l3}</span>
+    </div>
+    <div style="font-size:15px;color:#9a9488;line-height:1.7;max-width:480px;margin:0 auto 28px">${sub}</div>
+    <div style="display:inline-flex;background:rgba(255,255,255,0.04);border:1px solid rgba(200,169,110,0.25);border-radius:4px;overflow:hidden;max-width:400px">
+      <input style="background:transparent;border:none;outline:none;padding:12px 16px;color:#fff;font-family:'Syne',sans-serif;font-size:13px;width:200px" placeholder="Enter your email">
+      <button style="padding:12px 18px;background:#c8a96e;border:none;color:#08090c;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">${cta}</button>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:11px;color:#5a5648;margin-top:10px">${note}</div>`;
+}
+
+function refreshPreview(){updatePreview();}
+
+async function saveAll(){
+  setSaveStatus('Saving...');
+  const pairs=[
+    ['banner_active', document.getElementById('sBannerActive').checked?'true':'false'],
+    ['banner_text',   document.getElementById('sBannerText').value],
+    ['banner_link',   document.getElementById('sBannerLink').value],
+    ['banner_color',  document.getElementById('sBannerColor').value],
+    ['hero_badge',         document.getElementById('sHeroBadge').value],
+    ['hero_title_line1',   document.getElementById('sHeroL1').value],
+    ['hero_title_line2',   document.getElementById('sHeroL2').value],
+    ['hero_title_line3',   document.getElementById('sHeroL3').value],
+    ['hero_subtitle',      document.getElementById('sHeroSub').value],
+    ['hero_cta_primary',   document.getElementById('sHeroCta').value],
+    ['hero_cta_note',      document.getElementById('sHeroNote').value],
+    ['journal_eyebrow',    document.getElementById('sJEyebrow').value],
+    ['journal_title',      document.getElementById('sJTitle').value],
+    ['journal_title2',     document.getElementById('sJTitle2').value],
+    ['journal_desc',       document.getElementById('sJDesc').value],
+    ['cta_title',          document.getElementById('sCtaTitle').value],
+    ['cta_title2',         document.getElementById('sCtaTitle2').value],
+    ['cta_subtitle',       document.getElementById('sCtaSub').value],
+    ['cta_button',         document.getElementById('sCtaBtn').value],
+    ['footer_copy',        document.getElementById('sFooterCopy').value],
+  ];
+
+  for(const[key,value]of pairs){
+    const{error}=await _sb.from('site_settings').upsert({key,value,updated_at:new Date().toISOString()},{onConflict:'key'});
+    if(error){setSaveStatus('Error: '+error.message);return;}
+  }
+  setSaveStatus('✓ Saved — refresh homepage to see changes');
+  await loadSettings();
+}
+
+function setSaveStatus(m){const el=document.getElementById('saveStatus');if(el)el.textContent=m;}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="hub-sidebar.js" onload="main()"></script>
+</body>
+</html>

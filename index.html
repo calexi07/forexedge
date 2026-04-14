@@ -650,7 +650,7 @@ footer {
     <div class="nav-eagle">🦅</div>
     <div class="nav-name">Eagle<span>Pips</span></div>
   </a>
-  <ul class="nav-links">
+  <ul class="nav-links" id="navLinks">
     <li><a href="#journal">Journal</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="market-updates.html" style="color:var(--gold)">Market Updates</a></li>
@@ -671,17 +671,17 @@ footer {
     <div class="hero-icon">🦅</div>
     <div class="hero-badge">
       <div class="badge-dot"></div>
-      Platform launching soon
+      <span id="heroBadgeText">Platform launching soon</span>
     </div>
 
     <h1 class="hero-h1">
-      See what<br>
-      <em>others miss.</em>
-      <span class="outline">Trade smarter.</span>
+      <span id="heroL1">See what</span><br>
+      <em id="heroL2">others miss.</em>
+      <span class="outline" id="heroL3">Trade smarter.</span>
     </h1>
 
     <p class="hero-sub">
-      EaglePips gives you the analytical edge — AI-powered fundamental analysis, a professional trading journal, and structured education in one platform.
+      <span id="heroSubtitle">EaglePips gives you the analytical edge — AI-powered fundamental analysis, a professional trading journal, and structured education in one platform.</span>
     </p>
 
     <div class="hero-form" id="heroForm">
@@ -691,7 +691,7 @@ footer {
     <div class="hero-success" id="heroSuccess">
       ✓ &nbsp;You're on the list — we'll notify you at launch.
     </div>
-    <p class="hero-note">Be first to know when we launch. No spam, ever.</p>
+    <p class="hero-note" id="heroNote">Be first to know when we launch. No spam, ever.</p>
   </div>
 
   <div class="scroll-hint">
@@ -704,9 +704,9 @@ footer {
 <section class="journal-section" id="journal">
   <div class="journal-inner">
     <div class="journal-text fade-in">
-      <span class="section-eyebrow">// Trading Journal</span>
-      <h2 class="section-title">Know your edge.<br><em>Fix your leaks.</em></h2>
-      <p class="section-sub">A professional multi-account journal that turns your trade history into actionable insights — automatically.</p>
+      <span class="section-eyebrow" id="journalEyebrow">// Trading Journal</span>
+      <h2 class="section-title"><span id="journalTitle">Know your edge.</span><br><em id="journalTitle2">Fix your leaks.</em></h2>
+      <p class="section-sub" id="journalDesc">A professional multi-account journal that turns your trade history into actionable insights — automatically.</p>
 
       <div class="journal-features">
         <div class="jf-item">
@@ -892,8 +892,8 @@ footer {
 <section class="cta-section">
   <div class="cta-inner fade-in">
     <span class="cta-eagle">🦅</span>
-    <h2 class="cta-h2">Ready to trade<br><em>with an edge?</em></h2>
-    <p class="cta-sub">Join traders who want to see what others miss. Be the first to access EaglePips when we launch.</p>
+    <h2 class="cta-h2"><span id="ctaTitle">Ready to trade</span><br><em id="ctaTitle2">with an edge?</em></h2>
+    <p class="cta-sub" id="ctaSub">Join traders who want to see what others miss. Be the first to access EaglePips when we launch.</p>
     <div class="cta-form" id="ctaForm">
       <input type="email" class="hero-input" id="ctaEmail" placeholder="Your email address" autocomplete="email">
       <button class="hero-submit" onclick="submitEmail('cta')">Get Early Access</button>
@@ -914,10 +914,75 @@ footer {
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="auth.html">Sign In</a></li>
   </ul>
-  <div class="footer-copy">© 2026 EaglePips. All rights reserved.</div>
+  <div class="footer-copy" id="footerCopy">© 2026 EaglePips. All rights reserved.</div>
 </footer>
 
 <script>
+
+/* ── Load settings from Supabase ── */
+async function loadSiteSettings() {
+  try {
+    const _sb = window.supabase.createClient(
+      'https://vaimxhgqcdhjhdiaampa.supabase.co',
+      'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH'
+    );
+    const [settRes, navRes] = await Promise.all([
+      _sb.from('site_settings').select('key,value'),
+      _sb.from('nav_items').select('*').eq('active', true).order('sort_order', {ascending: true})
+    ]);
+    const s = {};
+    (settRes.data || []).forEach(r => s[r.key] = r.value);
+    applySettings(s);
+    if (navRes.data?.length) applyNav(navRes.data);
+  } catch(e) { console.warn('Settings load:', e); }
+}
+
+function applySettings(s) {
+  const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+  const setHtml = (id, val) => { const el = document.getElementById(id); if (el && val) el.innerHTML = val; };
+  const setVal = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
+
+  // Banner
+  if (s.banner_active === 'true' && s.banner_text) {
+    const colorMap = {gold:'rgba(200,169,110,0.1)',green:'rgba(76,175,125,0.1)',red:'rgba(224,92,92,0.1)'};
+    const textMap  = {gold:'#c8a96e',green:'#4caf7d',red:'#e05c5c'};
+    const c = s.banner_color || 'gold';
+    const banner = document.createElement('div');
+    banner.id = 'siteBanner';
+    banner.style.cssText = `padding:10px 16px;text-align:center;font-size:13px;font-weight:500;background:${colorMap[c]};color:${textMap[c]};border-bottom:1px solid ${textMap[c]}33;position:fixed;top:0;left:0;right:0;z-index:200`;
+    banner.innerHTML = s.banner_link ? `<a href="${s.banner_link}" style="color:inherit;text-decoration:none">${s.banner_text}</a>` : s.banner_text;
+    document.body.prepend(banner);
+    // Push nav down
+    const nav = document.querySelector('nav');
+    if (nav) nav.style.top = '40px';
+  }
+
+  if (s.hero_badge)       set('heroBadgeText', s.hero_badge);
+  if (s.hero_title_line1) set('heroL1', s.hero_title_line1);
+  if (s.hero_title_line2) set('heroL2', s.hero_title_line2);
+  if (s.hero_title_line3) set('heroL3', s.hero_title_line3);
+  if (s.hero_subtitle)    set('heroSubtitle', s.hero_subtitle);
+  if (s.hero_cta_primary) { const btn = document.querySelector('.hero-submit'); if(btn) btn.textContent = s.hero_cta_primary; }
+  if (s.hero_cta_note)    set('heroNote', s.hero_cta_note);
+  if (s.journal_eyebrow)  set('journalEyebrow', s.journal_eyebrow);
+  if (s.journal_title)    set('journalTitle', s.journal_title);
+  if (s.journal_title2)   set('journalTitle2', s.journal_title2);
+  if (s.journal_desc)     set('journalDesc', s.journal_desc);
+  if (s.cta_title)        set('ctaTitle', s.cta_title);
+  if (s.cta_title2)       set('ctaTitle2', s.cta_title2);
+  if (s.cta_subtitle)     set('ctaSub', s.cta_subtitle);
+  if (s.cta_button)       { const btn = document.querySelector('#ctaForm .hero-submit'); if(btn) btn.textContent = s.cta_button; }
+  if (s.footer_copy)      set('footerCopy', s.footer_copy);
+}
+
+function applyNav(items) {
+  const navLinks = document.getElementById('navLinks');
+  if (!navLinks) return;
+  navLinks.innerHTML = items.map(item =>
+    `<li><a href="${item.url}" class="nav-link"${item.open_new_tab?' target="_blank"':''}>${item.label}</a></li>`
+  ).join('');
+}
+
 /* ── Auth state check for nav ── */
 async function checkIndexAuth() {
   try {
@@ -960,7 +1025,7 @@ async function signOutIndex() {
   window.location.reload();
 }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="checkIndexAuth()"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="loadSiteSettings();checkIndexAuth()"></script>
 <script>
 
 /* ── Email capture ── */
