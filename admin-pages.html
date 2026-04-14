@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EaglePips — Pages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="hub.css">
+<style>
+.pages-layout{display:grid;grid-template-columns:280px 1fr;gap:18px;align-items:start}
+.page-list{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;position:sticky;top:74px;max-height:calc(100vh-100px);display:flex;flex-direction:column}
+.pl-hdr{padding:12px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;background:var(--bg3);flex-shrink:0}
+.pl-body{overflow-y:auto;flex:1}
+.pl-item{padding:11px 14px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background 0.15s}
+.pl-item:last-child{border-bottom:none}
+.pl-item:hover{background:var(--gold-dim)}
+.pl-item.active{background:var(--gold-dim);border-left:2px solid var(--gold)}
+.pl-title{font-size:12px;font-weight:500;color:var(--white);margin-bottom:3px}
+.pl-meta{font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);display:flex;gap:8px;align-items:center}
+.spill{font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;border-radius:100px;letter-spacing:0.06em;text-transform:uppercase}
+.spill.live{background:var(--bull-bg);color:var(--bull);border:1px solid rgba(76,175,125,0.2)}
+.spill.draft{background:rgba(255,255,255,0.04);color:var(--white3);border:1px solid var(--border2)}
+/* Editor */
+.page-editor{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;overflow:hidden}
+.pe-tabs{display:flex;border-bottom:1px solid var(--border2);background:var(--bg3)}
+.pe-tab{padding:10px 16px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--white3);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s}
+.pe-tab:hover{color:var(--white2)}
+.pe-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.pe-panel{padding:20px;display:none}
+.pe-panel.active{display:flex;flex-direction:column;gap:14px}
+/* Template cards */
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.tpl-card{padding:16px;background:var(--bg3);border:2px solid var(--border2);border-radius:4px;cursor:pointer;transition:all 0.15s;text-align:center}
+.tpl-card:hover{border-color:var(--gold-border);background:var(--gold-dim)}
+.tpl-card.selected{border-color:var(--gold);background:var(--gold-dim)}
+.tpl-icon{font-size:28px;margin-bottom:8px}
+.tpl-name{font-size:12px;font-weight:600;color:var(--white);margin-bottom:3px}
+.tpl-desc{font-size:10px;color:var(--white3);line-height:1.4}
+/* Sections editor */
+.section-card{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:10px}
+.sc-hdr{padding:10px 14px;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.2);cursor:pointer}
+.sc-hdr:hover{background:var(--gold-dim)}
+.sc-drag{color:var(--white3);cursor:grab;font-size:14px}
+.sc-title{font-size:12px;font-weight:600;color:var(--white);flex:1}
+.sc-type{font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:100px}
+.sc-body{padding:14px;display:flex;flex-direction:column;gap:10px}
+.sc-body.collapsed{display:none}
+.add-section-row{display:flex;gap:6px;flex-wrap:wrap}
+.add-sec-btn{padding:6px 12px;background:transparent;border:1px dashed rgba(200,169,110,0.2);color:rgba(200,169,110,0.5);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;border-radius:3px;transition:all 0.15s;display:flex;align-items:center;gap:4px}
+.add-sec-btn:hover{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
+/* Export */
+.export-box{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:16px}
+.export-preview{font-family:'DM Mono',monospace;font-size:11px;color:var(--white2);background:var(--bg);border:1px solid var(--border2);border-radius:3px;padding:14px;max-height:300px;overflow-y:auto;white-space:pre;line-height:1.6;margin-top:10px}
+</style>
+</head>
+<body class="et-loading">
+<div id="et-loader">
+  <div class="et-loader-logo"><div class="et-loader-eagle">🦅</div><div class="et-loader-name">Eagle<span>Pips</span></div></div>
+  <div class="et-loader-bar"><div class="et-loader-bar-fill"></div></div>
+  <div class="et-loader-text">Loading pages...</div>
+</div>
+<div id="etSidebarMount"></div>
+<div class="hub-main">
+  <div class="hub-topbar">
+    <a href="admin.html" style="background:none;border:1px solid var(--border2);color:var(--white3);padding:5px 12px;border-radius:3px;font-family:'DM Mono',monospace;font-size:11px;text-decoration:none;transition:all 0.2s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">← Admin</a>
+    <div class="hub-topbar-title" style="flex:1;margin-left:14px">📄 <strong>Pages</strong></div>
+    <span id="saveStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)"></span>
+    <button class="et-btn-ghost" onclick="savePage(false)" style="padding:6px 12px;font-size:11px">💾 Save Draft</button>
+    <button class="et-btn-gold" onclick="savePage(true)" style="padding:6px 14px;font-size:11px">🚀 Publish</button>
+  </div>
+  <div class="hub-content" id="adminContent">
+    <div style="text-align:center;padding:60px"><div class="et-spinner"></div></div>
+  </div>
+</div>
+
+<script>
+let _user,_sb,pages=[],editingId=null,sections=[],activeTab='settings';
+
+const TEMPLATES = {
+  simple:  { name:'Simple',   icon:'📄', desc:'Title + text content' },
+  hero:    { name:'Hero',     icon:'🦅', desc:'Big hero + sections' },
+  pricing: { name:'Pricing',  icon:'💎', desc:'Pricing tiers table' },
+  contact: { name:'Contact',  icon:'📬', desc:'Contact form + info' },
+  custom:  { name:'Custom',   icon:'⚡', desc:'Build section by section' },
+};
+
+const SECTION_TYPES = {
+  hero:      { label:'Hero',       icon:'🦅', fields:['title','subtitle','cta_text','cta_url','bg_image'] },
+  text:      { label:'Text Block', icon:'📝', fields:['title','content'] },
+  features:  { label:'Features',   icon:'✨', fields:['title','subtitle','items'] },
+  pricing:   { label:'Pricing',    icon:'💎', fields:['title','subtitle','tiers'] },
+  cta:       { label:'CTA Banner', icon:'📣', fields:['title','subtitle','btn_text','btn_url'] },
+  faq:       { label:'FAQ',        icon:'❓', fields:['title','items'] },
+  contact:   { label:'Contact',    icon:'📬', fields:['title','subtitle','email','phone','address'] },
+  image:     { label:'Image',      icon:'🖼', fields:['image_url','caption','full_width'] },
+  divider:   { label:'Divider',    icon:'—',  fields:[] },
+};
+
+async function main(){
+  const res=await initEtSidebar('admin');
+  if(!res)return;
+  _user=res.user;_sb=res.sb;
+  if(!_user.user_metadata?.is_admin){document.getElementById('adminContent').innerHTML='<div style="text-align:center;padding:60px;color:var(--white3)">Access denied.</div>';return;}
+  renderLayout();
+  await loadPages();
+}
+
+function renderLayout(){
+  document.getElementById('adminContent').innerHTML=`
+    <div class="pages-layout">
+      <div>
+        <div class="page-list">
+          <div class="pl-hdr">
+            <span style="font-size:12px;font-weight:600;color:var(--white)">Pages</span>
+            <button class="et-btn-gold" onclick="newPage()" style="padding:4px 10px;font-size:10px">+ New</button>
+          </div>
+          <div class="pl-body" id="pageList"><div style="padding:20px;text-align:center"><div class="et-spinner"></div></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="page-editor" id="pageEditor">
+          <div style="text-align:center;padding:40px;color:var(--white3);font-size:13px">
+            <div style="font-size:32px;opacity:0.15;margin-bottom:12px">📄</div>
+            Select a page or create a new one
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function loadPages(){
+  const{data}=await _sb.from('pages').select('*').order('created_at',{ascending:false});
+  pages=data||[];
+  renderList();
+}
+
+function renderList(){
+  const el=document.getElementById('pageList');
+  if(!pages.length){el.innerHTML='<div style="padding:20px;text-align:center;font-size:12px;color:var(--white3)">No pages yet.</div>';return;}
+  el.innerHTML=pages.map(p=>`
+    <div class="pl-item ${editingId===p.id?'active':''}" onclick="loadPage('${p.id}')">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:3px">
+        <div class="pl-title">${p.title}</div>
+        <span class="spill ${p.published?'live':'draft'}">${p.published?'Live':'Draft'}</span>
+      </div>
+      <div class="pl-meta">
+        <span>${TEMPLATES[p.template]?.icon||'📄'} ${p.template}</span>
+        <span>/${p.slug}</span>
+      </div>
+      <div style="margin-top:5px;display:flex;gap:8px">
+        ${p.published?`<a href="page.html?slug=${p.slug}" target="_blank" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);text-decoration:none">↗ View</a>`:''}
+        <button onclick="event.stopPropagation();delPage('${p.id}')" style="background:none;border:none;color:var(--white3);cursor:pointer;font-size:9px;padding:0;font-family:'DM Mono',monospace;transition:color 0.15s" onmouseover="this.style.color='var(--bear)'" onmouseout="this.style.color='var(--white3)'">🗑 Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+function newPage(){
+  editingId=null;sections=[];
+  renderEditor({title:'',slug:'',template:'simple',meta_description:'',published:false,sections:[]});
+  renderList();
+}
+
+function loadPage(id){
+  const p=pages.find(x=>x.id===id);if(!p)return;
+  editingId=id;
+  sections=Array.isArray(p.sections)?p.sections:[];
+  renderEditor(p);
+  renderList();
+}
+
+function renderEditor(p){
+  const tpl=p.template||'simple';
+  document.getElementById('pageEditor').innerHTML=`
+    <div class="pe-tabs">
+      <div class="pe-tab ${activeTab==='settings'?'active':''}" onclick="switchTab('settings')">⚙ Settings</div>
+      <div class="pe-tab ${activeTab==='content'?'active':''}" onclick="switchTab('content')">✏️ Content</div>
+      <div class="pe-tab ${activeTab==='export'?'active':''}" onclick="switchTab('export')">⬇ Export HTML</div>
+    </div>
+
+    <!-- Settings tab -->
+    <div class="pe-panel ${activeTab==='settings'?'active':''}" id="tab-settings">
+      <div><label class="et-form-label">Page Title *</label><input type="text" class="et-form-input" id="pTitle" value="${esc(p.title)}" oninput="autoSlug()"></div>
+      <div><label class="et-form-label">Slug (URL) * — page will be at /${esc(p.slug)}.html</label><input type="text" class="et-form-input" id="pSlug" value="${esc(p.slug)}" placeholder="about"></div>
+      <div><label class="et-form-label">Meta Description (SEO)</label><input type="text" class="et-form-input" id="pMeta" value="${esc(p.meta_description||'')}" placeholder="Brief description for search engines..."></div>
+      <div>
+        <label class="et-form-label">Template</label>
+        <div class="tpl-grid" id="tplGrid">
+          ${Object.entries(TEMPLATES).map(([key,t])=>`
+            <div class="tpl-card ${tpl===key?'selected':''}" onclick="selectTemplate('${key}')">
+              <div class="tpl-icon">${t.icon}</div>
+              <div class="tpl-name">${t.name}</div>
+              <div class="tpl-desc">${t.desc}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Content tab -->
+    <div class="pe-panel ${activeTab==='content'?'active':''}" id="tab-content">
+      <div id="sectionsEditor"></div>
+      <div class="add-section-row" id="addSectionRow">
+        ${Object.entries(SECTION_TYPES).map(([key,t])=>`
+          <button class="add-sec-btn" onclick="addSection('${key}')"><span>${t.icon}</span>${t.label}</button>`).join('')}
+      </div>
+    </div>
+
+    <!-- Export tab -->
+    <div class="pe-panel ${activeTab==='export'?'active':''}" id="tab-export">
+      <div class="export-box">
+        <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:6px">Download HTML File</div>
+        <div style="font-size:13px;color:var(--white2);line-height:1.7;margin-bottom:14px">
+          Generate the HTML file for this page. Upload it to your GitHub repo and it will be live at <code style="font-family:'DM Mono',monospace;font-size:12px;background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:2px;color:var(--gold)">${esc(p.slug)||'slug'}.html</code>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="et-btn-gold" onclick="downloadHTML()" style="padding:9px 20px">⬇ Download ${esc(p.slug)||'page'}.html</button>
+          <button class="et-btn-ghost" onclick="previewHTML()" style="padding:9px 16px">👁 Preview</button>
+        </div>
+        <div id="htmlPreview" style="display:none;margin-top:14px">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px">Generated HTML</div>
+          <pre class="export-preview" id="htmlCode"></pre>
+        </div>
+      </div>
+      <div style="padding:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;font-size:12px;color:var(--white2);line-height:1.8">
+        <strong style="color:var(--white)">How to publish:</strong><br>
+        1. Save the page (Draft or Publish)<br>
+        2. Click "Download .html"<br>
+        3. Add the file to your GitHub repo<br>
+        4. Vercel deploys automatically in ~15 seconds<br>
+        5. Add to navigation via <a href="admin-nav.html" style="color:var(--gold)">Nav Manager</a>
+      </div>
+    </div>`;
+
+  renderSectionsEditor();
+}
+
+function switchTab(tab){
+  activeTab=tab;
+  document.querySelectorAll('.pe-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.pe-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`.pe-tab:nth-child(${tab==='settings'?1:tab==='content'?2:3})`).classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+function selectTemplate(key){
+  document.querySelectorAll('.tpl-card').forEach(c=>c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  // Auto-add default sections for template
+  if(!sections.length){
+    const defaults={
+      simple:[{type:'text',title:'Content',data:{title:'',content:''}}],
+      hero:[{type:'hero',title:'Hero',data:{title:'',subtitle:'',cta_text:'Get Started',cta_url:'auth.html'}},{type:'text',title:'About',data:{title:'About Us',content:''}}],
+      pricing:[{type:'hero',title:'Hero',data:{title:'Simple, transparent pricing',subtitle:''}},{type:'pricing',title:'Pricing Tiers',data:{title:'',tiers:[]}}],
+      contact:[{type:'contact',title:'Contact',data:{title:'Get in touch',subtitle:'',email:'',phone:'',address:''}},{type:'text',title:'Additional Info',data:{title:'',content:''}}],
+      custom:[],
+    };
+    sections=defaults[key]||[];
+    renderSectionsEditor();
+  }
+}
+
+function autoSlug(){
+  if(editingId)return;
+  document.getElementById('pSlug').value=document.getElementById('pTitle').value.toLowerCase().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').slice(0,60);
+}
+
+// Sections editor
+function renderSectionsEditor(){
+  const el=document.getElementById('sectionsEditor');
+  if(!el)return;
+  if(!sections.length){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--white3);font-size:13px;margin-bottom:10px">No sections yet. Add one below.</div>';return;}
+  el.innerHTML=sections.map((s,i)=>renderSectionCard(s,i)).join('');
+}
+
+function renderSectionCard(s,i){
+  const st=SECTION_TYPES[s.type]||{label:s.type,icon:'📦'};
+  const d=s.data||{};
+  let fields='';
+
+  switch(s.type){
+    case'hero':
+      fields=`
+        <div><label class="et-form-label">Headline</label><input type="text" class="et-form-input" value="${esc(d.title||'')}" oninput="updateSection(${i},'title',this.value)" placeholder="Page headline"></div>
+        <div><label class="et-form-label">Subtitle</label><textarea class="et-form-input" rows="2" style="resize:none" oninput="updateSection(${i},'subtitle',this.value)" placeholder="Supporting text">${esc(d.subtitle||'')}</textarea></div>
+        <div class="et-form-grid2">
+          <div><label class="et-form-label">CTA Button Text</label><input type="text" class="et-form-input" value="${esc(d.cta_text||'')}" oninput="updateSection(${i},'cta_text',this.value)" placeholder="Get Started"></div>
+          <div><label class="et-form-label">CTA URL</label><input type="text" class="et-form-input" value="${esc(d.cta_url||'')}" oninput="updateSection(${i},'cta_url',this.value)" placeholder="auth.html"></div>
+        </div>
+        <div><label class="et-form-label">Background Image URL (optional)</label><input type="url" class="et-form-input" value="${esc(d.bg_image||'')}" oninput="updateSection(${i},'bg_image',this.value)" placeholder="https://..."></div>`;
+      break;
+    case'text':
+      fields=`
+        <div><label class="et-form-label">Section Title</label><input type="text" class="et-form-input" value="${esc(d.title||'')}" oninput="updateSection(${i},'title',this.value)" placeholder="Optional title"></div>
+        <div><label class="et-form-label">Content (Markdown supported)</label><textarea class="et-form-input" rows="8" style="resize:vertical;font-family:'DM Mono',monospace;font-size:13px" oninput="updateSection(${i},'content',this.value)" placeholder="Write your content here...&#10;&#10;**Bold text**, *italic*, ## Heading, - list item">${esc(d.content||'')}</textarea></div>`;
+      break;
+    case'features':
+      fields=`
+        <div><label class="et-form-label">Section Title</label><input type="text" class="et-form-input" value="${esc(d.title||'')}" oninput="updateSection(${i},'title',this.value)" placeholder="Why EaglePips?"></div>
+        <div><label class="et-form-label">Subtitle</label><input type="text" class="et-form-input" value="${esc(d.subtitle||'')}" oninput="updateSection(${i},'subtitle',this.value)"></div>
+        <div>
+          <label class="et-form-label">Feature Items (one per line: icon | title | description)</label>
+          <textarea class="et-form-input" rows="6" style="resize:vertical;font-family:'DM Mono',monospace;font-size:12px" oninput="updateSection(${i},'items_raw',this.value)" placeholder="📊 | Trading Journal | Track every trade automatically&#10;🤖 | AI Analysis | Get AI-powered insights&#10;📰 | News Sentiment | Real-time market news">${esc(d.items_raw||'')}</textarea>
+          <div style="font-size:11px;color:var(--white3);margin-top:4px">Format: emoji | Title | Description</div>
+        </div>`;
+      break;
+    case'pricing':
+      fields=`
+        <div><label class="et-form-label">Section Title</label><input type="text" class="et-form-input" value="${esc(d.title||'')}" oninput="updateSection(${i},'title',this.value)" placeholder="Choose your plan"></div>
+        <div>
+          <label class="et-form-label">Pricing Tiers (JSON format)</label>
+          <textarea class="et-form-input" rows="10" style="resize:vertical;font-family:'DM Mono',monospace;font-size:12px;line-height:1.6" oninput="updateSection(${i},'tiers_raw',this.value)" placeholder='[&#10;  {"name":"Free","price":"$0","period":"forever","features":["Journal (3 accounts)","Basic stats"],"cta":"Get Started","url":"auth.html","featured":false},&#10;  {"name":"Pro","price":"$19","period":"month","features":["Unlimited journals","AI Coach","Priority support"],"cta":"Start Free Trial","url":"auth.html","featured":true}&#10;]'>${esc(d.tiers_raw||'')}</textarea>
+        </div>`;
+      break;
+    case'cta':
+      fields=`
+        <div><label class="et-form-label">Headline</label><input type="text" class="et-form-input" value="${esc(d.title||'')}" oninput="updateSection(${i},'title',this.value)" placeholder="Ready to get started?"></div>
+        <div><label class="et-form-label">Subtitle</label><input type="text" class="et-form-input" value="${esc(d.subtitle||'')}" oninput="updateSection(${i},'subtitle',this.value)"></div>
+        <div class="et-form-grid2">
+          <div><label class="et-form-label">Button Text</label><input type="text" class="et-form-input" value="${esc(d.btn_text||'')}" oninput="updateSection(${i},'btn_text',this.value)" placeholder="Get Started →"></div>
+          <div><label class="et-form-label">Button URL</label><input type="text" class="et-form-input" value="${esc(d.btn_url||'')}" oninput="updateSection(${i},'btn_url',this.value)" placeholder="auth.html"></div>
+        </div>`;
+      break;
+    case'faq':
+      fields=`
+        <div><label class="et-form-label">Section Title</label><input type="text" class="et-form-input" value="${esc(d.title||'')}" oninput="updateSection(${i},'title',this.value)" placeholder="Frequently Asked Questions"></div>
+        <div>
+          <label class="et-form-label">Questions (one per line: Question | Answer)</label>
+          <textarea class="et-form-input" rows="8" style="resize:vertical;font-family:'DM Mono',monospace;font-size:12px" oninput="updateSection(${i},'items_raw',this.value)" placeholder="What is EaglePips? | EaglePips is a professional trading platform...&#10;How much does it cost? | We offer a free plan...">${esc(d.items_raw||'')}</textarea>
+          <div style="font-size:11px;color:var(--white3);margin-top:4px">Format: Question | Answer</div>
+        </div>`;
+      break;
+    case'contact':
+      fields=`
+        <div><label class="et-form-label">Section Title</label><input type="text" class="et-form-input" value="${esc(d.title||'')}" oninput="updateSection(${i},'title',this.value)" placeholder="Get in touch"></div>
+        <div><label class="et-form-label">Subtitle</label><input type="text" class="et-form-input" value="${esc(d.subtitle||'')}" oninput="updateSection(${i},'subtitle',this.value)"></div>
+        <div class="et-form-grid2">
+          <div><label class="et-form-label">Email</label><input type="email" class="et-form-input" value="${esc(d.email||'')}" oninput="updateSection(${i},'email',this.value)" placeholder="hello@eaglepips.com"></div>
+          <div><label class="et-form-label">Phone (optional)</label><input type="text" class="et-form-input" value="${esc(d.phone||'')}" oninput="updateSection(${i},'phone',this.value)" placeholder="+40 700 000 000"></div>
+        </div>
+        <div><label class="et-form-label">Address (optional)</label><input type="text" class="et-form-input" value="${esc(d.address||'')}" oninput="updateSection(${i},'address',this.value)"></div>`;
+      break;
+    case'image':
+      fields=`
+        <div><label class="et-form-label">Image URL</label><input type="url" class="et-form-input" value="${esc(d.image_url||'')}" oninput="updateSection(${i},'image_url',this.value)" placeholder="https://..."></div>
+        <div><label class="et-form-label">Caption (optional)</label><input type="text" class="et-form-input" value="${esc(d.caption||'')}" oninput="updateSection(${i},'caption',this.value)"></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border:1px solid var(--border2);border-radius:3px">
+          <input type="checkbox" id="imgFull-${i}" ${d.full_width?'checked':''} onchange="updateSection(${i},'full_width',this.checked)" style="accent-color:var(--gold);width:16px;height:16px">
+          <label for="imgFull-${i}" style="font-size:13px;color:var(--white2);cursor:pointer">Full width image</label>
+        </div>`;
+      break;
+    case'divider':
+      fields=`<div style="font-size:12px;color:var(--white3);padding:8px 0">A simple horizontal divider line between sections.</div>`;
+      break;
+  }
+
+  return`<div class="section-card" id="sc-${i}">
+    <div class="sc-hdr" onclick="toggleSC(${i})">
+      <span class="sc-drag" title="Drag to reorder">⠿</span>
+      <span class="sc-title">${st.icon} ${s.title||st.label}</span>
+      <span class="sc-type">${st.label}</span>
+      <div style="display:flex;gap:4px;margin-left:auto" onclick="event.stopPropagation()">
+        ${i>0?`<button style="width:24px;height:24px;background:none;border:1px solid var(--border2);color:var(--white3);cursor:pointer;border-radius:3px;font-size:11px;transition:all 0.15s" onclick="moveSection(${i},-1)" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">↑</button>`:''}
+        ${i<sections.length-1?`<button style="width:24px;height:24px;background:none;border:1px solid var(--border2);color:var(--white3);cursor:pointer;border-radius:3px;font-size:11px;transition:all 0.15s" onclick="moveSection(${i},1)" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">↓</button>`:''}
+        <button style="width:24px;height:24px;background:none;border:1px solid var(--border2);color:var(--white3);cursor:pointer;border-radius:3px;font-size:11px;transition:all 0.15s" onclick="removeSection(${i})" onmouseover="this.style.borderColor='var(--bear)';this.style.color='var(--bear)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">🗑</button>
+      </div>
+    </div>
+    <div class="sc-body" id="scb-${i}">
+      <div><label class="et-form-label">Section Label (internal)</label><input type="text" class="et-form-input" value="${esc(s.title||st.label)}" oninput="sections[${i}].title=this.value;document.querySelector('#sc-${i} .sc-title').textContent='${st.icon} '+this.value" style="font-size:12px"></div>
+      ${fields}
+    </div>
+  </div>`;
+}
+
+function toggleSC(i){const b=document.getElementById('scb-'+i);b?.classList.toggle('collapsed');}
+function updateSection(i,key,val){if(sections[i])sections[i].data={...sections[i].data,[key]:val};}
+function moveSection(i,dir){
+  const ni=i+dir;if(ni<0||ni>=sections.length)return;
+  [sections[i],sections[ni]]=[sections[ni],sections[i]];
+  renderSectionsEditor();
+}
+function removeSection(i){if(confirm('Remove this section?')){sections.splice(i,1);renderSectionsEditor();}}
+function addSection(type){
+  sections.push({type,title:SECTION_TYPES[type]?.label||type,data:{}});
+  renderSectionsEditor();
+  // Scroll to new section
+  setTimeout(()=>document.getElementById(`sc-${sections.length-1}`)?.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+}
+
+// Save
+async function savePage(publish){
+  const title=document.getElementById('pTitle')?.value.trim();
+  const slug=document.getElementById('pSlug')?.value.trim();
+  if(!title||!slug){alert('Title and slug are required.');return;}
+  const payload={
+    title,slug,
+    template:document.querySelector('.tpl-card.selected')?.dataset?.key||document.querySelector('.tpl-card.selected')?.onclick?.toString().match(/'(\w+)'/)?.[1]||'simple',
+    meta_description:document.getElementById('pMeta')?.value.trim()||null,
+    sections:sections,
+    published:publish,
+    updated_at:new Date().toISOString()
+  };
+  // Get template from selected card
+  const selCard=document.querySelector('.tpl-card.selected');
+  if(selCard){
+    const onclick=selCard.getAttribute('onclick');
+    const match=onclick?.match(/selectTemplate\('(\w+)'\)/);
+    if(match)payload.template=match[1];
+  }
+  setSaveStatus('Saving...');
+  let err;
+  if(editingId){
+    const r=await _sb.from('pages').update(payload).eq('id',editingId);err=r.error;
+  } else {
+    const r=await _sb.from('pages').insert(payload).select().single();
+    err=r.error;if(!err&&r.data)editingId=r.data.id;
+  }
+  if(err){alert(err.message);setSaveStatus('Error');return;}
+  setSaveStatus(publish?'✓ Published':'✓ Saved');
+  await loadPages();
+}
+
+async function delPage(id){
+  if(!confirm('Delete this page?'))return;
+  await _sb.from('pages').delete().eq('id',id);
+  if(editingId===id){editingId=null;sections=[];document.getElementById('pageEditor').innerHTML='<div style="text-align:center;padding:40px;color:var(--white3);font-size:13px">Select a page or create a new one</div>';}
+  await loadPages();
+}
+
+// HTML Generation
+function generateHTML(){
+  const title=document.getElementById('pTitle')?.value||'Page';
+  const slug=document.getElementById('pSlug')?.value||'page';
+  const meta=document.getElementById('pMeta')?.value||'';
+  const selCard=document.querySelector('.tpl-card.selected');
+  let template='simple';
+  if(selCard){const m=selCard.getAttribute('onclick')?.match(/selectTemplate\('(\w+)'\)/);if(m)template=m[1];}
+
+  const sectionsHTML=sections.map(s=>generateSection(s)).join('\n');
+
+  return`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EaglePips — ${title}</title>
+${meta?`<meta name="description" content="${meta}">`:``}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+.page-wrap{max-width:1100px;margin:0 auto;padding:100px 24px 80px}
+.page-hero{text-align:center;padding:100px 24px 60px;position:relative;overflow:hidden;border-bottom:1px solid rgba(255,255,255,0.06)}
+.page-hero::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(200,169,110,0.07) 0%,transparent 70%);pointer-events:none}
+.page-section{padding:70px 24px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.page-section:last-child{border-bottom:none}
+.section-inner{max-width:860px;margin:0 auto}
+.section-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#c8a96e;margin-bottom:12px;display:block}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,48px);font-weight:900;color:#fff;margin-bottom:14px;line-height:1.1}
+.section-title em{color:#c8a96e;font-style:italic}
+.section-sub{font-size:16px;color:#a09880;line-height:1.7;max-width:560px}
+.prose{font-size:16px;color:#c8c4bc;line-height:1.85}
+.prose h2{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#fff;margin:32px 0 12px}
+.prose h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;margin:24px 0 10px}
+.prose p{margin-bottom:16px}
+.prose strong{color:#fff}
+.prose em{color:#c8a96e;font-style:italic}
+.prose ul{padding-left:20px;margin-bottom:16px}
+.prose li{margin-bottom:6px}
+.prose blockquote{border-left:3px solid #c8a96e;padding:10px 16px;background:rgba(200,169,110,0.06);margin:20px 0;font-style:italic;color:#a09880}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:36px}
+.feature-card{background:#0c0e13;border:1px solid rgba(255,255,255,0.06);border-radius:4px;padding:22px;transition:border-color 0.2s}
+.feature-card:hover{border-color:rgba(200,169,110,0.2)}
+.feature-icon{font-size:28px;margin-bottom:10px}
+.feature-title{font-size:15px;font-weight:600;color:#fff;margin-bottom:6px}
+.feature-desc{font-size:13px;color:#a09880;line-height:1.6}
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:36px}
+.pricing-card{background:#0c0e13;border:1px solid rgba(255,255,255,0.06);border-radius:4px;padding:28px;position:relative}
+.pricing-card.featured{border-color:rgba(200,169,110,0.3);background:rgba(200,169,110,0.04)}
+.pricing-card.featured::before{content:'Popular';position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-family:'DM Mono',monospace;font-size:9px;padding:3px 12px;background:#c8a96e;color:#08090c;border-radius:100px;letter-spacing:0.08em;font-weight:700}
+.pricing-name{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#a09880;margin-bottom:12px}
+.pricing-price{font-family:'Playfair Display',serif;font-size:42px;font-weight:900;color:#fff;line-height:1}
+.pricing-period{font-size:13px;color:#7a7570;margin-bottom:20px}
+.pricing-features{list-style:none;padding:0;margin:0 0 24px;display:flex;flex-direction:column;gap:8px}
+.pricing-features li{font-size:13px;color:#c8c4bc;display:flex;align-items:center;gap:8px}
+.pricing-features li::before{content:'✓';color:#4caf7d;font-weight:700;flex-shrink:0}
+.pricing-btn{display:block;width:100%;padding:11px;text-align:center;border-radius:4px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all 0.2s}
+.pricing-btn.default{background:transparent;border:1px solid rgba(255,255,255,0.1);color:#c8c4bc}
+.pricing-btn.default:hover{border-color:#c8a96e;color:#c8a96e}
+.pricing-btn.gold{background:#c8a96e;border:1px solid #c8a96e;color:#08090c}
+.pricing-btn.gold:hover{background:#e8cc94}
+.faq-list{display:flex;flex-direction:column;gap:0;margin-top:28px;border:1px solid rgba(255,255,255,0.06);border-radius:4px;overflow:hidden}
+.faq-item{border-bottom:1px solid rgba(255,255,255,0.06)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{padding:16px 18px;font-size:14px;font-weight:600;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;transition:background 0.15s;user-select:none}
+.faq-q:hover{background:rgba(200,169,110,0.05)}
+.faq-a{padding:0 18px 16px;font-size:14px;color:#a09880;line-height:1.7;display:none}
+.faq-item.open .faq-a{display:block}
+.faq-item.open .faq-arrow{transform:rotate(180deg)}
+.faq-arrow{transition:transform 0.2s;font-size:12px;color:#7a7570}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:32px}
+.contact-info{display:flex;flex-direction:column;gap:16px}
+.contact-item{display:flex;align-items:flex-start;gap:12px}
+.contact-item-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+.contact-item-label{font-family:'DM Mono',monospace;font-size:9px;color:#7a7570;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px}
+.contact-item-val{font-size:14px;color:#c8c4bc}
+.contact-form{display:flex;flex-direction:column;gap:12px}
+.contact-form input,.contact-form textarea{width:100%;background:#0c0e13;border:1px solid rgba(255,255,255,0.08);color:#fff;font-family:'Syne',sans-serif;font-size:14px;padding:11px 14px;border-radius:4px;outline:none;transition:border-color 0.2s}
+.contact-form input:focus,.contact-form textarea:focus{border-color:rgba(200,169,110,0.3)}
+.contact-form textarea{resize:vertical;min-height:120px}
+.contact-form button{padding:12px;background:#c8a96e;border:none;color:#08090c;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:background 0.2s}
+.contact-form button:hover{background:#e8cc94}
+.cta-section{text-align:center;padding:70px 24px;background:#0c0e13;border-top:1px solid rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.05)}
+.divider-section{padding:32px 24px;display:flex;align-items:center;justify-content:center}
+.divider-line{width:60px;height:1px;background:rgba(200,169,110,0.2)}
+@media(max-width:700px){.contact-grid{grid-template-columns:1fr}.pricing-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="navMount"></div>
+${sectionsHTML}
+<footer>
+  <div class="footer-logo">Eagle<span>Pips</span></div>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="market-updates.html">Market Updates</a></li>
+  </ul>
+  <div class="footer-copy" id="footerCopy">© 2026 EaglePips. All rights reserved.</div>
+</footer>
+<script>
+function checkIndexAuth(){}
+<\/script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="initNav()"><\/script>
+<script src="nav.js"><\/script>
+<script>
+function initNav(){renderNav('');}
+// FAQ toggle
+document.querySelectorAll('.faq-q').forEach(q=>{
+  q.addEventListener('click',()=>q.closest('.faq-item').classList.toggle('open'));
+});
+<\/script>
+</body>
+</html>`;
+}
+
+function generateSection(s){
+  const d=s.data||{};
+  switch(s.type){
+    case'hero':
+      return`<div class="page-hero"${d.bg_image?` style="background:url('${d.bg_image}') center/cover no-repeat"`:''}>\n  <div style="position:relative;z-index:1;max-width:700px;margin:0 auto">\n    <h1 class="section-title">${d.title||'Page Title'}</h1>\n    ${d.subtitle?`<p class="section-sub" style="margin:0 auto 28px">${d.subtitle}</p>`:''}\n    ${d.cta_text?`<a href="${d.cta_url||'#'}" style="display:inline-flex;padding:13px 32px;background:#c8a96e;color:#08090c;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border-radius:3px;transition:background 0.2s" onmouseover="this.style.background='#e8cc94'" onmouseout="this.style.background='#c8a96e'">${d.cta_text}</a>`:''}\n  </div>\n</div>`;
+    case'text':
+      const prose=parseMd(d.content||'');
+      return`<div class="page-section">\n  <div class="section-inner">\n    ${d.title?`<h2 class="section-title">${d.title}</h2>`:''}\n    <div class="prose">${prose}</div>\n  </div>\n</div>`;
+    case'features':
+      const featItems=(d.items_raw||'').split('\n').filter(Boolean).map(line=>{const p=line.split('|').map(x=>x.trim());return p.length>=3?`<div class="feature-card"><div class="feature-icon">${p[0]}</div><div class="feature-title">${p[1]}</div><div class="feature-desc">${p[2]}</div></div>`:''}).join('');
+      return`<div class="page-section">\n  <div class="section-inner">\n    ${d.title?`<h2 class="section-title">${d.title}</h2>`:''}\n    ${d.subtitle?`<p class="section-sub">${d.subtitle}</p>`:''}\n    <div class="features-grid">${featItems}</div>\n  </div>\n</div>`;
+    case'pricing':
+      let tiers=[];try{tiers=JSON.parse(d.tiers_raw||'[]');}catch(e){}
+      const tierCards=tiers.map(t=>`<div class="pricing-card${t.featured?' featured':''}"><div class="pricing-name">${t.name||''}</div><div class="pricing-price">${t.price||'$0'}</div><div class="pricing-period">/ ${t.period||'month'}</div><ul class="pricing-features">${(t.features||[]).map(f=>`<li>${f}</li>`).join('')}</ul><a href="${t.url||'auth.html'}" class="pricing-btn ${t.featured?'gold':'default'}">${t.cta||'Get Started'}</a></div>`).join('');
+      return`<div class="page-section">\n  <div class="section-inner" style="max-width:1000px">\n    ${d.title?`<h2 class="section-title" style="text-align:center">${d.title}</h2>`:''}\n    <div class="pricing-grid">${tierCards}</div>\n  </div>\n</div>`;
+    case'cta':
+      return`<div class="cta-section">\n  <h2 class="section-title">${d.title||'Ready to get started?'}</h2>\n  ${d.subtitle?`<p class="section-sub" style="margin:0 auto 28px">${d.subtitle}</p>`:''}\n  ${d.btn_text?`<a href="${d.btn_url||'auth.html'}" style="display:inline-flex;padding:13px 32px;background:#c8a96e;color:#08090c;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border-radius:3px">${d.btn_text}</a>`:''}\n</div>`;
+    case'faq':
+      const faqItems=(d.items_raw||'').split('\n').filter(Boolean).map((line,i)=>{const p=line.split('|').map(x=>x.trim());return p.length>=2?`<div class="faq-item"><div class="faq-q">${p[0]}<span class="faq-arrow">▾</span></div><div class="faq-a">${p[1]}</div></div>`:''}).join('');
+      return`<div class="page-section">\n  <div class="section-inner">\n    ${d.title?`<h2 class="section-title">${d.title}</h2>`:''}\n    <div class="faq-list">${faqItems}</div>\n  </div>\n</div>`;
+    case'contact':
+      return`<div class="page-section">\n  <div class="section-inner">\n    ${d.title?`<h2 class="section-title">${d.title}</h2>`:''}\n    ${d.subtitle?`<p class="section-sub">${d.subtitle}</p>`:''}\n    <div class="contact-grid">\n      <div class="contact-info">\n        ${d.email?`<div class="contact-item"><div class="contact-item-icon">📧</div><div><div class="contact-item-label">Email</div><div class="contact-item-val">${d.email}</div></div></div>`:''}\n        ${d.phone?`<div class="contact-item"><div class="contact-item-icon">📞</div><div><div class="contact-item-label">Phone</div><div class="contact-item-val">${d.phone}</div></div></div>`:''}\n        ${d.address?`<div class="contact-item"><div class="contact-item-icon">📍</div><div><div class="contact-item-label">Address</div><div class="contact-item-val">${d.address}</div></div></div>`:''}\n      </div>\n      <form class="contact-form" onsubmit="event.preventDefault();this.innerHTML='<div style=\\'text-align:center;padding:20px;color:#4caf7d;font-size:15px\\'>✓ Message sent! We\\'ll get back to you soon.</div>'">\n        <input type="text" placeholder="Your name" required>\n        <input type="email" placeholder="Your email" required>\n        <textarea placeholder="Your message" required></textarea>\n        <button type="submit">Send Message →</button>\n      </form>\n    </div>\n  </div>\n</div>`;
+    case'image':
+      return`<div class="page-section" style="padding:40px 24px">\n  <div class="${d.full_width?'':'section-inner'}">\n    <img src="${d.image_url||''}" alt="${d.caption||''}" style="width:100%;border-radius:4px;display:block;border:1px solid rgba(255,255,255,0.06)">\n    ${d.caption?`<div style="text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:#7a7570;margin-top:8px">${d.caption}</div>`:''}\n  </div>\n</div>`;
+    case'divider':
+      return`<div class="divider-section"><div class="divider-line"></div><span style="font-size:16px;margin:0 14px;opacity:0.2">🦅</span><div class="divider-line"></div></div>`;
+    default:
+      return'';
+  }
+}
+
+function parseMd(c){
+  if(!c)return'';
+  return c.replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/^---$/gm,'<hr>').replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>').replace(/^- (.+)$/gm,'<li>$1</li>').replace(/(<li>[\s\S]+?<\/li>)/g,'<ul>$1</ul>').split('\n\n').map(b=>{b=b.trim();if(!b||b.startsWith('<'))return b;return'<p>'+b.replace(/\n/g,'<br>')+'</p>';}).join('');
+}
+
+function downloadHTML(){
+  const slug=document.getElementById('pSlug')?.value||'page';
+  const html=generateHTML();
+  const blob=new Blob([html],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`${slug}.html`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function previewHTML(){
+  const html=generateHTML();
+  const el=document.getElementById('htmlPreview');
+  const code=document.getElementById('htmlCode');
+  if(el.style.display==='none'){
+    el.style.display='block';
+    code.textContent=html.substring(0,3000)+(html.length>3000?'\n\n... (truncated for display)':'');
+  } else {
+    el.style.display='none';
+  }
+}
+
+function esc(str){return(str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function setSaveStatus(m){const el=document.getElementById('saveStatus');if(el)el.textContent=m;}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="hub-sidebar.js" onload="main()"></script>
+</body>
+</html>
