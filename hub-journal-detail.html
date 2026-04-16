@@ -84,8 +84,8 @@
           </div>
           <div class="et-table-wrap">
             <table class="et-table">
-              <thead><tr><th>Date</th><th>Pair</th><th>Dir</th><th>Entry</th><th>SL</th><th>TP</th><th>Lots</th><th>Risk</th><th>PnL</th><th>R:R</th><th>Status</th><th>Session</th><th>Tag</th><th>Links</th><th>Notes</th><th></th></tr></thead>
-              <tbody id="tradesBody"><tr><td colspan="16" style="text-align:center;padding:40px;color:var(--white3);font-size:13px">No trades yet — log your first trade!</td></tr></tbody>
+              <thead><tr><th>Date</th><th>Pair</th><th>Dir</th><th>Entry</th><th>SL</th><th>TP</th><th>Lots</th><th>Risk</th><th>PnL</th><th>R:R</th><th>Status</th><th>Strategy</th><th>Links</th><th>Notes</th><th></th></tr></thead>
+              <tbody id="tradesBody"><tr><td colspan="15" style="text-align:center;padding:40px;color:var(--white3);font-size:13px">No trades yet — log your first trade!</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -152,6 +152,9 @@
     <div class="et-form-group"><label class="et-form-label">Link to Analysis (optional)</label>
       <select class="et-form-input" id="atAnal"><option value="">— No analysis linked —</option></select>
     </div>
+    <div class="et-form-group"><label class="et-form-label">Strategy (optional)</label>
+      <select class="et-form-input" id="atStrategy"><option value="">— No strategy —</option></select>
+    </div>
 
     <button class="et-form-submit" id="atBtn" onclick="saveTrade()">Open Trade →</button>
   </div>
@@ -217,7 +220,7 @@ async function main(){
   const{data:j,error}=await _sb.from('journals').select('*').eq('id',id).eq('user_id',_user.id).single();
   if(error||!j){window.location.href='hub-journal.html';return;}
   _j=j;document.getElementById('topbarTitle').innerHTML=`<strong>${j.name}</strong>`;
-  await Promise.all([loadTrades(),loadPayouts(),loadPairHist(),loadAnalyses()]);
+  await Promise.all([loadTrades(),loadPayouts(),loadPairHist(),loadAnalyses(),loadStrategies()]);
 }
 
 async function loadTrades(){
@@ -235,6 +238,14 @@ async function loadAnalyses(){
   if(!sel)return;
   sel.innerHTML='<option value="">— No analysis linked —</option>';
   analyses.forEach(a=>{const o=document.createElement('option');o.value=a.id;o.textContent=`${a.pair} — ${a.date} (${a.bias})`;sel.appendChild(o);});
+}
+
+async function loadStrategies(){
+  const{data}=await _sb.from('strategies').select('id,name,active').eq('user_id',_user.id).eq('active',true).order('name',{ascending:true});
+  const sel=document.getElementById('atStrategy');
+  if(!sel)return;
+  sel.innerHTML='<option value="">— No strategy —</option>';
+  (data||[]).forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=s.name;sel.appendChild(o);});
 }
 
 // Pair autocomplete
@@ -288,6 +299,7 @@ function openAddTrade(){
   document.getElementById('atDate').value=new Date().toISOString().split('T')[0];
   ['atPair','atEntry','atSL','atTP','atLot','atRisk','atTV'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('atDir').value='long';
+  document.getElementById('atStrategy').value='';
   document.getElementById('atAlert').style.display='none';
   document.getElementById('rrPrev').style.display='none';
   etOpenModal('addTradeModal');
@@ -307,7 +319,8 @@ async function saveTrade(){
     r_multiple:r,status:'open',
     trade_date:document.getElementById('atDate').value,
     tradingview_link:document.getElementById('atTV').value.trim()||null,
-    analysis_id:document.getElementById('atAnal').value||null
+    analysis_id:document.getElementById('atAnal').value||null,
+    strategy_id:document.getElementById('atStrategy').value||null
   });
   btn.disabled=false;btn.textContent='Open Trade →';
   if(error){const a=document.getElementById('atAlert');a.textContent=error.message;a.className='et-alert err';a.style.display='block';return;}
@@ -366,12 +379,24 @@ async function closeTrade(){
   etCloseModal('closeTradeModal');await loadTrades();
 }
 
+// Resolve strategy names in table
+async function resolveStrategyNames(){
+  const ids=[...new Set(trades.filter(t=>t.strategy_id).map(t=>t.strategy_id))];
+  if(!ids.length)return;
+  const{data}=await _sb.from('strategies').select('id,name').in('id',ids);
+  const map={};(data||[]).forEach(s=>map[s.id]=s.name);
+  trades.forEach(t=>{
+    const el=document.getElementById('strat-'+t.id);
+    if(el&&t.strategy_id)el.textContent=map[t.strategy_id]||'—';
+  });
+}
+
 // Render trades
 function renderTrades(){
   const filter=document.getElementById('filterStatus').value;
   const filtered=filter?trades.filter(t=>t.status===filter):trades;
   const tb=document.getElementById('tradesBody');
-  if(!filtered.length){tb.innerHTML=`<tr><td colspan="16" style="text-align:center;padding:40px;color:var(--white3);font-size:13px">${filter?'No '+filter+' trades.':'No trades yet.'}</td></tr>`;return;}
+  if(!filtered.length){tb.innerHTML=`<tr><td colspan="15" style="text-align:center;padding:40px;color:var(--white3);font-size:13px">${filter?'No '+filter+' trades.':'No trades yet.'}</td></tr>`;return;}
   tb.innerHTML=filtered.map(t=>{
     const open=t.status==='open';
     const pc=open?'var(--white2)':(t.pnl||0)>=0?'var(--bull)':'var(--bear)';
@@ -390,8 +415,7 @@ function renderTrades(){
       <td style="font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:${pc}">${pt}</td>
       <td style="font-family:'DM Mono',monospace;font-size:10px">${t.r_multiple||'—'}</td>
       <td>${open?'<span class="pill open">OPEN</span>':`<span class="pill ${t.status}">${(t.status||'').toUpperCase()}</span>`}</td>
-      <td style="font-size:11px;color:var(--white2)">${t.session||'—'}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:2px;white-space:nowrap">${t.tag||'—'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:2px;white-space:nowrap" id="strat-${t.id}">—</td>
       <td style="white-space:nowrap">
         ${t.tradingview_link?`<a href="${t.tradingview_link}" target="_blank" class="tv-link" title="View on TradingView">TV↗</a>`:''}
         ${t.analysis_id?`<a href="hub-analyses.html" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);text-decoration:none;margin-left:4px" title="Linked analysis">📊</a>`:''}

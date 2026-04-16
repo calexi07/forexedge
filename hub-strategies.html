@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EaglePips — My Strategies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="hub.css">
+<style>
+/* Strategy cards grid */
+.strat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.strat-card{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;overflow:hidden;transition:border-color 0.2s,transform 0.2s;cursor:pointer}
+.strat-card:hover{border-color:var(--gold-border);transform:translateY(-2px)}
+.strat-card-top{height:4px;background:linear-gradient(90deg,var(--gold),rgba(200,169,110,0.3))}
+.strat-card-body{padding:16px}
+.strat-card-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:6px}
+.strat-card-desc{font-size:12px;color:var(--white2);line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.strat-card-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.strat-tag{font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;background:var(--bg3);border:1px solid var(--border2);color:var(--white3);border-radius:100px;letter-spacing:0.05em}
+.strat-tag.tf{background:rgba(74,158,255,0.08);border-color:rgba(74,158,255,0.2);color:#6ba3ff}
+.strat-tag.active{background:var(--bull-bg);border-color:rgba(76,175,125,0.2);color:var(--bull)}
+.strat-tag.inactive{background:rgba(255,255,255,0.04);border-color:var(--border2);color:var(--white3)}
+.strat-card-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px;background:var(--bg3);border-top:1px solid var(--border2)}
+.strat-stat-val{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--white);margin-bottom:2px}
+.strat-stat-lbl{font-family:'DM Mono',monospace;font-size:8px;color:var(--white3);text-transform:uppercase;letter-spacing:0.1em}
+
+/* Builder modal sections */
+.builder-section{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:10px}
+.builder-section-hdr{padding:9px 14px;background:rgba(0,0,0,0.2);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--white3);cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background 0.15s}
+.builder-section-hdr:hover{background:var(--gold-dim);color:var(--gold)}
+.builder-section-body{padding:14px;display:flex;flex-direction:column;gap:10px}
+.builder-section-body.collapsed{display:none}
+
+/* Checklist builder */
+.checklist-items{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.checklist-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg2);border:1px solid var(--border2);border-radius:3px}
+.checklist-item input[type=text]{flex:1;background:none;border:none;color:var(--white2);font-family:'Syne',sans-serif;font-size:12px;outline:none}
+.checklist-item input[type=text]::placeholder{color:var(--white3)}
+.checklist-del{background:none;border:none;color:var(--white3);cursor:pointer;font-size:13px;padding:0 2px;transition:color 0.15s;flex-shrink:0}
+.checklist-del:hover{color:var(--bear)}
+.add-check-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;background:transparent;border:1px dashed rgba(200,169,110,0.2);color:rgba(200,169,110,0.5);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;border-radius:3px;transition:all 0.15s;width:100%}
+.add-check-btn:hover{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
+
+/* Screenshots */
+.screenshots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.screenshot-item{position:relative;border-radius:3px;overflow:hidden;border:1px solid var(--border2);background:var(--bg2)}
+.screenshot-item img{width:100%;height:90px;object-fit:cover;display:block;cursor:pointer;transition:opacity 0.15s}
+.screenshot-item img:hover{opacity:0.8}
+.screenshot-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.7);border:none;color:var(--white3);cursor:pointer;width:20px;height:20px;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.screenshot-del:hover{background:var(--bear);color:#fff}
+.screenshot-add{border:1px dashed rgba(200,169,110,0.2);background:transparent;border-radius:3px;height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px;transition:all 0.15s}
+.screenshot-add:hover{border-color:var(--gold-border);background:var(--gold-dim)}
+.screenshot-add-icon{font-size:20px;opacity:0.4}
+.screenshot-add-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.08em}
+
+/* TF / Pairs pills selector */
+.pills-selector{display:flex;gap:5px;flex-wrap:wrap}
+.pill-opt{font-family:'DM Mono',monospace;font-size:10px;padding:4px 10px;border:1px solid var(--border2);color:var(--white3);background:var(--bg2);border-radius:100px;cursor:pointer;transition:all 0.15s}
+.pill-opt:hover{border-color:var(--gold-border);color:var(--gold)}
+.pill-opt.on{background:var(--gold-dim);border-color:var(--gold-border);color:var(--gold)}
+.pill-custom{font-family:'DM Mono',monospace;font-size:10px;padding:4px 10px;border:1px dashed rgba(200,169,110,0.2);color:rgba(200,169,110,0.4);background:transparent;border-radius:100px;cursor:pointer;transition:all 0.15s}
+.pill-custom:hover{border-color:var(--gold-border);color:var(--gold)}
+
+/* View modal */
+.view-strat-section{border-left:3px solid var(--gold);padding:14px 18px;background:rgba(200,169,110,0.03);margin-bottom:10px;border-radius:0 4px 4px 0}
+.view-strat-section h4{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.view-strat-section p{font-size:13px;color:var(--white2);line-height:1.8;white-space:pre-wrap}
+.checklist-view{display:flex;flex-direction:column;gap:5px}
+.checklist-view-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--white2)}
+.checklist-view-item::before{content:'☐';color:var(--gold);flex-shrink:0;font-size:15px}
+.strat-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;margin-bottom:14px}
+.strat-stat-box{text-align:center}
+.strat-stat-box .val{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--white);margin-bottom:3px}
+.strat-stat-box .lbl{font-family:'DM Mono',monospace;font-size:8px;color:var(--white3);text-transform:uppercase;letter-spacing:0.1em}
+
+/* Lightbox */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;display:none;align-items:center;justify-content:center;cursor:zoom-out}
+.lightbox.open{display:flex}
+.lightbox img{max-width:95vw;max-height:92vh;object-fit:contain;border-radius:4px}
+</style>
+</head>
+<body class="et-loading">
+<div id="et-loader">
+  <div class="et-loader-logo"><div class="et-loader-eagle">🦅</div><div class="et-loader-name">Eagle<span>Pips</span></div></div>
+  <div class="et-loader-bar"><div class="et-loader-bar-fill"></div></div>
+  <div class="et-loader-text">Loading strategies...</div>
+</div>
+<div id="etSidebarMount"></div>
+<div class="hub-main">
+  <div class="hub-topbar">
+    <div class="hub-topbar-title">⚡ <strong>My Strategies</strong></div>
+    <button class="et-btn-gold" onclick="openNew()" style="padding:7px 16px;font-size:11px">+ New Strategy</button>
+  </div>
+  <div class="hub-content et-fade" id="stratContent">
+    <div style="text-align:center;padding:60px"><div class="et-spinner"></div></div>
+  </div>
+</div>
+
+<!-- BUILD / EDIT MODAL -->
+<div class="et-modal-overlay" id="stratModal">
+  <div class="et-modal" style="max-width:640px;max-height:92vh;overflow-y:auto">
+    <button class="et-modal-close" onclick="etCloseModal('stratModal')">✕</button>
+    <div class="et-modal-title" id="smTitle">New Strategy</div>
+    <input type="hidden" id="smId">
+
+    <!-- Name + status -->
+    <div class="et-form-grid2" style="margin-bottom:10px">
+      <div class="et-form-group"><label class="et-form-label">Strategy Name *</label>
+        <input type="text" class="et-form-input" id="smName" placeholder="e.g. London OB Reversal">
+      </div>
+      <div class="et-form-group"><label class="et-form-label">Winrate Target (%)</label>
+        <input type="number" class="et-form-input" id="smWR" placeholder="55" min="0" max="100">
+      </div>
+    </div>
+    <div class="et-form-group" style="margin-bottom:12px"><label class="et-form-label">Short Description</label>
+      <textarea class="et-form-input" id="smDesc" rows="2" style="resize:none" placeholder="Brief overview of what this strategy does..."></textarea>
+    </div>
+
+    <!-- Timeframes -->
+    <div class="builder-section">
+      <div class="builder-section-hdr" onclick="toggleBS(this)">⏱ Timeframes <span>▾</span></div>
+      <div class="builder-section-body">
+        <div class="pills-selector" id="smTFs">
+          <div class="pill-opt" onclick="togglePill(this,'tf')">M15</div>
+          <div class="pill-opt" onclick="togglePill(this,'tf')">M30</div>
+          <div class="pill-opt" onclick="togglePill(this,'tf')">H1</div>
+          <div class="pill-opt" onclick="togglePill(this,'tf')">H4</div>
+          <div class="pill-opt" onclick="togglePill(this,'tf')">Daily</div>
+          <div class="pill-opt" onclick="togglePill(this,'tf')">Weekly</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pairs -->
+    <div class="builder-section">
+      <div class="builder-section-hdr" onclick="toggleBS(this)">📊 Recommended Pairs <span>▾</span></div>
+      <div class="builder-section-body">
+        <div class="pills-selector" id="smPairs">
+          <div class="pill-opt" onclick="togglePill(this,'pair')">EUR/USD</div>
+          <div class="pill-opt" onclick="togglePill(this,'pair')">GBP/USD</div>
+          <div class="pill-opt" onclick="togglePill(this,'pair')">XAU/USD</div>
+          <div class="pill-opt" onclick="togglePill(this,'pair')">USD/JPY</div>
+          <div class="pill-opt" onclick="togglePill(this,'pair')">GBP/JPY</div>
+          <div class="pill-opt" onclick="togglePill(this,'pair')">EUR/JPY</div>
+          <div class="pill-opt" onclick="togglePill(this,'pair')">AUD/USD</div>
+          <div class="pill-opt" onclick="togglePill(this,'pair')">NZD/USD</div>
+          <button class="pill-custom" onclick="addCustomPair()">+ Custom</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Entry Rules -->
+    <div class="builder-section">
+      <div class="builder-section-hdr" onclick="toggleBS(this)">✅ Entry Rules <span>▾</span></div>
+      <div class="builder-section-body">
+        <textarea class="et-form-input" id="smEntry" rows="4" style="resize:vertical" placeholder="1. Price must be at a key level&#10;2. BOS confirmed on H1&#10;3. OB present on entry TF&#10;4. London session only"></textarea>
+      </div>
+    </div>
+
+    <!-- Exit Rules -->
+    <div class="builder-section">
+      <div class="builder-section-hdr" onclick="toggleBS(this)">🚪 Exit Rules <span>▾</span></div>
+      <div class="builder-section-body">
+        <textarea class="et-form-input" id="smExit" rows="3" style="resize:vertical" placeholder="1. TP at next liquidity pool&#10;2. Move SL to BE at 1R&#10;3. Close if daily bias changes"></textarea>
+      </div>
+    </div>
+
+    <!-- Setup Checklist -->
+    <div class="builder-section">
+      <div class="builder-section-hdr" onclick="toggleBS(this)">☑ Setup Checklist <span>▾</span></div>
+      <div class="builder-section-body">
+        <div class="checklist-items" id="smChecklist"></div>
+        <button class="add-check-btn" onclick="addCheckItem()">+ Add checklist item</button>
+      </div>
+    </div>
+
+    <!-- Screenshots -->
+    <div class="builder-section">
+      <div class="builder-section-hdr" onclick="toggleBS(this)">🖼 Reference Screenshots <span>▾</span></div>
+      <div class="builder-section-body">
+        <div style="font-size:11px;color:var(--white3);margin-bottom:8px">Add TradingView image URLs as reference charts for this strategy.</div>
+        <div class="screenshots-grid" id="smScreenshots">
+          <div class="screenshot-add" onclick="addScreenshot()">
+            <div class="screenshot-add-icon">📸</div>
+            <div class="screenshot-add-lbl">Add Image URL</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="builder-section">
+      <div class="builder-section-hdr" onclick="toggleBS(this)">📝 Additional Notes <span>▾</span></div>
+      <div class="builder-section-body">
+        <textarea class="et-form-input" id="smNotes" rows="3" style="resize:vertical" placeholder="Any additional context, market conditions this works best in, lessons learned..."></textarea>
+      </div>
+    </div>
+
+    <!-- Active toggle -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;margin-bottom:14px">
+      <div><div style="font-size:13px;font-weight:500;color:var(--white)">Active Strategy</div><div style="font-size:11px;color:var(--white3)">Inactive strategies won't appear in trade entry</div></div>
+      <input type="checkbox" id="smActive" checked style="width:18px;height:18px;accent-color:var(--gold);cursor:pointer">
+    </div>
+
+    <button class="et-form-submit" id="smBtn" onclick="saveStrategy()">Save Strategy →</button>
+  </div>
+</div>
+
+<!-- VIEW STRATEGY MODAL -->
+<div class="et-modal-overlay" id="viewStratModal">
+  <div class="et-modal" style="max-width:700px;max-height:94vh;overflow-y:auto;padding:0;border-radius:6px;border-color:rgba(200,169,110,0.2)">
+    <div id="viewStratContent"></div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLB()">
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="hub-sidebar.js"></script>
+<script>
+let _user,_sb,strategies=[],tradeStats={};
+const TF_DEFAULTS=['M15','M30','H1','H4','Daily','Weekly'];
+const PAIR_DEFAULTS=['EUR/USD','GBP/USD','XAU/USD','USD/JPY','GBP/JPY','EUR/JPY','AUD/USD','NZD/USD'];
+let screenshots=[],checklist=[];
+
+async function main(){
+  const res=await initEtSidebar('strategies');if(!res)return;
+  _user=res.user;_sb=res.sb;
+  await loadAll();
+}
+
+async function loadAll(){
+  const[sRes,tRes]=await Promise.all([
+    _sb.from('strategies').select('*').eq('user_id',_user.id).order('created_at',{ascending:false}),
+    _sb.from('journal_trades').select('strategy_id,pnl,status').eq('user_id',_user.id)
+  ]);
+  strategies=sRes.data||[];
+  // Build stats per strategy
+  const trades=tRes.data||[];
+  tradeStats={};
+  trades.forEach(t=>{
+    if(!t.strategy_id)return;
+    if(!tradeStats[t.strategy_id])tradeStats[t.strategy_id]={total:0,wins:0,losses:0,be:0,pnl:0};
+    const s=tradeStats[t.strategy_id];
+    const closed=['win','loss','be'].includes(t.status);
+    if(closed){
+      s.total++;
+      if(t.status==='win')s.wins++;
+      else if(t.status==='loss')s.losses++;
+      else s.be++;
+      s.pnl+=parseFloat(t.pnl)||0;
+    }
+  });
+  render();
+}
+
+function render(){
+  const el=document.getElementById('stratContent');
+  if(!strategies.length){
+    el.innerHTML=`<div style="text-align:center;padding:80px 20px">
+      <div style="font-size:56px;opacity:0.1;margin-bottom:18px">⚡</div>
+      <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--white);margin-bottom:10px">No strategies yet</div>
+      <div style="font-size:14px;color:var(--white2);line-height:1.7;margin-bottom:24px;max-width:400px;margin-left:auto;margin-right:auto">Build your first strategy and start linking it to your trades to track what actually works.</div>
+      <button class="et-btn-gold" onclick="openNew()" style="padding:10px 24px">+ Build First Strategy</button>
+    </div>`;
+    return;
+  }
+  el.innerHTML=`<div class="strat-grid">${strategies.map(s=>stratCard(s)).join('')}</div>`;
+}
+
+function stratCard(s){
+  const st=tradeStats[s.id]||{total:0,wins:0,pnl:0};
+  const wr=st.total>0?((st.wins/st.total)*100).toFixed(0)+'%':'—';
+  const pnl=st.total>0?((st.pnl>=0?'+':'')+st.pnl.toFixed(0)):' —';
+  const pnlColor=st.pnl>=0?'var(--bull)':'var(--bear)';
+  const tfs=(s.timeframes||[]).slice(0,3);
+  const pairs=(s.pairs||[]).slice(0,3);
+  return`<div class="strat-card" onclick="openView('${s.id}')">
+    <div class="strat-card-top"></div>
+    <div class="strat-card-body">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px">
+        <div class="strat-card-name">${s.name}</div>
+        <span class="strat-tag ${s.active?'active':'inactive'}">${s.active?'Active':'Inactive'}</span>
+      </div>
+      ${s.description?`<div class="strat-card-desc">${s.description}</div>`:''}
+      <div class="strat-card-meta">
+        ${tfs.map(t=>`<span class="strat-tag tf">${t}</span>`).join('')}
+        ${pairs.map(p=>`<span class="strat-tag">${p}</span>`).join('')}
+        ${(s.timeframes||[]).length>3?`<span class="strat-tag">+${(s.timeframes||[]).length-3}</span>`:''}
+      </div>
+      ${s.winrate_target?`<div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)">Target WR: <span style="color:var(--gold)">${s.winrate_target}%</span></div>`:''}
+    </div>
+    <div class="strat-card-stats">
+      <div><div class="strat-stat-val">${st.total}</div><div class="strat-stat-lbl">Trades</div></div>
+      <div><div class="strat-stat-val" style="color:${st.total>0?(parseFloat(wr)>=(s.winrate_target||50)?'var(--bull)':'var(--bear)'):'var(--white)'}">${wr}</div><div class="strat-stat-lbl">Win Rate</div></div>
+      <div><div class="strat-stat-val" style="color:${pnlColor}">$${pnl}</div><div class="strat-stat-lbl">PnL</div></div>
+    </div>
+  </div>`;
+}
+
+// ── Open View ──────────────────────────────────────
+function openView(id){
+  const s=strategies.find(x=>x.id===id);if(!s)return;
+  const st=tradeStats[s.id]||{total:0,wins:0,losses:0,be:0,pnl:0};
+  const wr=st.total>0?((st.wins/st.total)*100).toFixed(1)+'%':'—';
+  const pnl=st.total>0?(st.pnl>=0?'+':'')+st.pnl.toFixed(2):'—';
+  const pnlColor=st.pnl>0?'var(--bull)':st.pnl<0?'var(--bear)':'var(--white)';
+  const losses=st.losses||0;
+  const tfs=(s.timeframes||[]).join(', ')||'—';
+  const pairs=(s.pairs||[]).join(', ')||'—';
+  const checklist=Array.isArray(s.checklist)?s.checklist:[];
+  const shots=s.screenshots||[];
+
+  function section(icon,label,content,border='var(--gold)'){
+    if(!content)return'';
+    return`<div style="border-left:3px solid ${border};padding:14px 18px;background:rgba(255,255,255,0.02);margin-bottom:10px;border-radius:0 4px 4px 0">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:${border};margin-bottom:8px">${icon} ${label}</div>
+      ${content}
+    </div>`;
+  }
+
+  document.getElementById('viewStratContent').innerHTML=`
+    <!-- Header -->
+    <div style="padding:20px 24px 16px;border-bottom:1px solid rgba(255,255,255,0.06);position:sticky;top:0;background:#0c0e13;z-index:10;border-radius:6px 6px 0 0">
+      <button onclick="etCloseModal('viewStratModal')" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.background='rgba(224,92,92,0.2)';this.style.color='var(--bear)'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='rgba(255,255,255,0.5)'">✕</button>
+      <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:#fff;margin-bottom:6px">${s.name}</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;background:${s.active?'var(--bull-bg)':'rgba(255,255,255,0.04)'};border:1px solid ${s.active?'rgba(76,175,125,0.2)':'var(--border2)'};color:${s.active?'var(--bull)':'var(--white3)'};border-radius:100px">${s.active?'● Active':'○ Inactive'}</span>
+        ${(s.timeframes||[]).map(t=>`<span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;background:rgba(74,158,255,0.08);border:1px solid rgba(74,158,255,0.2);color:#6ba3ff;border-radius:100px">${t}</span>`).join('')}
+        ${s.winrate_target?`<span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:100px">Target ${s.winrate_target}% WR</span>`:''}
+      </div>
+    </div>
+    <!-- Stats row -->
+    <div style="padding:16px 24px 0">
+      <div class="strat-stat-row">
+        <div class="strat-stat-box"><div class="val">${st.total}</div><div class="lbl">Trades</div></div>
+        <div class="strat-stat-box"><div class="val" style="color:${st.total>0?(parseFloat(wr)>=(s.winrate_target||50)?'var(--bull)':'var(--bear)'):'var(--white)'}">${wr}</div><div class="lbl">Win Rate</div></div>
+        <div class="strat-stat-box"><div class="val" style="color:${pnlColor}">$${pnl}</div><div class="lbl">Net PnL</div></div>
+        <div class="strat-stat-box"><div class="val">${st.wins}W / ${losses}L</div><div class="lbl">W / L</div></div>
+      </div>
+      ${s.description?`<div style="font-size:13px;color:var(--white2);line-height:1.8;margin-bottom:14px;padding:12px 14px;background:var(--bg3);border-radius:4px;border:1px solid var(--border2)">${s.description}</div>`:''}
+      ${section('✅','Entry Rules',s.entry_rules?`<div style="font-size:13px;color:var(--white2);line-height:1.8;white-space:pre-wrap">${s.entry_rules}</div>`:'','var(--bull)')}
+      ${section('🚪','Exit Rules',s.exit_rules?`<div style="font-size:13px;color:var(--white2);line-height:1.8;white-space:pre-wrap">${s.exit_rules}</div>`:'','var(--bear)')}
+      ${section('📊','Pairs',pairs!=='—'?`<div style="font-size:13px;color:var(--white2)">${pairs}</div>`:'')}
+      ${checklist.length?section('☑','Setup Checklist',`<div style="display:flex;flex-direction:column;gap:6px">${checklist.map(c=>`<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--white2)"><span style="color:var(--gold);font-size:15px">☐</span>${c}</div>`).join('')}</div>`):''}
+      ${s.notes?section('📝','Notes',`<div style="font-size:13px;color:var(--white2);line-height:1.8;white-space:pre-wrap">${s.notes}</div>`):''}
+      ${shots.length?`<div style="margin-bottom:14px"><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--white3);margin-bottom:8px">🖼 Reference Charts</div><div class="screenshots-grid">${shots.map(url=>`<div class="screenshot-item"><img src="${url}" onclick="openLB('${url}')" onerror="this.parentElement.style.display='none'"></div>`).join('')}</div></div>`:''}
+    </div>
+    <!-- Footer -->
+    <div style="padding:14px 24px;border-top:1px solid rgba(255,255,255,0.06);display:flex;gap:8px;position:sticky;bottom:0;background:#0c0e13;border-radius:0 0 6px 6px">
+      <button class="et-btn-ghost" onclick="etCloseModal('viewStratModal');openEdit('${s.id}')" style="padding:7px 14px;font-size:12px">✏️ Edit</button>
+      <button class="et-btn-ghost" onclick="toggleActive('${s.id}')" style="padding:7px 14px;font-size:12px">${s.active?'🚫 Deactivate':'✅ Activate'}</button>
+      <button class="et-btn-ghost" onclick="delStrategy('${s.id}')" style="padding:7px 12px;font-size:12px;margin-left:auto;color:var(--bear);border-color:rgba(224,92,92,0.2)" onmouseover="this.style.background='var(--bear-bg)'" onmouseout="this.style.background=''">🗑 Delete</button>
+    </div>`;
+  etOpenModal('viewStratModal');
+}
+
+// ── Open New / Edit ────────────────────────────────
+function openNew(){
+  document.getElementById('smId').value='';
+  document.getElementById('smTitle').textContent='New Strategy';
+  document.getElementById('smName').value='';
+  document.getElementById('smDesc').value='';
+  document.getElementById('smWR').value='';
+  document.getElementById('smEntry').value='';
+  document.getElementById('smExit').value='';
+  document.getElementById('smNotes').value='';
+  document.getElementById('smActive').checked=true;
+  screenshots=[];checklist=[];
+  // Reset pills
+  document.querySelectorAll('#smTFs .pill-opt,#smPairs .pill-opt').forEach(p=>p.classList.remove('on'));
+  renderChecklist();renderScreenshots();
+  etOpenModal('stratModal');
+}
+
+function openEdit(id){
+  const s=strategies.find(x=>x.id===id);if(!s)return;
+  document.getElementById('smId').value=s.id;
+  document.getElementById('smTitle').textContent='Edit Strategy';
+  document.getElementById('smName').value=s.name||'';
+  document.getElementById('smDesc').value=s.description||'';
+  document.getElementById('smWR').value=s.winrate_target||'';
+  document.getElementById('smEntry').value=s.entry_rules||'';
+  document.getElementById('smExit').value=s.exit_rules||'';
+  document.getElementById('smNotes').value=s.notes||'';
+  document.getElementById('smActive').checked=s.active!==false;
+  // TFs
+  document.querySelectorAll('#smTFs .pill-opt').forEach(p=>{p.classList.toggle('on',(s.timeframes||[]).includes(p.textContent));});
+  // Pairs — handle default + custom
+  document.querySelectorAll('#smPairs .pill-opt').forEach(p=>{p.classList.toggle('on',(s.pairs||[]).includes(p.textContent));});
+  (s.pairs||[]).filter(p=>!PAIR_DEFAULTS.includes(p)).forEach(p=>addCustomPillEl(p,'pair'));
+  // Screenshots + checklist
+  screenshots=[...(s.screenshots||[])];
+  checklist=Array.isArray(s.checklist)?[...s.checklist]:[];
+  renderChecklist();renderScreenshots();
+  etOpenModal('stratModal');
+}
+
+// ── Save ───────────────────────────────────────────
+async function saveStrategy(){
+  const name=document.getElementById('smName').value.trim();
+  if(!name){alert('Strategy name is required.');return;}
+  const btn=document.getElementById('smBtn');btn.disabled=true;btn.textContent='Saving...';
+
+  // Collect TFs
+  const tfs=[...document.querySelectorAll('#smTFs .pill-opt.on')].map(p=>p.textContent);
+  // Collect pairs (default on + custom)
+  const pairs=[...document.querySelectorAll('#smPairs .pill-opt.on')].map(p=>p.textContent);
+
+  // Collect checklist from DOM
+  const cl=[...document.querySelectorAll('.cl-input')].map(i=>i.value.trim()).filter(Boolean);
+
+  const payload={
+    user_id:_user.id,name,
+    description:document.getElementById('smDesc').value||null,
+    entry_rules:document.getElementById('smEntry').value||null,
+    exit_rules:document.getElementById('smExit').value||null,
+    timeframes:tfs.length?tfs:null,
+    pairs:pairs.length?pairs:null,
+    winrate_target:parseFloat(document.getElementById('smWR').value)||null,
+    checklist:cl,
+    screenshots:screenshots.length?screenshots:null,
+    notes:document.getElementById('smNotes').value||null,
+    active:document.getElementById('smActive').checked,
+    updated_at:new Date().toISOString()
+  };
+
+  const id=document.getElementById('smId').value;
+  let err;
+  if(id){const r=await _sb.from('strategies').update(payload).eq('id',id).eq('user_id',_user.id);err=r.error;}
+  else{const r=await _sb.from('strategies').insert(payload);err=r.error;}
+  btn.disabled=false;btn.textContent='Save Strategy →';
+  if(err){alert(err.message);return;}
+  etCloseModal('stratModal');
+  await loadAll();
+}
+
+async function toggleActive(id){
+  const s=strategies.find(x=>x.id===id);if(!s)return;
+  await _sb.from('strategies').update({active:!s.active}).eq('id',id).eq('user_id',_user.id);
+  etCloseModal('viewStratModal');
+  await loadAll();
+}
+
+async function delStrategy(id){
+  if(!confirm('Delete this strategy? Trades using it will keep the reference.'))return;
+  await _sb.from('strategies').delete().eq('id',id).eq('user_id',_user.id);
+  etCloseModal('viewStratModal');
+  await loadAll();
+}
+
+// ── Pills ──────────────────────────────────────────
+function togglePill(el){el.classList.toggle('on');}
+function addCustomPair(){
+  const p=prompt('Enter pair (e.g. USD/CHF):');
+  if(!p?.trim())return;
+  addCustomPillEl(p.trim().toUpperCase(),'pair');
+}
+function addCustomPillEl(text,type){
+  const container=document.getElementById(type==='tf'?'smTFs':'smPairs');
+  const addBtn=container.querySelector('.pill-custom');
+  const el=document.createElement('div');
+  el.className='pill-opt on';
+  el.textContent=text;
+  el.onclick=()=>el.classList.toggle('on');
+  container.insertBefore(el,addBtn);
+}
+
+// ── Checklist ──────────────────────────────────────
+function renderChecklist(){
+  const el=document.getElementById('smChecklist');
+  el.innerHTML=checklist.map((item,i)=>`
+    <div class="checklist-item">
+      <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3);flex-shrink:0">${i+1}.</span>
+      <input type="text" class="cl-input" value="${item.replace(/"/g,'&quot;')}" placeholder="Checklist item..." oninput="checklist[${i}]=this.value">
+      <button class="checklist-del" onclick="removeCheck(${i})">✕</button>
+    </div>`).join('');
+}
+function addCheckItem(){checklist.push('');renderChecklist();setTimeout(()=>{const inputs=document.querySelectorAll('.cl-input');inputs[inputs.length-1]?.focus();},50);}
+function removeCheck(i){checklist.splice(i,1);renderChecklist();}
+
+// ── Screenshots ────────────────────────────────────
+function renderScreenshots(){
+  const grid=document.getElementById('smScreenshots');
+  grid.innerHTML=screenshots.map((url,i)=>`
+    <div class="screenshot-item">
+      <img src="${url}" onclick="openLB('${url}')" onerror="this.parentElement.style.display='none'">
+      <button class="screenshot-del" onclick="removeShot(${i})">✕</button>
+    </div>`).join('')+`<div class="screenshot-add" onclick="addScreenshot()"><div class="screenshot-add-icon">📸</div><div class="screenshot-add-lbl">Add Image</div></div>`;
+}
+function addScreenshot(){
+  const url=prompt('Enter image URL (TradingView, Imgur, etc.):');
+  if(!url?.trim())return;
+  screenshots.push(url.trim());renderScreenshots();
+}
+function removeShot(i){screenshots.splice(i,1);renderScreenshots();}
+
+// ── UI helpers ─────────────────────────────────────
+function toggleBS(hdr){const b=hdr.nextElementSibling;b.classList.toggle('collapsed');const s=hdr.querySelector('span:last-child');if(s)s.textContent=b.classList.contains('collapsed')?'▸':'▾';}
+function openLB(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('open');}
+function closeLB(){document.getElementById('lightbox').classList.remove('open');}
+
+document.addEventListener('click',e=>{if(e.target.classList.contains('et-modal-overlay'))etCloseModal(e.target.id);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLB();document.querySelectorAll('.et-modal-overlay.active').forEach(m=>etCloseModal(m.id));}});
+main();
+</script>
+</body>
+</html>

@@ -68,6 +68,12 @@ function renderEtSidebar(activePage, userName, userId, journals=[], activeAnalys
       ${analysisItems}
       <div class="et-divider"></div>
 
+      <span class="et-cat">Strategies</span>
+      <a href="hub-strategies.html" class="et-item${activePage==='strategies'?' active':''}">
+        <span class="et-icon">⚡</span>My Strategies
+      </a>
+      <div class="et-divider"></div>
+
       <span class="et-cat">Payouts</span>
       <a href="hub-payouts.html" class="et-item${activePage==='payouts'?' active':''}">
         <span class="et-icon">💸</span>My Payouts
