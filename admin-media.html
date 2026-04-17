@@ -109,7 +109,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="hub-sidebar.js"></script>
 <script>
-const BUCKET = 'media';
+const BUCKET = 'EaglePips';
 let _user, _sb, allFiles = [], selected = new Set(), currentFilter = 'all', searchTerm = '';
 const SB_URL = 'https://vaimxhgqcdhjhdiaampa.supabase.co';
 
@@ -125,7 +125,7 @@ async function main() {
 }
 
 async function loadMedia() {
-  const { data, error } = await _sb.storage.from(BUCKET).list('', {
+  const { data, error } = await _sb.storage.from('EaglePips').list('', {
     limit: 500, offset: 0, sortBy: { column: 'created_at', order: 'desc' }
   });
   if (error) { showError(error.message); return; }
@@ -135,7 +135,8 @@ async function loadMedia() {
 }
 
 function getPublicUrl(name) {
-  const { data } = _sb.storage.from(BUCKET).getPublicUrl(name);
+  const { data } = _sb.storage.from('EaglePips').getPublicUrl(name);
+  // Supabase public URL format: /storage/v1/object/public/bucket/filename
   return data.publicUrl;
 }
 
@@ -223,7 +224,7 @@ async function deleteSelected() {
   const names = [...selected];
   if (!confirm(`Delete ${names.length} file(s)?`)) return;
   for (const name of names) {
-    await _sb.storage.from(BUCKET).remove([name]);
+    await _sb.storage.from('EaglePips').remove([name]);
   }
   selected.clear();
   updateSelBar();
@@ -254,7 +255,7 @@ async function uploadFiles(files) {
     queue.prepend(row);
 
     // Upload
-    const { error } = await _sb.storage.from(BUCKET).upload(fname, file, {
+    const { error } = await _sb.storage.from('EaglePips').upload(fname, file, {
       cacheControl: '3600', upsert: false
     });
 
