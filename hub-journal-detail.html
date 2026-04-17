@@ -633,21 +633,83 @@ function renderCalendar(){
   document.getElementById('calTitle').textContent=MONTHS[calM]+' '+calY;
   const first=new Date(calY,calM,1).getDay(),dim=new Date(calY,calM+1,0).getDate();
   const off=first===0?6:first-1,today=new Date();
-  const dp={};trades.forEach(t=>{if(!t.trade_date)return;const d=new Date(t.trade_date);if(d.getFullYear()===calY&&d.getMonth()===calM){const day=d.getDate();dp[day]=(dp[day]||0)+(parseFloat(t.pnl)||0);}});
-  let h=['Mo','Tu','We','Th','Fr','Sa','Su'].map(d=>`<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);text-align:center;padding:3px 0">${d}</div>`).join('');
-  for(let i=0;i<off;i++)h+=`<div></div>`;
+
+  // Build PnL map per day
+  const dp={};
+  trades.forEach(t=>{
+    if(!t.trade_date)return;
+    const d=new Date(t.trade_date+'T12:00:00');
+    if(d.getFullYear()===calY&&d.getMonth()===calM){
+      const day=d.getDate();
+      if(!dp[day])dp[day]={pnl:0,count:0,open:0};
+      if(['win','loss','be'].includes(t.status)){dp[day].pnl+=(parseFloat(t.pnl)||0);dp[day].count++;}
+      if(t.status==='open')dp[day].open++;
+    }
+  });
+
+  // Day-name header
+  let h=['Mo','Tu','We','Th','Fr','Sa','Su'].map(d=>`
+    <div style="font-family:'DM Mono',monospace;font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);text-align:center;padding:6px 0;letter-spacing:0.08em">${d}</div>
+  `).join('');
+
+  // Empty offset cells
+  for(let i=0;i<off;i++)h+=`<div style="background:rgba(255,255,255,0.01);border-radius:6px;border:1px solid rgba(255,255,255,0.03)"></div>`;
+
   for(let d=1;d<=dim;d++){
-    const it=today.getDate()===d&&today.getMonth()===calM&&today.getFullYear()===calY;
-    const p=dp[d];const bg=it?'transparent':p>0?'var(--bull-bg)':p<0?'var(--bear-bg)':'transparent';
-    const border=it?'1px solid var(--gold)':p>0?'1px solid rgba(76,175,125,0.2)':p<0?'1px solid rgba(224,92,92,0.2)':'1px solid transparent';
-    const color=it?'var(--gold)':p>0?'var(--bull)':p<0?'var(--bear)':'var(--white3)';
-    const pnlHtml=p!==undefined?`<div style="font-family:'DM Mono',monospace;font-size:7px">${p>=0?'+':''}$${Math.abs(p).toFixed(0)}</div>`:'';
+    const isToday=today.getDate()===d&&today.getMonth()===calM&&today.getFullYear()===calY;
+    const day=dp[d];
     const dateStr=`${calY}-${String(calM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const hasNote=dayNotes[dateStr];
-    const noteDot=hasNote?`<div style="width:4px;height:4px;border-radius:50%;background:var(--gold);opacity:0.7;flex-shrink:0"></div>`:'';
-    h+=`<div onclick="openDayModal('${dateStr}')" style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:9px;background:${bg};border:${border};cursor:pointer;transition:all 0.15s;gap:1px;border-radius:3px;color:${color}" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">${d}${pnlHtml}${noteDot}</div>`;
+
+    // Colors per day state
+    let bg,borderStyle,numColor,pnlColor;
+    if(isToday){
+      bg='rgba(200,169,110,0.08)';
+      borderStyle='2px solid rgba(200,169,110,0.6)';
+      numColor='#c8a96e';
+    } else if(day&&day.pnl>0){
+      bg='rgba(76,175,125,0.1)';
+      borderStyle='1px solid rgba(76,175,125,0.3)';
+      numColor='#ffffff';
+      pnlColor='#4caf7d';
+    } else if(day&&day.pnl<0){
+      bg='rgba(224,92,92,0.1)';
+      borderStyle='1px solid rgba(224,92,92,0.3)';
+      numColor='#ffffff';
+      pnlColor='#e05c5c';
+    } else if(day&&day.pnl===0&&day.count>0){
+      bg='rgba(255,255,255,0.04)';
+      borderStyle='1px solid rgba(255,255,255,0.12)';
+      numColor='#c8c4bc';
+    } else {
+      bg='rgba(255,255,255,0.02)';
+      borderStyle='1px solid rgba(255,255,255,0.06)';
+      numColor='rgba(255,255,255,0.45)';
+    }
+
+    const pnlStr=day?`${day.pnl>=0?'+':''}$${Math.abs(day.pnl).toFixed(0)}`:'';
+    const openBadge=day?.open?`<span style="font-family:'DM Mono',monospace;font-size:8px;color:#6ba3ff;line-height:1">${day.open} open</span>`:'';
+    const noteDot=hasNote?`<span style="font-size:8px;line-height:1;opacity:0.8">●</span>`:'';
+
+    h+=`<div
+      onclick="openDayModal('${dateStr}')"
+      style="min-height:56px;display:flex;flex-direction:column;padding:7px 8px;background:${bg};border:${borderStyle};border-radius:6px;cursor:pointer;transition:all 0.15s;position:relative;gap:3px"
+      onmouseover="this.style.borderColor='rgba(200,169,110,0.4)';this.style.background='rgba(200,169,110,0.08)'"
+      onmouseout="this.style.borderColor='${borderStyle.split(' solid ')[1]}';this.style.background='${bg}'"
+    >
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <span style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:${numColor};line-height:1">${d}</span>
+        ${noteDot?`<span style="font-size:8px;color:#c8a96e">●</span>`:''}
+      </div>
+      ${pnlStr?`<div style="font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:${pnlColor};line-height:1;margin-top:auto">${pnlStr}</div>`:''}
+      ${openBadge||''}
+    </div>`;
   }
-  document.getElementById('calGrid').innerHTML=h;
+
+  // Update grid gap
+  const grid=document.getElementById('calGrid');
+  grid.style.gap='5px';
+  grid.innerHTML=h;
 }
 function calNav(d){calM+=d;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}renderCalendar();}
 
