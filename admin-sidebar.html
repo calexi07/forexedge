@@ -154,7 +154,8 @@ function toggleWidgetFields(){
   const t=document.getElementById('wType').value;
   document.getElementById('wContentWrap').style.display=['text','cta','links'].includes(t)?'':'none';
   document.getElementById('wImageWrap').style.display=['ad','image'].includes(t)?'':'none';
-  document.getElementById('wLinkWrap').style.display=['cta','ad'].includes(t)?'':'none';
+  document.getElementById('wLinkWrap').style.display=['cta','ad','image'].includes(t)?'':'none';
+  document.getElementById('wLinkLabelWrap').style.display=['cta','ad','image'].includes(t)?'':'none';
   document.getElementById('wLinkLabelWrap').style.display=['cta'].includes(t)?'':'none';
 }
 

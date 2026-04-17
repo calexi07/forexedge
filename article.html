@@ -139,8 +139,10 @@ function renderSidebarWidget(w){
       (w.image_url?`<a href="${w.link_url||'#'}" target="_blank"><img src="${w.image_url}" class="sw-img" alt="${w.title||'Ad'}"></a>`:
       `<div class="sw-ad"><span>📢</span><span>Advertisement</span>${w.link_url?`<a href="${w.link_url}" target="_blank" style="color:var(--gold);font-size:10px;text-decoration:none">${w.link_label||'Visit'}</a>`:''}</div>`)
     :w.type==='image'?
-      (w.image_url?`<img src="${w.image_url}" class="sw-img" alt="${w.title||''}">`:'')+
-      (w.content?`<div class="sw-text" style="margin-top:10px">${w.content}</div>`:'')
+      (w.image_url?(w.link_url?`<a href="${w.link_url}" target="_blank" style="display:block">`:'')
+        +`<img src="${w.image_url}" class="sw-img" alt="${w.title||''}" style="transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">`
+        +(w.link_url?`</a>`:''):'')
+      +(w.content?`<div class="sw-text" style="margin-top:10px">${w.content}</div>`:'')
     :`<div class="sw-text">${w.content||''}</div>
      ${w.link_url?`<a href="${w.link_url}" class="sw-cta-btn" target="_blank">${w.link_label||'Learn More'}</a>`:''}`}
   </div>`;
