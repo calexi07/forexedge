@@ -35,7 +35,7 @@
     <button class="et-btn-ghost" onclick="etOpenModal('payoutModal')" style="padding:7px 14px;font-size:11px">💸 Payout</button>
   </div>
   <div class="hub-content et-fade" style="padding-top:32px">
-    <div class="et-stats-2row" id="statsGrid">
+    <div class="et-stats-2row" id="statsGrid" style="gap:10px;margin-bottom:24px">
       <div class="et-stat"><div class="et-stat-lbl">Initial Balance</div><div class="et-stat-val o" id="stBal">$0</div></div>
       <div class="et-stat"><div class="et-stat-lbl">Current Balance</div><div class="et-stat-val" id="stCur">$0</div><div class="et-stat-sub" id="stCurSub">—</div></div>
       <div class="et-stat"><div class="et-stat-lbl">Net Profit</div><div class="et-stat-val" id="stProfit">$0</div></div>
@@ -52,9 +52,9 @@
     <div style="display:grid;grid-template-columns:1fr 280px;gap:18px;align-items:start">
       <div>
         <!-- Calendar -->
-        <div class="et-card" style="padding:16px;margin-bottom:14px">
+        <div class="et-card" style="padding:20px;margin-bottom:16px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--white)" id="calTitle">—</div>
+            <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--white)" id="calTitle">—</div>
             <div style="display:flex;gap:5px">
               <button onclick="calNav(-1)" style="background:none;border:1px solid var(--border2);color:var(--white3);width:24px;height:24px;cursor:pointer;font-size:12px;border-radius:4px;transition:all 0.2s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">‹</button>
               <button onclick="calNav(1)" style="background:none;border:1px solid var(--border2);color:var(--white3);width:24px;height:24px;cursor:pointer;font-size:12px;border-radius:4px;transition:all 0.2s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">›</button>
@@ -64,7 +64,7 @@
         </div>
         <!-- Equity -->
         <div class="et-card" style="padding:14px;margin-bottom:14px">
-          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:10px">Equity Curve</div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px">Equity Curve</div>
           <svg id="eqSvg" viewBox="0 0 600 70" preserveAspectRatio="none" style="width:100%;height:52px">
             <defs><linearGradient id="eqg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c8a96e" stop-opacity="0.18"/><stop offset="100%" stop-color="#c8a96e" stop-opacity="0"/></linearGradient></defs>
             <path id="eqLine" d="M0,35 L600,35" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="4"/>
@@ -74,7 +74,7 @@
         <!-- Trades -->
         <div class="et-card" style="overflow:hidden">
           <div style="padding:12px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-            <span style="font-size:14px;font-weight:600;color:var(--white)">Trade History</span>
+            <span style="font-size:15px;font-weight:700;color:var(--white)">Trade History</span>
             <div style="display:flex;gap:8px;align-items:center">
               <select id="filterStatus" class="et-form-input" style="width:auto;padding:5px 10px;font-size:11px" onchange="renderTrades()">
                 <option value="">All trades</option><option value="open">Open</option><option value="win">Wins</option><option value="loss">Losses</option><option value="be">Break Even</option>
@@ -96,21 +96,21 @@
           <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
             <span>🤖 AI Coach</span><span style="background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border);padding:2px 8px;border-radius:100px;font-size:8px;letter-spacing:0.1em">SOON</span>
           </div>
-          <div style="font-size:12px;color:var(--white3);line-height:1.7">AI-powered pattern detection — identifies your losing habits and suggests improvements.</div>
+          <div style="font-size:13px;color:var(--white2);line-height:1.7">AI-powered pattern detection — identifies your losing habits and suggests improvements.</div>
         </div>
         <div style="background:var(--bg2);border:1px solid rgba(76,175,125,0.25);border-left:3px solid var(--bull);padding:16px;border-radius:4px">
-          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--bull);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--bull);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
             <span>💸 Payouts</span>
             <button onclick="etOpenModal('payoutModal')" style="background:none;border:1px solid rgba(76,175,125,0.3);color:var(--bull);font-family:'DM Mono',monospace;font-size:8px;padding:2px 8px;cursor:pointer;border-radius:2px;transition:all 0.15s" onmouseover="this.style.background='var(--bull-bg)'" onmouseout="this.style.background='none'">+ Add</button>
           </div>
           <div id="payoutsList"><div style="font-size:12px;color:var(--white3);font-style:italic">No payouts yet.</div></div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0 0;margin-top:6px;border-top:1px solid var(--border2)">
             <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);text-transform:uppercase;letter-spacing:0.08em">Total</span>
-            <span style="font-family:'DM Mono',monospace;font-size:14px;color:var(--bull);font-weight:500" id="payoutsTotal">$0.00</span>
+            <span style="font-family:'DM Mono',monospace;font-size:16px;color:var(--bull);font-weight:600" id="payoutsTotal">$0.00</span>
           </div>
         </div>
         <div class="et-card" style="padding:16px">
-          <div style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:12px">Performance</div>
+          <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:14px">Performance</div>
           <div id="perfRows"></div>
         </div>
       </div>
@@ -607,7 +607,7 @@ function renderPerf(){
     ['Largest win',wins.length?'+$'+Math.max(...wins.map(t=>parseFloat(t.pnl)||0)).toFixed(2):'—','g'],
     ['Largest loss',losses.length?'-$'+Math.abs(Math.min(...losses.map(t=>parseFloat(t.pnl)||0))).toFixed(2):'—','r'],
   ];
-  document.getElementById('perfRows').innerHTML=rows.map(([l,v,c])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border2)"><span style="font-size:12px;color:var(--white2)">${l}</span><span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--${c==='g'?'bull':c==='r'?'bear':'gold2'})">${v}</span></div>`).join('');
+  document.getElementById('perfRows').innerHTML=rows.map(([l,v,c])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border2)"><span style="font-size:13px;color:var(--white)">${l}</span><span style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:var(--${c==='g'?'bull':c==='r'?'bear':'gold2'})">${v}</span></div>`).join('');
 }
 
 function renderEquity(){
@@ -722,7 +722,7 @@ function renderPayouts(){
   document.getElementById('payoutsTotal').textContent='$'+total.toFixed(2);
   const list=document.getElementById('payoutsList');
   if(!payouts.length){list.innerHTML='<div style="font-size:12px;color:var(--white3);font-style:italic">No payouts yet.</div>';renderStats();return;}
-  list.innerHTML=payouts.map(p=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border2)"><div><div style="font-size:12px;color:var(--white2)">${p.note||'Payout'}</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3)">${p.payout_date||'—'}</div></div><div style="display:flex;align-items:center;gap:6px"><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--bull);font-weight:500">+$${parseFloat(p.amount).toFixed(2)}</span><button onclick="delPayout('${p.id}')" style="background:none;border:none;color:var(--white3);cursor:pointer;font-size:11px;transition:color 0.15s" onmouseover="this.style.color='var(--bear)'" onmouseout="this.style.color='var(--white3)'">✕</button></div></div>`).join('');
+  list.innerHTML=payouts.map(p=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border2)"><div><div style="font-size:13px;color:var(--white)">${p.note||'Payout'}</div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white2)">${p.payout_date||'—'}</div></div><div style="display:flex;align-items:center;gap:6px"><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--bull);font-weight:500">+$${parseFloat(p.amount).toFixed(2)}</span><button onclick="delPayout('${p.id}')" style="background:none;border:none;color:var(--white3);cursor:pointer;font-size:11px;transition:color 0.15s" onmouseover="this.style.color='var(--bear)'" onmouseout="this.style.color='var(--white3)'">✕</button></div></div>`).join('');
   renderStats();
 }
 async function savePayout(){
