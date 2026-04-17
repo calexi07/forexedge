@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EaglePips — Media Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="hub.css">
+<style>
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.media-item{background:var(--bg2);border:1px solid var(--border);border-radius:4px;overflow:hidden;cursor:pointer;transition:all 0.2s;position:relative;group}
+.media-item:hover{border-color:var(--gold-border);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.media-item.selected{border-color:var(--gold);box-shadow:0 0 0 2px rgba(200,169,110,0.25)}
+.media-thumb{width:100%;height:120px;object-fit:cover;display:block;background:var(--bg3)}
+.media-thumb-icon{width:100%;height:120px;display:flex;align-items:center;justify-content:center;font-size:36px;background:var(--bg3)}
+.media-info{padding:8px 10px}
+.media-name{font-size:11px;font-weight:500;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px}
+.media-size{font-family:'DM Mono',monospace;font-size:9px;color:var(--white3)}
+.media-check{position:absolute;top:8px;right:8px;width:22px;height:22px;background:var(--gold);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:12px;color:#08090c;font-weight:700}
+.media-item.selected .media-check{display:flex}
+/* Upload zone */
+.upload-zone{border:2px dashed rgba(200,169,110,0.25);border-radius:6px;padding:32px;text-align:center;cursor:pointer;transition:all 0.2s;background:rgba(200,169,110,0.03)}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--gold-border);background:var(--gold-dim)}
+.upload-zone-icon{font-size:36px;margin-bottom:10px;opacity:0.5}
+.upload-zone-text{font-size:14px;color:var(--white2);margin-bottom:4px}
+.upload-zone-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)}
+/* Toolbar */
+.media-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.search-input{flex:1;min-width:180px;background:var(--bg2);border:1px solid var(--border);color:var(--white);font-family:'Syne',sans-serif;font-size:13px;padding:8px 12px;border-radius:4px;outline:none;transition:border-color 0.2s}
+.search-input:focus{border-color:var(--gold-border)}
+.filter-btn{padding:7px 14px;background:var(--bg3);border:1px solid var(--border);color:var(--white2);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:all 0.15s}
+.filter-btn:hover,.filter-btn.active{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
+/* Selected bar */
+.sel-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--gold-border);padding:14px 24px;display:flex;align-items:center;gap:12px;z-index:100;transform:translateY(100%);transition:transform 0.2s}
+.sel-bar.visible{transform:translateY(0)}
+.sel-url{flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--white2);font-family:'DM Mono',monospace;font-size:12px;padding:8px 12px;border-radius:3px;outline:none}
+/* Upload progress */
+.upload-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;margin-bottom:6px}
+.upload-item-name{flex:1;font-size:12px;color:var(--white2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.upload-progress{height:3px;background:var(--border);border-radius:2px;overflow:hidden;width:80px;flex-shrink:0}
+.upload-progress-fill{height:100%;background:var(--gold);transition:width 0.3s}
+.upload-status{font-family:'DM Mono',monospace;font-size:10px;color:var(--white3);flex-shrink:0;min-width:40px;text-align:right}
+/* Lightbox */
+.lb{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;display:none;align-items:center;justify-content:center;cursor:zoom-out}
+.lb.open{display:flex}
+.lb img{max-width:90vw;max-height:88vh;object-fit:contain;border-radius:4px}
+</style>
+</head>
+<body class="et-loading">
+<div id="et-loader">
+  <div class="et-loader-logo"><div class="et-loader-eagle">🦅</div><div class="et-loader-name">Eagle<span>Pips</span></div></div>
+  <div class="et-loader-bar"><div class="et-loader-bar-fill"></div></div>
+  <div class="et-loader-text">Loading media...</div>
+</div>
+<div id="etSidebarMount"></div>
+<div class="hub-main">
+  <div class="hub-topbar">
+    <a href="admin.html" style="background:none;border:1px solid var(--border2);color:var(--white3);padding:5px 10px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px;text-decoration:none;transition:all 0.2s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">← Admin</a>
+    <div class="hub-topbar-title" style="flex:1;margin-left:12px">🖼 <strong>Media Library</strong></div>
+    <span id="mediaCount" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--white3)"></span>
+    <button class="et-btn-gold" onclick="document.getElementById('fileInput').click()" style="padding:7px 16px;font-size:11px">⬆ Upload</button>
+  </div>
+  <div class="hub-content et-fade">
+
+    <!-- Upload zone -->
+    <div class="upload-zone" id="uploadZone"
+      ondragover="event.preventDefault();this.classList.add('drag')"
+      ondragleave="this.classList.remove('drag')"
+      ondrop="handleDrop(event)"
+      onclick="document.getElementById('fileInput').click()">
+      <div class="upload-zone-icon">📁</div>
+      <div class="upload-zone-text">Drop images here or click to upload</div>
+      <div class="upload-zone-sub">PNG, JPG, WebP, GIF, SVG · Max 10MB each</div>
+    </div>
+    <input type="file" id="fileInput" multiple accept="image/*" style="display:none" onchange="uploadFiles(this.files)">
+
+    <!-- Upload progress -->
+    <div id="uploadQueue" style="margin-top:10px;display:none"></div>
+
+    <!-- Toolbar -->
+    <div class="media-toolbar" style="margin-top:16px">
+      <input type="text" class="search-input" placeholder="Search images..." oninput="filterMedia(this.value)" id="searchInput">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('image',this)">Images</button>
+      <button id="deleteSelBtn" style="display:none;padding:7px 14px;background:var(--bear-bg);border:1px solid rgba(224,92,92,0.3);color:var(--bear);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;border-radius:3px;transition:all 0.15s" onclick="deleteSelected()">🗑 Delete Selected</button>
+    </div>
+
+    <!-- Grid -->
+    <div class="media-grid" id="mediaGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--white3)"><div class="et-spinner"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Selected bar -->
+<div class="sel-bar" id="selBar">
+  <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--white2)" id="selCount">0 selected</span>
+  <input type="text" class="sel-url" id="selUrl" readonly placeholder="Select an image to copy URL">
+  <button class="et-btn-ghost" onclick="copyUrl()" style="padding:7px 14px;font-size:11px" id="copyBtn">📋 Copy URL</button>
+  <button onclick="clearSelection()" style="background:none;border:none;color:var(--white3);cursor:pointer;font-size:18px;padding:0 4px;transition:color 0.15s" onmouseover="this.style.color='var(--bear)'" onmouseout="this.style.color='var(--white3)'">✕</button>
+</div>
+
+<!-- Lightbox -->
+<div class="lb" id="lb" onclick="document.getElementById('lb').classList.remove('open')">
+  <img id="lbImg" src="" alt="">
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="hub-sidebar.js"></script>
+<script>
+const BUCKET = 'media';
+let _user, _sb, allFiles = [], selected = new Set(), currentFilter = 'all', searchTerm = '';
+const SB_URL = 'https://vaimxhgqcdhjhdiaampa.supabase.co';
+
+async function main() {
+  const res = await initEtSidebar('admin');
+  if (!res) return;
+  _user = res.user; _sb = res.sb;
+  if (!_user.user_metadata?.is_admin) {
+    document.querySelector('.hub-main').innerHTML = '<div style="text-align:center;padding:60px;color:var(--white3)">Access denied.</div>';
+    return;
+  }
+  await loadMedia();
+}
+
+async function loadMedia() {
+  const { data, error } = await _sb.storage.from(BUCKET).list('', {
+    limit: 500, offset: 0, sortBy: { column: 'created_at', order: 'desc' }
+  });
+  if (error) { showError(error.message); return; }
+  allFiles = (data || []).filter(f => f.name !== '.emptyFolderPlaceholder');
+  document.getElementById('mediaCount').textContent = allFiles.length + ' file' + (allFiles.length !== 1 ? 's' : '');
+  renderGrid();
+}
+
+function getPublicUrl(name) {
+  const { data } = _sb.storage.from(BUCKET).getPublicUrl(name);
+  return data.publicUrl;
+}
+
+function isImage(name) {
+  return /\.(png|jpg|jpeg|gif|webp|svg|bmp)$/i.test(name);
+}
+
+function fmtSize(bytes) {
+  if (!bytes) return '—';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+}
+
+function renderGrid() {
+  const grid = document.getElementById('mediaGrid');
+  let files = allFiles;
+  if (searchTerm) files = files.filter(f => f.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  if (currentFilter === 'image') files = files.filter(f => isImage(f.name));
+
+  if (!files.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--white3)">
+      <div style="font-size:40px;opacity:0.15;margin-bottom:12px">🖼</div>
+      <div style="font-size:14px">No media found. Upload some images!</div>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = files.map(f => {
+    const url = getPublicUrl(f.name);
+    const img = isImage(f.name);
+    const sel = selected.has(f.name);
+    return `<div class="media-item ${sel ? 'selected' : ''}" id="mi-${CSS.escape(f.name)}" onclick="toggleSelect('${f.name.replace(/'/g,"\\'")}')">
+      ${img
+        ? `<img class="media-thumb" src="${url}" alt="${f.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" ondblclick="event.stopPropagation();openLB('${url}')">`
+        : ''}
+      <div class="media-thumb-icon" style="${img ? 'display:none' : ''}">📄</div>
+      <div class="media-check">✓</div>
+      <div class="media-info">
+        <div class="media-name" title="${f.name}">${f.name}</div>
+        <div class="media-size">${fmtSize(f.metadata?.size)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleSelect(name) {
+  if (selected.has(name)) selected.delete(name);
+  else { selected.clear(); selected.add(name); } // single select
+  updateSelBar();
+  renderGrid();
+}
+
+function updateSelBar() {
+  const bar = document.getElementById('selBar');
+  const count = selected.size;
+  const delBtn = document.getElementById('deleteSelBtn');
+  if (count === 0) { bar.classList.remove('visible'); delBtn.style.display = 'none'; return; }
+  bar.classList.add('visible');
+  delBtn.style.display = count > 0 ? '' : 'none';
+  document.getElementById('selCount').textContent = count + ' selected';
+  if (count === 1) {
+    const name = [...selected][0];
+    document.getElementById('selUrl').value = getPublicUrl(name);
+  } else {
+    document.getElementById('selUrl').value = count + ' files selected';
+  }
+}
+
+function clearSelection() { selected.clear(); updateSelBar(); renderGrid(); }
+
+function copyUrl() {
+  const url = document.getElementById('selUrl').value;
+  if (!url || url.includes('selected')) return;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied!';
+    btn.style.color = 'var(--bull)';
+    setTimeout(() => { btn.textContent = '📋 Copy URL'; btn.style.color = ''; }, 2000);
+  });
+}
+
+async function deleteSelected() {
+  if (!selected.size) return;
+  const names = [...selected];
+  if (!confirm(`Delete ${names.length} file(s)?`)) return;
+  for (const name of names) {
+    await _sb.storage.from(BUCKET).remove([name]);
+  }
+  selected.clear();
+  updateSelBar();
+  await loadMedia();
+}
+
+// Upload
+async function uploadFiles(files) {
+  if (!files?.length) return;
+  const queue = document.getElementById('uploadQueue');
+  queue.style.display = 'block';
+  queue.innerHTML = '';
+
+  for (const file of files) {
+    if (file.size > 10 * 1024 * 1024) { alert(`${file.name} is too large (max 10MB)`); continue; }
+    // Create unique filename
+    const ext = file.name.split('.').pop();
+    const base = file.name.replace(/\.[^.]+$/, '').replace(/[^a-z0-9-_]/gi, '-').toLowerCase();
+    const fname = `${base}-${Date.now()}.${ext}`;
+
+    const row = document.createElement('div');
+    row.className = 'upload-item';
+    row.innerHTML = `
+      <span style="font-size:16px">${file.type.startsWith('image/') ? '🖼' : '📄'}</span>
+      <span class="upload-item-name">${file.name}</span>
+      <div class="upload-progress"><div class="upload-progress-fill" id="prog-${fname}" style="width:0%"></div></div>
+      <span class="upload-status" id="stat-${fname}">0%</span>`;
+    queue.prepend(row);
+
+    // Upload
+    const { error } = await _sb.storage.from(BUCKET).upload(fname, file, {
+      cacheControl: '3600', upsert: false
+    });
+
+    const prog = document.getElementById('prog-' + fname);
+    const stat = document.getElementById('stat-' + fname);
+    if (error) {
+      if (prog) prog.style.background = 'var(--bear)';
+      if (stat) stat.textContent = '✗';
+      stat.style.color = 'var(--bear)';
+    } else {
+      if (prog) prog.style.width = '100%';
+      if (stat) { stat.textContent = '✓'; stat.style.color = 'var(--bull)'; }
+    }
+  }
+  await loadMedia();
+  setTimeout(() => { queue.style.display = 'none'; queue.innerHTML = ''; }, 3000);
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('drag');
+  uploadFiles(e.dataTransfer.files);
+}
+
+function filterMedia(q) { searchTerm = q; renderGrid(); }
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
+}
+
+function openLB(url) { document.getElementById('lbImg').src = url; document.getElementById('lb').classList.add('open'); }
+
+function showError(msg) {
+  document.getElementById('mediaGrid').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--bear);font-size:13px">Error: ${msg}</div>`;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('lb').classList.remove('open');
+});
+
+main();
+</script>
+</body>
+</html>

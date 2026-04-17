@@ -8,6 +8,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="hub.css">
 <style>
+/* ─ Global readability fixes ─ */
+.et-form-label{color:var(--white2)!important;font-size:10px!important}
+.et-form-input{font-size:13px!important;color:var(--white)!important;background:var(--bg3)!important;border-color:var(--border)!important}
+.et-form-input:focus{border-color:var(--gold-border)!important}
 .al-item{padding:10px 14px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background 0.15s}
 .al-item:hover{background:var(--gold-dim)}
 .al-item.active{background:var(--gold-dim);border-left:2px solid var(--gold)}
@@ -17,52 +21,53 @@
 .spill.live{background:var(--bull-bg);color:var(--bull);border:1px solid rgba(76,175,125,0.2)}
 .spill.draft{background:rgba(255,255,255,0.04);color:var(--white3);border:1px solid var(--border2)}
 /* Palette */
-.wpal{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:5px;margin-bottom:10px}
-.wpal-btn{padding:9px 5px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;cursor:grab;transition:all 0.15s;text-align:center;user-select:none;display:flex;flex-direction:column;align-items:center;gap:3px}
-.wpal-btn:hover{border-color:var(--gold-border);background:var(--gold-dim)}
+.wpal{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;margin-bottom:12px}
+.wpal-btn{padding:12px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;cursor:grab;transition:all 0.15s;text-align:center;user-select:none;display:flex;flex-direction:column;align-items:center;gap:5px}
+.wpal-btn:hover{border-color:var(--gold-border);background:var(--gold-dim);transform:translateY(-1px)}
 .wpal-btn:active{cursor:grabbing;opacity:0.7}
-.wpal-icon{font-size:16px}
-.wpal-lbl{font-family:'DM Mono',monospace;font-size:8px;color:var(--white2);letter-spacing:0.03em}
+.wpal-icon{font-size:20px}
+.wpal-lbl{font-family:'DM Mono',monospace;font-size:10px;color:var(--white2);letter-spacing:0.03em;font-weight:500}
 /* Canvas */
-.canvas{background:var(--bg);border:1px solid var(--border2);border-radius:3px;min-height:260px;padding:10px}
-.c-section{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:4px;margin-bottom:9px;transition:border-color 0.15s}
-.c-section:hover{border-color:rgba(200,169,110,0.25)}
-.c-section.selected{border-color:var(--gold)!important;box-shadow:0 0 0 2px rgba(200,169,110,0.1)}
-.c-sbar{padding:5px 9px;background:rgba(0,0,0,0.25);display:flex;align-items:center;gap:5px;border-bottom:1px solid rgba(255,255,255,0.04);border-radius:4px 4px 0 0;cursor:pointer}
-.c-sbar:hover{background:rgba(200,169,110,0.06)}
-.c-slbl{font-family:'DM Mono',monospace;font-size:8px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;flex:1}
-.cbtn{width:19px;height:19px;background:none;border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.3);cursor:pointer;border-radius:2px;font-size:9px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0}
-.cbtn:hover{border-color:var(--gold-border);color:var(--gold)}
-.cbtn.del:hover{border-color:var(--bear);color:var(--bear)}
+.canvas{background:var(--bg);border:1px solid var(--border);border-radius:4px;min-height:280px;padding:12px}
+.c-section{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:4px;margin-bottom:10px;transition:border-color 0.15s}
+.c-section:hover{border-color:rgba(200,169,110,0.35)}
+.c-section.selected{border-color:var(--gold)!important;box-shadow:0 0 0 2px rgba(200,169,110,0.12)}
+.c-sbar{padding:6px 10px;background:rgba(255,255,255,0.04);display:flex;align-items:center;gap:6px;border-bottom:1px solid rgba(255,255,255,0.07);border-radius:4px 4px 0 0;cursor:pointer}
+.c-sbar:hover{background:rgba(200,169,110,0.08)}
+.c-slbl{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,0.5);letter-spacing:0.1em;text-transform:uppercase;flex:1}
+.cbtn{width:22px;height:22px;background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);cursor:pointer;border-radius:3px;font-size:10px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0}
+.cbtn:hover{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
+.cbtn.del:hover{border-color:var(--bear);color:var(--bear);background:var(--bear-bg)}
 .c-cols{display:grid;gap:7px;padding:7px}
-.c-col{min-height:44px;border:1px dashed rgba(255,255,255,0.07);border-radius:3px;padding:3px;transition:all 0.15s}
-.c-col.drag-over{border-color:var(--gold);background:rgba(200,169,110,0.05)}
-.c-col-e{font-family:'DM Mono',monospace;font-size:8px;color:rgba(255,255,255,0.15);text-align:center;padding:8px;letter-spacing:0.1em;text-transform:uppercase;pointer-events:none}
-.c-widget{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:6px;margin-bottom:4px;cursor:pointer;transition:all 0.15s;user-select:none}
+.c-col{min-height:52px;border:1px dashed rgba(255,255,255,0.12);border-radius:4px;padding:5px;transition:all 0.15s}
+.c-col.drag-over{border-color:var(--gold);background:rgba(200,169,110,0.07);border-style:solid}
+.c-col-e{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,0.25);text-align:center;padding:12px;letter-spacing:0.1em;text-transform:uppercase;pointer-events:none}
+.c-widget{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:8px;margin-bottom:6px;cursor:pointer;transition:all 0.15s;user-select:none}
 .c-widget:last-child{margin-bottom:0}
-.c-widget:hover{border-color:rgba(200,169,110,0.3)}
-.c-widget.selected{border-color:var(--gold);background:rgba(200,169,110,0.05)}
-.c-wbar{display:flex;align-items:center;gap:4px;margin-bottom:2px}
-.c-wtype{font-family:'DM Mono',monospace;font-size:8px;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase}
-.c-wprev{font-size:11px;color:rgba(255,255,255,0.5);line-height:1.4;overflow:hidden;max-height:44px}
+.c-widget:hover{border-color:rgba(200,169,110,0.4);background:rgba(200,169,110,0.04)}
+.c-widget.selected{border-color:var(--gold);background:rgba(200,169,110,0.07);box-shadow:0 0 0 1px rgba(200,169,110,0.2)}
+.c-wbar{display:flex;align-items:center;gap:5px;margin-bottom:4px}
+.c-wtype{font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;font-weight:600}
+.c-wprev{font-size:12px;color:rgba(255,255,255,0.7);line-height:1.5;overflow:hidden;max-height:52px}
 .add-row-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;border:1px dashed rgba(200,169,110,0.15);border-radius:3px;background:transparent;color:rgba(200,169,110,0.4);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;transition:all 0.15s;margin-top:5px}
 .add-row-btn:hover{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
 /* Props */
-.props-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;position:sticky;top:74px;max-height:calc(100vh - 100px);overflow-y:auto}
-.props-hdr{padding:9px 13px;border-bottom:1px solid var(--border2);background:var(--bg3);font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.12em;text-transform:uppercase}
-.pg{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;overflow:hidden;margin-bottom:5px}
-.pg-h{padding:7px 10px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--white3);cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all 0.15s}
+.props-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:4px;position:sticky;top:74px;max-height:calc(100vh - 100px);overflow-y:auto}
+.props-hdr{padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg3);font-family:'DM Mono',monospace;font-size:10px;color:var(--white2);letter-spacing:0.12em;text-transform:uppercase;font-weight:500}
+.pg{background:var(--bg3);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-bottom:6px}
+.pg-h{padding:9px 12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--white2);cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all 0.15s;font-weight:500}
 .pg-h:hover{background:var(--gold-dim);color:var(--gold)}
-.pg-b{padding:9px;display:flex;flex-direction:column;gap:7px}
+.pg-b{padding:10px;display:flex;flex-direction:column;gap:8px}
 .pg-b.collapsed{display:none}
-.pl{font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px}
-.pi{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--white);font-family:'Syne',sans-serif;font-size:12px;padding:6px 8px;border-radius:3px;outline:none;transition:border-color 0.2s}
+.pl{font-family:'DM Mono',monospace;font-size:10px;color:var(--white2);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;font-weight:500}
+.pi{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--white);font-family:'Syne',sans-serif;font-size:13px;padding:8px 10px;border-radius:3px;outline:none;transition:border-color 0.2s}
 .pi:focus{border-color:var(--gold-border)}
-.pta{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--white);font-family:'Syne',sans-serif;font-size:12px;padding:6px 8px;border-radius:3px;outline:none;resize:vertical;min-height:65px;line-height:1.6}
+.pta{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--white);font-family:'Syne',sans-serif;font-size:13px;padding:8px 10px;border-radius:3px;outline:none;resize:vertical;min-height:80px;line-height:1.7}
 .pta:focus{border-color:var(--gold-border)}
-.pta.code{font-family:'DM Mono',monospace;font-size:11px}
-.psel{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--white);font-family:'Syne',sans-serif;font-size:12px;padding:6px 8px;border-radius:3px;outline:none}
-.pr2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pta.code{font-family:'DM Mono',monospace;font-size:12px}
+.psel{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--white);font-family:'Syne',sans-serif;font-size:13px;padding:8px 10px;border-radius:3px;outline:none}
+.psel option{background:var(--bg3)}
+.pr2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 /* Layout picker */
 .lp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .lp-opt{padding:10px 6px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;cursor:pointer;text-align:center;transition:all 0.15s}
@@ -90,8 +95,8 @@
 .kn-add{width:100%;padding:6px;background:transparent;border:1px dashed rgba(200,169,110,0.2);color:rgba(200,169,110,0.5);font-family:'Syne',sans-serif;font-size:12px;cursor:pointer;border-radius:3px;transition:all 0.15s;margin-top:2px}
 .kn-add:hover{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
 /* Tabs */
-.btab{padding:9px 16px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--white3);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;background:none;border-top:none;border-left:none;border-right:none}
-.btab:hover{color:var(--white2)}
+.btab{padding:10px 18px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--white2);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;background:none;border-top:none;border-left:none;border-right:none;font-weight:500}
+.btab:hover{color:var(--white)}
 .btab.active{color:var(--gold);border-bottom-color:var(--gold)}
 </style>
 </head>
@@ -181,7 +186,7 @@ function renderLayout(){
       <!-- Editor -->
       <div>
         <!-- Meta -->
-        <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:14px;margin-bottom:10px;display:flex;flex-direction:column;gap:9px">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:16px;margin-bottom:12px;display:flex;flex-direction:column;gap:11px">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
             <div><label class="et-form-label">Title *</label><input type="text" class="et-form-input" id="eTitle" placeholder="EUR/USD Weekly Analysis..." oninput="autoSlug();autoExcerpt()"></div>
             <div><label class="et-form-label">Slug *</label><input type="text" class="et-form-input" id="eSlug" placeholder="eurusd-weekly-2026"></div>
@@ -211,7 +216,7 @@ function renderLayout(){
         </div>
 
         <!-- Builder -->
-        <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;overflow:hidden">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;overflow:hidden">
           <div style="display:flex;border-bottom:1px solid var(--border2);background:var(--bg3)">
             <button class="btab active" id="tab-build" onclick="switchTab('build')">⚙ Builder</button>
             <button class="btab" id="tab-prev" onclick="switchTab('prev')">👁 Preview</button>
@@ -353,6 +358,23 @@ function renderCanvas(){
   canvas.appendChild(btn);
 }
 
+function mkWHTML(w,cId,rId){
+  return `<div class="c-widget${selW===w.id?' selected':''}" id="w-${w.id}"
+    draggable="true"
+    ondragstart="wds(event,'${w.id}','${cId}','${rId}')"
+    onclick="event.stopPropagation();selWidget('${w.id}','${cId}','${rId}')">
+    <div class="c-wbar">
+      <span style="cursor:grab;color:rgba(255,255,255,0.35);font-size:11px;margin-right:2px">⠿</span>
+      <span class="c-wtype">${w.type}</span>
+      <div style="display:flex;gap:2px;margin-left:auto">
+        <button class="cbtn" onclick="event.stopPropagation();cpW('${w.id}','${cId}','${rId}')" style="width:18px;height:18px;font-size:8px" title="Duplicate">⧉</button>
+        <button class="cbtn del" onclick="event.stopPropagation();rmW('${w.id}','${cId}','${rId}')" style="width:18px;height:18px;font-size:8px" title="Delete">✕</button>
+      </div>
+    </div>
+    <div class="c-wprev">${getPrev(w)}</div>
+  </div>`;
+}
+
 function mkSec(row,ri){
   const el=document.createElement('div');
   el.className='c-section';el.id='row-'+row.id;el.dataset.ri=ri;
@@ -362,29 +384,20 @@ function mkSec(row,ri){
     <div class="c-sbar">
       <span class="c-slbl">Row · ${row.cols.length} col${row.cols.length>1?'s':''}</span>
       <div style="display:flex;gap:3px">
-        ${ri>0?`<button class="cbtn" onclick="event.stopPropagation();mvRow('${row.id}',-1)">↑</button>`:''}
-        ${ri<rows.length-1?`<button class="cbtn" onclick="event.stopPropagation();mvRow('${row.id}',1)">↓</button>`:''}
-        <button class="cbtn" onclick="event.stopPropagation();cpRow('${row.id}')">⧉</button>
-        <button class="cbtn del" onclick="event.stopPropagation();rmRow('${row.id}')">✕</button>
+        ${ri>0?`<button class="cbtn" onclick="event.stopPropagation();mvRow('${row.id}',-1)" title="Move up">↑</button>`:''}
+        ${ri<rows.length-1?`<button class="cbtn" onclick="event.stopPropagation();mvRow('${row.id}',1)" title="Move down">↓</button>`:''}
+        <button class="cbtn" onclick="event.stopPropagation();cpRow('${row.id}')" title="Duplicate">⧉</button>
+        <button class="cbtn del" onclick="event.stopPropagation();rmRow('${row.id}')" title="Delete">✕</button>
       </div>
     </div>
     <div class="c-cols" style="grid-template-columns:${fr}">
       ${row.cols.map((col,ci)=>`
         <div class="c-col" id="col-${col.id}" data-ri="${ri}" data-ci="${ci}"
           ondragover="cdo(event,'${col.id}')" ondragleave="cdl(event,'${col.id}')" ondrop="cdrop(event,'${col.id}','${row.id}')">
-          ${col.widgets?.length?col.widgets.map(w=>mkW(w,col.id,row.id)).join(''):`<div class="c-col-e">Drop here</div>`}
+          ${col.widgets?.length ? col.widgets.map(w=>mkWHTML(w,col.id,row.id)).join('') : '<div class="c-col-e">Drop here</div>'}
         </div>`).join('')}
     </div>`;
   return el;
-}
-
-function mkW(w,cId,rId){
-  const d=document.createElement('div');
-  d.className=`c-widget${selW===w.id?' selected':''}`;d.id='w-'+w.id;d.draggable=true;
-  d.ondragstart=e=>wds(e,w.id,cId,rId);
-  d.onclick=e=>{e.stopPropagation();selWidget(w.id,cId,rId);};
-  d.innerHTML=`<div class="c-wbar"><span style="cursor:grab;color:rgba(255,255,255,0.2);font-size:10px">⠿</span><span class="c-wtype">${w.type}</span><div style="display:flex;gap:2px;margin-left:auto"><button class="cbtn" onclick="event.stopPropagation();cpW('${w.id}','${cId}','${rId}')" style="width:16px;height:16px;font-size:8px">⧉</button><button class="cbtn del" onclick="event.stopPropagation();rmW('${w.id}','${cId}','${rId}')" style="width:16px;height:16px;font-size:8px">✕</button></div></div><div class="c-wprev">${getPrev(w)}</div>`;
-  return d;
 }
 
 function getPrev(w){
@@ -416,7 +429,14 @@ function rmRow(id){if(!confirm('Delete row?'))return;rows=rows.filter(r=>r.id!==
 function addW(type,cId,rId){const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);if(!col)return;col.widgets.push({id:uid(),type,props:{...WD[type]}});renderCanvas();autoExcerpt();}
 function rmW(wId,cId,rId){const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);if(!col)return;col.widgets=col.widgets.filter(w=>w.id!==wId);if(selW===wId){selW=null;rProps(null,null,null);}renderCanvas();}
 function cpW(wId,cId,rId){const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);if(!col)return;const wi=col.widgets.findIndex(w=>w.id===wId);if(wi<0)return;const c={...JSON.parse(JSON.stringify(col.widgets[wi])),id:uid()};col.widgets.splice(wi+1,0,c);renderCanvas();}
-function upd(wId,cId,rId,k,v){const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);const w=col?.widgets.find(x=>x.id===wId);if(!w)return;w.props={...w.props,[k]:v};const el=document.getElementById('w-'+wId);if(el){const pv=el.querySelector('.c-wprev');if(pv)pv.innerHTML=getPrev(w);}autoExcerpt();}
+function upd(wId,cId,rId,k,v){
+  const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);const w=col?.widgets.find(x=>x.id===wId);
+  if(!w)return;
+  w.props={...w.props,[k]:v};
+  const el=document.getElementById('w-'+wId);
+  if(el){const pv=el.querySelector('.c-wprev');if(pv)pv.innerHTML=getPrev(w);}
+  autoExcerpt();
+}
 
 // Selection
 function selWidget(wId,cId,rId){selW=wId;selS=null;document.querySelectorAll('.c-widget,.c-section').forEach(e=>e.classList.remove('selected'));document.getElementById('w-'+wId)?.classList.add('selected');const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);const w=col?.widgets.find(x=>x.id===wId);if(w)rProps(w,cId,rId);}
@@ -438,7 +458,13 @@ function rProps(w,cId,rId){
   switch(w.type){
     case'heading': html=H('Content',TA('text','Text',p.text,2)+R2(I('size','Size px',p.size||'28','number'),SE('level','Tag',[['h1','H1'],['h2','H2'],['h3','H3'],['h4','H4']],p.level||'h2'))+SE('align','Align',[['left','Left'],['center','Center'],['right','Right']],p.align||'left'));break;
     case'text': html=H('Content',TA('content','Content (Markdown)',p.content,6));break;
-    case'image': html=H('Image',I('src','Image URL',p.src,'url')+I('alt','Alt',p.alt)+I('caption','Caption',p.caption)+I('width','Width',p.width||'100%'));break;
+    case'image': html=H('Image',
+    `<div><div class="pl">Image</div>
+     <div style="display:flex;gap:6px;align-items:stretch">
+       <input type="url" class="pi" style="flex:1" value="${(p.src||'').replace(/"/g,'&quot;')}" placeholder="https://... or browse" oninput="upd('${w.id}','${cId}','${rId}','src',this.value)" id="imgSrc-${w.id}">
+       <button onclick="openMediaPicker(url=>{upd('${w.id}','${cId}','${rId}','src',url);document.getElementById('imgSrc-${w.id}').value=url;})" style="padding:0 10px;background:var(--bg3);border:1px solid var(--border);color:var(--white2);border-radius:3px;cursor:pointer;font-size:11px;white-space:nowrap;transition:all 0.15s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--white2)'">🖼 Browse</button>
+     </div></div>`+
+    I('alt','Alt Text',p.alt)+I('caption','Caption',p.caption)+I('width','Width',p.width||'100%'));break;
     case'button': html=H('Button',I('text','Label',p.text)+I('url','URL',p.url,'url')+R2(SE('style','Style',[['gold','Gold'],['outline','Outline'],['ghost','Ghost']],p.style||'gold'),SE('align','Align',[['left','Left'],['center','Center'],['right','Right']],p.align||'left')));break;
     case'quote': html=H('Quote',TA('text','Text',p.text,3)+I('author','Author',p.author));break;
     case'callout': html=H('Callout',TA('text','Content',p.text,3)+SE('type','Type',[['note','📝 Note'],['bull','🟢 Bullish'],['bear','🔴 Bearish'],['info','ℹ️ Info']],p.type||'note'));break;
@@ -569,8 +595,111 @@ async function delArt(id){
 
 function setSS(m){const el=document.getElementById('saveStatus');if(el)el.textContent=m;}
 function uid(){return Math.random().toString(36).slice(2,10);}
+
+// ── Media Picker ─────────────────────────────────────
+const BUCKET='media';
+let mpFiles=[],mpSelected=null,mpCallback=null,mpSearch='';
+
+function openMediaPicker(callback){
+  mpCallback=callback;mpSelected=null;mpSearch='';
+  document.getElementById('mpSearch').value='';
+  document.getElementById('mpSelectBtn').disabled=true;
+  etOpenModal('mediaPickerModal');
+  mpLoad();
+}
+
+async function mpLoad(){
+  const{data}=await _sb.storage.from(BUCKET).list('',{limit:500,sortBy:{column:'created_at',order:'desc'}});
+  mpFiles=(data||[]).filter(f=>f.name!=='.emptyFolderPlaceholder'&&/\.(png|jpg|jpeg|gif|webp|svg)$/i.test(f.name));
+  mpRender();
+}
+
+function mpGetUrl(name){
+  const{data}=_sb.storage.from(BUCKET).getPublicUrl(name);
+  return data.publicUrl;
+}
+
+function mpRender(){
+  const grid=document.getElementById('mpGrid');
+  let files=mpFiles;
+  if(mpSearch)files=files.filter(f=>f.name.toLowerCase().includes(mpSearch.toLowerCase()));
+  if(!files.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--white3);font-size:12px">No images found. Upload some!</div>';return;}
+  grid.innerHTML=files.map(f=>{
+    const url=mpGetUrl(f.name);
+    const sel=mpSelected===f.name;
+    return`<div onclick="mpSelect('${f.name.replace(/'/g,"\'")}','${url.replace(/'/g,"\'")}');event.stopPropagation()"
+      style="border:2px solid ${sel?'var(--gold)':'rgba(255,255,255,0.08)'};border-radius:4px;overflow:hidden;cursor:pointer;transition:all 0.15s;background:var(--bg3);position:relative"
+      onmouseover="if('${f.name}'!==mpSelected)this.style.borderColor='rgba(200,169,110,0.4)'"
+      onmouseout="if('${f.name}'!==mpSelected)this.style.borderColor='rgba(255,255,255,0.08)'">
+      <img src="${url}" style="width:100%;height:90px;object-fit:cover;display:block" loading="lazy" onerror="this.style.display='none'">
+      ${sel?'<div style="position:absolute;top:4px;right:4px;background:var(--gold);color:#08090c;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">✓</div>':''}
+      <div style="padding:5px 6px;font-family:'DM Mono',monospace;font-size:8px;color:var(--white2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</div>
+    </div>`;
+  }).join('');
+}
+
+function mpSelect(name,url){
+  mpSelected=name;
+  document.getElementById('mpSelectBtn').disabled=false;
+  mpRender();
+}
+
+function mpFilter(q){mpSearch=q;mpRender();}
+
+function mpConfirm(){
+  if(!mpSelected||!mpCallback)return;
+  const url=mpGetUrl(mpSelected);
+  mpCallback(url);
+  etCloseModal('mediaPickerModal');
+}
+
+async function mpUpload(files){
+  if(!files?.length)return;
+  const status=document.getElementById('mpUploadStatus');
+  status.style.display='block';
+  for(const file of files){
+    const ext=file.name.split('.').pop();
+    const base=file.name.replace(/\.[^.]+$/,'').replace(/[^a-z0-9-_]/gi,'-').toLowerCase();
+    const fname=`${base}-${Date.now()}.${ext}`;
+    status.textContent=`Uploading ${file.name}...`;
+    const{error}=await _sb.storage.from(BUCKET).upload(fname,file,{cacheControl:'3600',upsert:false});
+    if(error)status.textContent=`Error: ${error.message}`;
+  }
+  status.textContent='Done!';
+  await mpLoad();
+  setTimeout(()=>{status.style.display='none';},2000);
+}
 document.addEventListener('click',e=>{if(e.target.classList.contains('et-modal-overlay'))etCloseModal(e.target.id);});
 </script>
+<!-- Media Picker Modal -->
+<div class="et-modal-overlay" id="mediaPickerModal">
+  <div class="et-modal" style="max-width:860px;max-height:90vh;display:flex;flex-direction:column;padding:0">
+    <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--bg3)">
+      <span style="font-size:14px;font-weight:600;color:var(--white)">🖼 Media Library</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="mpSearch" placeholder="Search..." style="background:var(--bg);border:1px solid var(--border);color:var(--white);font-family:'Syne',sans-serif;font-size:12px;padding:6px 10px;border-radius:3px;outline:none;width:180px" oninput="mpFilter(this.value)">
+        <button class="et-btn-gold" id="mpSelectBtn" onclick="mpConfirm()" style="padding:6px 14px;font-size:11px" disabled>✓ Use Image</button>
+        <button onclick="etCloseModal('mediaPickerModal')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:13px;transition:all 0.15s">✕</button>
+      </div>
+    </div>
+    <!-- Upload zone in modal -->
+    <div style="padding:10px 14px;border-bottom:1px solid var(--border);background:rgba(200,169,110,0.03);flex-shrink:0">
+      <div style="border:1px dashed rgba(200,169,110,0.2);border-radius:4px;padding:10px;text-align:center;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px" onclick="document.getElementById('mpFileInput').click()" onmouseover="this.style.borderColor='var(--gold-border)';this.style.background='var(--gold-dim)'" onmouseout="this.style.borderColor='rgba(200,169,110,0.2)';this.style.background='transparent'">
+        <span style="font-size:16px">⬆</span>
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white2);letter-spacing:0.06em">Upload new image</span>
+      </div>
+      <input type="file" id="mpFileInput" multiple accept="image/*" style="display:none" onchange="mpUpload(this.files)">
+      <div id="mpUploadStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3);text-align:center;margin-top:5px;display:none"></div>
+    </div>
+    <!-- Grid -->
+    <div style="overflow-y:auto;flex:1;padding:12px">
+      <div id="mpGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px">
+        <div style="grid-column:1/-1;text-align:center;padding:40px"><div class="et-spinner"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="hub-sidebar.js" onload="main()"></script>
 </body>
