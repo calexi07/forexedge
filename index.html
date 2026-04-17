@@ -131,8 +131,36 @@ nav {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   text-align: center;
-  padding: 120px 24px 80px;
+  padding: 60px 24px 60px;
   position: relative; overflow: hidden;
+}
+/* Video bg */
+.hero-video-wrap {
+  position: absolute; inset: 0; z-index: 0;
+  overflow: hidden;
+}
+.hero-video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0.22;
+  filter: grayscale(30%);
+}
+.hero-video-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(8,9,12,0.5) 0%, rgba(8,9,12,0.3) 50%, rgba(8,9,12,0.85) 100%);
+}
+/* Scroll button */
+.hero-scroll-btn {
+  position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+  background: none; border: none; cursor: pointer; z-index: 3;
+  color: rgba(200,169,110,0.6);
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+.hero-scroll-btn:hover { color: var(--gold); }
+.scroll-arrow { width: 28px; height: 28px; display: block; }
+@keyframes scrollBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(8px); }
 }
 
 /* Background grid */
@@ -478,6 +506,9 @@ section { padding: 100px 48px; }
   background: var(--border2);
   border: 1px solid var(--border2);
 }
+.rm-card-featured {
+  background: linear-gradient(135deg, rgba(200,169,110,0.06), rgba(200,169,110,0.02));
+}
 .rm-card {
   background: var(--bg);
   padding: 36px 32px;
@@ -648,41 +679,178 @@ footer {
 <div id="navMount"></div>
 
 <!-- ═══ HERO ═══ -->
-<section class="hero">
+<section class="hero" id="hero">
+  <!-- Video background -->
+  <div class="hero-video-wrap">
+    <video class="hero-video" autoplay muted loop playsinline poster="">
+      <source src="https://www.pexels.com/download/video/3571264/" type="video/mp4">
+    </video>
+    <div class="hero-video-overlay"></div>
+  </div>
   <div class="hero-grid"></div>
   <div class="hero-orb1"></div>
-  <div class="hero-orb2"></div>
 
   <div class="hero-content">
-    <div class="hero-icon">🦅</div>
-    <div class="hero-badge">
-      <div class="badge-dot"></div>
-      <span id="heroBadgeText">Platform launching soon</span>
-    </div>
-
     <h1 class="hero-h1">
       <span id="heroL1">See what</span><br>
-      <em id="heroL2">others miss.</em>
+      <em id="heroL2">others miss.</em><br>
       <span class="outline" id="heroL3">Trade smarter.</span>
     </h1>
-
     <p class="hero-sub">
       <span id="heroSubtitle">EaglePips gives you the analytical edge — AI-powered fundamental analysis, a professional trading journal, and structured education in one platform.</span>
     </p>
-
-    <div class="hero-form" id="heroForm">
-      <input type="email" class="hero-input" id="heroEmail" placeholder="Enter your email address" autocomplete="email">
-      <button class="hero-submit" onclick="submitEmail('hero')">Notify Me</button>
-    </div>
-    <div class="hero-success" id="heroSuccess">
-      ✓ &nbsp;You're on the list — we'll notify you at launch.
-    </div>
-    <p class="hero-note" id="heroNote">Be first to know when we launch. No spam, ever.</p>
   </div>
 
-  <div class="scroll-hint">
-    <div class="scroll-line"></div>
-    Scroll
+  <!-- Animated scroll arrow -->
+  <button class="hero-scroll-btn" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})" aria-label="Scroll down">
+    <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M12 5v14M5 12l7 7 7-7"/>
+    </svg>
+  </button>
+</section>
+
+<!-- ═══ FEATURES GRID (Section 2) ═══ -->
+<section id="features" style="padding:100px 48px">
+  <div class="roadmap-section">
+    <div class="roadmap-header fade-in">
+      <span class="section-eyebrow">// The Platform</span>
+      <h2 class="section-title">Everything you need<br><em>to trade smarter.</em></h2>
+      <p class="section-sub" style="margin-top:8px">One platform. Multiple tools. Built for serious traders.</p>
+    </div>
+
+    <!-- Top row: 2 big cards -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+      <!-- Trading Journal — big card, links to journal section -->
+      <a href="#journal" onclick="event.preventDefault();document.getElementById('journal').scrollIntoView({behavior:'smooth'})" style="text-decoration:none">
+        <div class="rm-card rm-card-featured fade-in" style="height:100%;cursor:pointer;transition:all 0.2s;border-color:rgba(200,169,110,0.25)" onmouseover="this.style.borderColor='rgba(200,169,110,0.5)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='rgba(200,169,110,0.25)';this.style.transform=''">
+          <span class="rm-status live">● Live Now</span>
+          <span class="rm-icon" style="font-size:36px">📒</span>
+          <div class="rm-title" style="font-size:20px">Trading Journal</div>
+          <div class="rm-desc" style="font-size:14px;line-height:1.7">Multi-account journal with PnL calendar, equity curve, deep performance statistics, strategy tracking and payout management. Built for prop traders.</div>
+          <div class="rm-tags">
+            <span class="rm-tag">Multi-Account</span>
+            <span class="rm-tag">Prop Firms</span>
+            <span class="rm-tag">Statistics</span>
+            <span class="rm-tag">Payouts</span>
+          </div>
+          <div style="margin-top:16px;font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:0.06em">Explore Journal →</div>
+        </div>
+      </a>
+
+      <!-- Market Updates — big card -->
+      <a href="market-updates.html" style="text-decoration:none">
+        <div class="rm-card fade-in fade-in-delay-1" style="height:100%;cursor:pointer;transition:all 0.2s;border-color:rgba(74,158,255,0.2)" onmouseover="this.style.borderColor='rgba(74,158,255,0.4)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='rgba(74,158,255,0.2)';this.style.transform=''">
+          <span class="rm-status live" style="background:rgba(74,158,255,0.1);border-color:rgba(74,158,255,0.3);color:#6ba3ff">● Live Now</span>
+          <span class="rm-icon" style="font-size:36px">📰</span>
+          <div class="rm-title" style="font-size:20px">Market Updates</div>
+          <div class="rm-desc" style="font-size:14px;line-height:1.7">Technical and fundamental analysis written by experienced traders. Weekly deep-dives on major pairs, macro events, and market structure shifts.</div>
+          <div class="rm-tags">
+            <span class="rm-tag">Weekly Analysis</span>
+            <span class="rm-tag">Macro</span>
+            <span class="rm-tag">Fundamentals</span>
+            <span class="rm-tag">Free</span>
+          </div>
+          <div style="margin-top:16px;font-family:'DM Mono',monospace;font-size:11px;color:#6ba3ff;letter-spacing:0.06em">Read Articles →</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Bottom row: smaller coming soon cards -->
+    <div class="roadmap-grid">
+      <div class="rm-card fade-in" style="opacity:0.7">
+        <span class="rm-status soon">◦ Coming Soon</span>
+        <span class="rm-icon">🤖</span>
+        <div class="rm-title">AI News Sentiment</div>
+        <div class="rm-desc">Every forex news story analyzed by AI — Bullish, Bearish, or Neutral verdict with full reasoning.</div>
+        <div class="rm-tags"><span class="rm-tag">Real-Time</span><span class="rm-tag">AI Analysis</span></div>
+      </div>
+      <div class="rm-card fade-in fade-in-delay-1" style="opacity:0.7">
+        <span class="rm-status soon">◦ Coming Soon</span>
+        <span class="rm-icon">📊</span>
+        <div class="rm-title">AI Bias Engine</div>
+        <div class="rm-desc">Bullish, Bearish or Neutral bias for every major pair — updated after each macro event.</div>
+        <div class="rm-tags"><span class="rm-tag">Major Pairs</span><span class="rm-tag">Macro Events</span></div>
+      </div>
+      <div class="rm-card fade-in fade-in-delay-2" style="opacity:0.7">
+        <span class="rm-status soon">◦ Coming Soon</span>
+        <span class="rm-icon">🏦</span>
+        <div class="rm-title">Central Bank Monitor</div>
+        <div class="rm-desc">Live policy tracking for Fed, ECB, BOE, BOJ — hawkish/dovish scoring and rate differentials.</div>
+        <div class="rm-tags"><span class="rm-tag">6 Central Banks</span><span class="rm-tag">Rate Differentials</span></div>
+      </div>
+      <div class="rm-card fade-in fade-in-delay-3" style="opacity:0.7">
+        <span class="rm-status soon">◦ Coming Soon</span>
+        <span class="rm-icon">🎓</span>
+        <div class="rm-title">Forex Academy</div>
+        <div class="rm-desc">Structured learning from zero to advanced — fundamentals, central banks, macro and COT data.</div>
+        <div class="rm-tags"><span class="rm-tag">10 Modules</span><span class="rm-tag">Free</span></div>
+      </div>
+      <div class="rm-card fade-in" style="opacity:0.7">
+        <span class="rm-status soon">◦ Coming Soon</span>
+        <span class="rm-icon">🏅</span>
+        <div class="rm-title">Mentor Hub</div>
+        <div class="rm-desc">Share your verified track record and offer mentorship to other traders on the platform.</div>
+        <div class="rm-tags"><span class="rm-tag">Verified Stats</span><span class="rm-tag">1-on-1</span></div>
+      </div>
+      <div class="rm-card fade-in fade-in-delay-1" style="opacity:0.7">
+        <span class="rm-status soon">◦ Coming Soon</span>
+        <span class="rm-icon">🔗</span>
+        <div class="rm-title">MT4/MT5 Sync</div>
+        <div class="rm-desc">Connect your trading account directly — trades sync automatically, no manual entry.</div>
+        <div class="rm-tags"><span class="rm-tag">Auto Sync</span><span class="rm-tag">All Brokers</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MARKET UPDATES SECTION ═══ -->
+<section style="padding:100px 48px;background:rgba(200,169,110,0.03);border-top:1px solid rgba(200,169,110,0.08);border-bottom:1px solid rgba(200,169,110,0.08)" id="market-updates-section">
+  <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center">
+    <div class="fade-in">
+      <span class="section-eyebrow">// Market Updates</span>
+      <h2 class="section-title">Analysis written<br><em>by traders,</em><br>for traders.</h2>
+      <p class="section-sub" style="margin-bottom:28px">We publish deep-dive market analysis every week — not surface-level headlines, but real technical and fundamental breakdowns that help you understand where price is likely to go and why.</p>
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:32px">
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:14px 16px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px">
+          <span style="font-size:22px;flex-shrink:0">📊</span>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:3px">Technical Analysis</div>
+            <div style="font-size:13px;color:var(--white2);line-height:1.6">Weekly breakdown of key levels, market structure, and price action setups across major pairs.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:14px 16px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px">
+          <span style="font-size:22px;flex-shrink:0">🏦</span>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:3px">Fundamental Insight</div>
+            <div style="font-size:13px;color:var(--white2);line-height:1.6">Central bank policy, macro data, and geopolitical context — translated into actionable bias.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:14px 16px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px">
+          <span style="font-size:22px;flex-shrink:0">🆓</span>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:3px">Always Free</div>
+            <div style="font-size:13px;color:var(--white2);line-height:1.6">All articles are publicly available — no paywall, no subscription required. Read and share freely.</div>
+          </div>
+        </div>
+      </div>
+      <a href="market-updates.html" class="btn-gold-lg" style="display:inline-flex;align-items:center;gap:8px">Read Latest Analysis →</a>
+    </div>
+    <!-- Mock article preview -->
+    <div class="fade-in fade-in-delay-2" style="background:var(--bg2);border:1px solid var(--border2);border-radius:6px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.4)">
+      <div style="height:180px;background:linear-gradient(135deg,#0c0e13,#161b24);display:flex;align-items:center;justify-content:center;font-size:48px;border-bottom:1px solid var(--border2)">📈</div>
+      <div style="padding:20px">
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <span style="font-family:'DM Mono',monospace;font-size:9px;padding:3px 9px;background:rgba(76,175,125,0.1);border:1px solid rgba(76,175,125,0.2);color:var(--bull);border-radius:100px;letter-spacing:0.06em">Market Update</span>
+        </div>
+        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:8px;line-height:1.3">EUR/USD — The Dollar Rally Is Running Out of Steam</div>
+        <div style="font-size:13px;color:var(--white2);line-height:1.7;margin-bottom:16px">DXY is approaching a key resistance zone while EUR sentiment turns more hawkish following ECB commentary. Here's what to watch this week...</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)">📅 April 2026 · EaglePips Team</div>
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold)">Read →</span>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -703,13 +871,6 @@ footer {
           </div>
         </div>
         <div class="jf-item">
-          <div class="jf-icon">🤖</div>
-          <div>
-            <div class="jf-title">AI Coach</div>
-            <div class="jf-desc">Automatically detects losing patterns — bad days, FOMO entries, worst pairs — and tells you exactly how to fix them.</div>
-          </div>
-        </div>
-        <div class="jf-item">
           <div class="jf-icon">🏦</div>
           <div>
             <div class="jf-title">Multi-Account</div>
@@ -723,6 +884,13 @@ footer {
             <div class="jf-desc">Win rate, profit factor, expectancy, equity curve — all calculated automatically from your trades.</div>
           </div>
         </div>
+        <div class="jf-item" style="opacity:0.6">
+          <div class="jf-icon">🤖</div>
+          <div>
+            <div class="jf-title">AI Coach <span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;background:rgba(200,169,110,0.1);border:1px solid rgba(200,169,110,0.2);color:var(--gold);border-radius:100px;letter-spacing:0.06em;margin-left:6px">future update</span></div>
+            <div class="jf-desc">Automatically detects losing patterns — bad days, FOMO entries, worst pairs — and tells you exactly how to fix them.</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -733,7 +901,7 @@ footer {
           <div class="mock-dot r"></div>
           <div class="mock-dot y"></div>
           <div class="mock-dot g"></div>
-          <span class="mock-tab">FTMO #1 Live — Journal</span>
+          <span class="mock-tab">The5ers High Stake 100k — Journal</span>
         </div>
         <div class="mock-stats-row">
           <div class="mock-stat"><div class="mock-stat-lbl">Win Rate</div><div class="mock-stat-val g">67.4%</div></div>
@@ -764,141 +932,11 @@ footer {
   </div>
 </section>
 
-<!-- ═══ ROADMAP ═══ -->
-<section id="roadmap" style="padding:100px 48px">
-  <div class="roadmap-section">
-    <div class="roadmap-header fade-in">
-      <span class="section-eyebrow">// What's Coming</span>
-      <h2 class="section-title">Built for serious<br><em>traders.</em></h2>
-      <p class="section-sub" style="margin-top:8px">We're building the complete analytical platform — here's what's on the roadmap.</p>
-    </div>
-    <div class="roadmap-grid">
-
-      <div class="rm-card fade-in">
-        <span class="rm-status live">● Live Now</span>
-        <span class="rm-icon">📒</span>
-        <div class="rm-title">Trading Journal</div>
-        <div class="rm-desc">Multi-account journal with PnL calendar, equity curve, AI coach, and deep performance statistics.</div>
-        <div class="rm-tags">
-          <span class="rm-tag">Multi-Account</span>
-          <span class="rm-tag">AI Coach</span>
-          <span class="rm-tag">Payouts</span>
-          <span class="rm-tag">Statistics</span>
-        </div>
-      </div>
-
-      <div class="rm-card fade-in fade-in-delay-1">
-        <span class="rm-status next">→ Up Next</span>
-        <span class="rm-icon">📰</span>
-        <div class="rm-title">AI News Sentiment</div>
-        <div class="rm-desc">Every forex news story analyzed by AI in real time — Bullish, Bearish, or Neutral verdict with full reasoning.</div>
-        <div class="rm-tags">
-          <span class="rm-tag">Real-Time</span>
-          <span class="rm-tag">AI Analysis</span>
-          <span class="rm-tag">All Pairs</span>
-        </div>
-      </div>
-
-      <div class="rm-card fade-in fade-in-delay-2">
-        <span class="rm-status next">→ Up Next</span>
-        <span class="rm-icon">🤖</span>
-        <div class="rm-title">AI Bias Engine</div>
-        <div class="rm-desc">Bullish, Bearish or Neutral bias for every major pair — updated after each macro event with AI reasoning.</div>
-        <div class="rm-tags">
-          <span class="rm-tag">Major Pairs</span>
-          <span class="rm-tag">Macro Events</span>
-          <span class="rm-tag">Pro Feature</span>
-        </div>
-      </div>
-
-      <div class="rm-card fade-in fade-in-delay-3">
-        <span class="rm-status soon">◦ Coming Soon</span>
-        <span class="rm-icon">🏦</span>
-        <div class="rm-title">Central Bank Monitor</div>
-        <div class="rm-desc">Live policy tracking for Fed, ECB, BOE, BOJ, RBA — hawkish/dovish scoring and rate differential analysis.</div>
-        <div class="rm-tags">
-          <span class="rm-tag">6 Central Banks</span>
-          <span class="rm-tag">Rate Differentials</span>
-        </div>
-      </div>
-
-      <div class="rm-card fade-in">
-        <span class="rm-status soon">◦ Coming Soon</span>
-        <span class="rm-icon">🎓</span>
-        <div class="rm-title">Forex Academy</div>
-        <div class="rm-desc">Structured learning from zero to advanced — fundamentals, central banks, macro trading, and COT data.</div>
-        <div class="rm-tags">
-          <span class="rm-tag">7 Modules</span>
-          <span class="rm-tag">Quizzes</span>
-          <span class="rm-tag">Certificates</span>
-        </div>
-      </div>
-
-      <div class="rm-card fade-in fade-in-delay-1">
-        <span class="rm-status soon">◦ Coming Soon</span>
-        <span class="rm-icon">🏅</span>
-        <div class="rm-title">Mentor Hub</div>
-        <div class="rm-desc">Share your verified track record and offer mentorship sessions to other traders on the platform.</div>
-        <div class="rm-tags">
-          <span class="rm-tag">Verified Stats</span>
-          <span class="rm-tag">1-on-1 Sessions</span>
-          <span class="rm-tag">Community</span>
-        </div>
-      </div>
-
-      <div class="rm-card fade-in fade-in-delay-2">
-        <span class="rm-status soon">◦ Coming Soon</span>
-        <span class="rm-icon">🔗</span>
-        <div class="rm-title">MT4/MT5 Sync</div>
-        <div class="rm-desc">Connect your trading account directly with your Account ID and Investor Password — trades sync automatically.</div>
-        <div class="rm-tags">
-          <span class="rm-tag">Auto Sync</span>
-          <span class="rm-tag">Read-Only</span>
-          <span class="rm-tag">All Brokers</span>
-        </div>
-      </div>
-
-      <div class="rm-card fade-in fade-in-delay-3">
-        <span class="rm-status soon">◦ Coming Soon</span>
-        <span class="rm-icon">🔧</span>
-        <div class="rm-title">Pro Tools</div>
-        <div class="rm-desc">Pip calculator, position size, risk/reward, currency correlations and compound growth — all inside the hub.</div>
-        <div class="rm-tags">
-          <span class="rm-tag">Calculators</span>
-          <span class="rm-tag">Correlations</span>
-          <span class="rm-tag">Free</span>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ═══ BOTTOM CTA ═══ -->
-<section class="cta-section">
-  <div class="cta-inner fade-in">
-    <span class="cta-eagle">🦅</span>
-    <h2 class="cta-h2"><span id="ctaTitle">Ready to trade</span><br><em id="ctaTitle2">with an edge?</em></h2>
-    <p class="cta-sub" id="ctaSub">Join traders who want to see what others miss. Be the first to access EaglePips when we launch.</p>
-    <div class="cta-form" id="ctaForm">
-      <input type="email" class="hero-input" id="ctaEmail" placeholder="Your email address" autocomplete="email">
-      <button class="hero-submit" onclick="submitEmail('cta')">Get Early Access</button>
-    </div>
-    <div class="hero-success" id="ctaSuccess">
-      ✓ &nbsp;You're on the list — we'll notify you at launch.
-    </div>
-    <p style="font-family:'DM Mono',monospace;font-size:11px;color:var(--white3);margin-top:12px">No spam. Unsubscribe anytime.</p>
-  </div>
-</section>
-
 <!-- FOOTER -->
 <footer>
-  <div class="footer-brand">Eagle<span>Pips</span></div>
   <ul class="footer-links">
-    <li><a href="#journal">Journal</a></li>
     <li><a href="market-updates.html">Market Updates</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="auth.html">Sign In</a></li>
+    <li><a href="journal.html">Journal</a></li>
   </ul>
   <div class="footer-copy" id="footerCopy">© 2026 EaglePips. All rights reserved.</div>
 </footer>
