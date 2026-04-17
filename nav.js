@@ -1,42 +1,42 @@
-/* EaglePips — Universal Nav */
+/* EaglePips — Universal Nav v2 */
 const _NAV_URL = 'https://vaimxhgqcdhjhdiaampa.supabase.co';
 const _NAV_KEY = 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
 
 async function renderNav(activePage) {
-  // Inject nav CSS if not already present (pages that don't have styles.css)
+  // Inject nav CSS — use #_nav prefix to beat any styles.css specificity
   if (!document.getElementById('_navCss')) {
     const s = document.createElement('style');
     s.id = '_navCss';
     s.textContent = `
-      nav{position:sticky;top:0;z-index:900;display:flex;align-items:center;gap:0;padding:0 32px;height:62px;background:rgba(8,9,12,0.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06)}
-      .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.02em;margin-right:32px;flex-shrink:0}
-      .nav-logo span{color:#c8a96e;font-style:italic}
-      .nav-logo-mark{width:28px;height:28px;background:linear-gradient(135deg,#c8a96e,#8a6a32);clip-path:polygon(50% 0%,85% 15%,100% 50%,85% 85%,50% 100%,15% 85%,0% 50%,15% 15%);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-      .nav-links{display:flex;list-style:none;gap:0;margin:0;padding:0;align-items:center}
-      .nav-link{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#7a7570;text-decoration:none;padding:6px 14px;border-radius:3px;transition:color 0.2s,background 0.2s}
-      .nav-link:hover{color:#c8c4bc}
-      .nav-link.active{color:#c8a96e}
-      .nav-cta{display:flex;align-items:center;gap:8px;margin-left:auto}
-      .btn-ghost{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;padding:8px 16px;background:transparent;border:1px solid rgba(255,255,255,0.12);color:#c8c4bc;text-decoration:none;border-radius:3px;transition:all 0.2s;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
-      .btn-ghost:hover{border-color:rgba(200,169,110,0.3);color:#c8a96e}
-      .btn-gold{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;padding:8px 18px;background:#c8a96e;border:1px solid #c8a96e;color:#08090c;text-decoration:none;border-radius:3px;transition:all 0.2s;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
-      .btn-gold:hover{background:#e8cc94;border-color:#e8cc94}
-      .nav-burger{display:none;background:none;border:1px solid rgba(255,255,255,0.1);color:#c8c4bc;width:34px;height:34px;border-radius:3px;cursor:pointer;font-size:15px;margin-left:auto;align-items:center;justify-content:center}
-      .mobile-nav{display:none;flex-direction:column;background:#08090c;border-bottom:1px solid rgba(255,255,255,0.06);padding:12px 20px;gap:4px}
-      .mobile-nav a{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#7a7570;text-decoration:none;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
-      .mobile-nav a:hover,.mobile-nav a.active{color:#c8a96e}
-      .mobile-nav.open{display:flex}
+      #_nav{position:sticky!important;top:0!important;z-index:900!important;display:flex!important;align-items:center!important;gap:0!important;padding:0 32px!important;height:62px!important;background:rgba(8,9,12,0.95)!important;backdrop-filter:blur(20px)!important;border-bottom:1px solid rgba(255,255,255,0.06)!important;box-sizing:border-box!important;width:100%!important}
+      #_nav .nav-logo{display:flex!important;align-items:center!important;gap:10px!important;text-decoration:none!important;font-family:'Playfair Display',serif!important;font-size:18px!important;font-weight:700!important;color:#fff!important;letter-spacing:-0.02em!important;margin-right:32px!important;flex-shrink:0!important;border-bottom:none!important}
+      #_nav .nav-logo span{color:#c8a96e!important;font-style:italic!important}
+      #_nav .nav-logo-mark{width:28px!important;height:28px!important;background:linear-gradient(135deg,#c8a96e,#8a6a32)!important;clip-path:polygon(50% 0%,85% 15%,100% 50%,85% 85%,50% 100%,15% 85%,0% 50%,15% 15%)!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:13px!important;flex-shrink:0!important}
+      #_nav .nav-links{display:flex!important;list-style:none!important;gap:0!important;margin:0!important;padding:0!important;align-items:center!important}
+      #_nav .nav-link{font-family:'Syne',sans-serif!important;font-size:11px!important;font-weight:700!important;letter-spacing:0.1em!important;text-transform:uppercase!important;color:#7a7570!important;text-decoration:none!important;padding:6px 14px!important;border-radius:3px!important;transition:color 0.2s!important;border-bottom:none!important}
+      #_nav .nav-link:hover{color:#c8c4bc!important;border-bottom:none!important}
+      #_nav .nav-link.active{color:#c8a96e!important;border-bottom:none!important}
+      #_nav .nav-cta{display:flex!important;align-items:center!important;gap:8px!important;margin-left:auto!important}
+      #_nav .btn-ghost{font-family:'Syne',sans-serif!important;font-size:11px!important;font-weight:700!important;letter-spacing:0.08em!important;padding:8px 16px!important;background:transparent!important;border:1px solid rgba(255,255,255,0.12)!important;color:#c8c4bc!important;text-decoration:none!important;border-radius:3px!important;transition:all 0.2s!important;cursor:pointer!important;display:inline-flex!important;align-items:center!important;gap:6px!important}
+      #_nav .btn-ghost:hover{border-color:rgba(200,169,110,0.3)!important;color:#c8a96e!important}
+      #_nav .btn-gold{font-family:'Syne',sans-serif!important;font-size:11px!important;font-weight:700!important;letter-spacing:0.08em!important;padding:8px 18px!important;background:#c8a96e!important;border:1px solid #c8a96e!important;color:#08090c!important;text-decoration:none!important;border-radius:3px!important;transition:all 0.2s!important;cursor:pointer!important;display:inline-flex!important;align-items:center!important;gap:6px!important}
+      #_nav .btn-gold:hover{background:#e8cc94!important;border-color:#e8cc94!important}
+      #_navBurger{display:none!important;background:none!important;border:1px solid rgba(255,255,255,0.1)!important;color:#c8c4bc!important;width:34px!important;height:34px!important;border-radius:3px!important;cursor:pointer!important;font-size:15px!important;margin-left:auto!important;align-items:center!important;justify-content:center!important}
+      #_mobileNav{display:none;flex-direction:column;background:#08090c;border-bottom:1px solid rgba(255,255,255,0.06);padding:12px 20px;gap:4px}
+      #_mobileNav a{font-family:'Syne',sans-serif!important;font-size:12px!important;font-weight:600!important;letter-spacing:0.08em!important;text-transform:uppercase!important;color:#7a7570!important;text-decoration:none!important;padding:10px 0!important;border-bottom:1px solid rgba(255,255,255,0.04)!important}
+      #_mobileNav a:hover,#_mobileNav a.active{color:#c8a96e!important}
+      #_mobileNav.open{display:flex!important}
       @media(max-width:860px){
-        nav{padding:0 16px}
-        .nav-links{display:none}
-        .nav-cta .btn-ghost:not(.hub-link){display:none}
-        .nav-burger{display:flex}
+        #_nav{padding:0 16px!important}
+        #_nav .nav-links{display:none!important}
+        #_nav .btn-ghost:not(.hub-link){display:none!important}
+        #_navBurger{display:flex!important}
       }
     `;
     document.head.appendChild(s);
   }
 
-  // Build nav links from DB, fallback to defaults
+  // Load nav items from DB
   let navItems = [];
   try {
     const _sb = window.supabase.createClient(_NAV_URL, _NAV_KEY);
@@ -45,29 +45,38 @@ async function renderNav(activePage) {
   } catch(e) {}
 
   const defaults = [
-    { label: 'Home', url: 'index.html' },
-    { label: 'Market Updates', url: 'market-updates.html' },
+    { id: 'home', label: 'Home', url: 'index.html' },
+    { id: 'updates', label: 'Market Updates', url: 'market-updates.html' },
   ];
-  const items = navItems.length ? navItems.filter(n => !n.parent_id) : defaults;
+  const roots = navItems.filter(n => !n.parent_id);
+  const items = roots.length ? roots : defaults;
 
-  // Build links with dropdown support
-  function buildLinks(items, mobile = false) {
+  function isActive(item) {
+    if (!activePage) return false;
+    return item.url?.includes(activePage) || item.label?.toLowerCase().replace(/\s+/g,'-').includes(activePage);
+  }
+
+  function buildLinks(items) {
     return items.map(item => {
       const children = navItems.filter(n => n.parent_id === item.id);
-      const isActive = activePage && (item.url?.includes(activePage) || item.label?.toLowerCase().includes(activePage));
-      if (mobile || !children.length) {
-        return `<${mobile ? 'a href="' + item.url + '"' : 'li'}${mobile ? ' class="' + (isActive ? 'active' : '') + '"' : ''}>
-          ${mobile ? item.label : `<a href="${item.url}" class="nav-link${isActive ? ' active' : ''}"${item.open_new_tab ? ' target="_blank"' : ''}>${item.label}</a>`}
-        </${mobile ? 'a' : 'li'}>`;
+      const active = isActive(item);
+      if (!children.length) {
+        return `<li><a href="${item.url}" class="nav-link${active?' active':''}"${item.open_new_tab?' target="_blank"':''}>${item.label}</a></li>`;
       }
-      // Dropdown
       const ddStyle = `position:absolute;top:calc(100% + 4px);left:0;background:#0c0e13;border:1px solid rgba(200,169,110,0.15);border-radius:4px;min-width:180px;padding:4px 0;display:none;z-index:200;box-shadow:0 16px 40px rgba(0,0,0,0.5)`;
       const subStyle = `display:block;padding:9px 14px;font-family:'Syne',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.05em;color:#a09880;text-decoration:none;transition:all 0.15s`;
-      const subs = children.map(c => `<a href="${c.url}" style="${subStyle}" onmouseover="this.style.background='rgba(200,169,110,0.08)';this.style.color='#c8c4bc'" onmouseout="this.style.background='';this.style.color='#a09880'"${c.open_new_tab ? ' target="_blank"' : ''}>${c.label}</a>`).join('');
+      const subs = children.map(c => `<a href="${c.url}" style="${subStyle}" onmouseover="this.style.background='rgba(200,169,110,0.08)';this.style.color='#c8c4bc'" onmouseout="this.style.background='';this.style.color='#a09880'"${c.open_new_tab?' target="_blank"':''}>${c.label}</a>`).join('');
       return `<li style="position:relative" onmouseover="this.querySelector('.nav-dd').style.display='block'" onmouseout="this.querySelector('.nav-dd').style.display='none'">
-        <a href="${item.url}" class="nav-link${isActive ? ' active' : ''}">${item.label} <span style="font-size:9px;opacity:0.5">▾</span></a>
+        <a href="${item.url}" class="nav-link${active?' active':''}">${item.label} <span style="font-size:9px;opacity:0.5">▾</span></a>
         <div class="nav-dd" style="${ddStyle}">${subs}</div>
       </li>`;
+    }).join('');
+  }
+
+  function buildMobile(items) {
+    return items.map(item => {
+      const active = isActive(item);
+      return `<a href="${item.url}"${active?' class="active"':''}${item.open_new_tab?' target="_blank"':''}>${item.label}</a>`;
     }).join('');
   }
 
@@ -85,14 +94,13 @@ async function renderNav(activePage) {
         <a href="auth.html" class="btn-ghost">Sign In</a>
         <a href="auth.html?tab=register" class="btn-gold">Get Access →</a>
       </div>
-      <button class="nav-burger" id="_burger" onclick="document.getElementById('_mobileNav').classList.toggle('open')">☰</button>
+      <button id="_navBurger" onclick="document.getElementById('_mobileNav').classList.toggle('open')">☰</button>
     </nav>
-    <div class="mobile-nav" id="_mobileNav">
-      ${buildLinks(items, true)}
-      <a href="auth.html?tab=register" style="color:var(--gold,#c8a96e);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.08em;text-decoration:none;padding:10px 0;border-bottom:none" id="_mobileAuth">Get Access →</a>
+    <div id="_mobileNav">
+      ${buildMobile(items)}
+      <a href="auth.html?tab=register" style="color:#c8a96e!important;font-family:'Syne',sans-serif!important;font-size:12px!important;font-weight:700!important;letter-spacing:0.08em!important;text-decoration:none!important;padding:10px 0!important;border-bottom:none!important" id="_mobileAuth">Get Access →</a>
     </div>`;
 
-  // Check auth state
   _checkNavAuth();
 }
 
@@ -130,7 +138,7 @@ async function _navSignOut() {
 }
 
 // Legacy compatibility
-function waitForSupabase(cb, n=0) { window.supabase ? cb() : n < 30 ? setTimeout(() => waitForSupabase(cb, n+1), 100) : null; }
+function waitForSupabase(cb, n=0) { window.supabase?.createClient ? cb() : n < 30 ? setTimeout(() => waitForSupabase(cb, n+1), 100) : null; }
 function checkNavAuthState() { _checkNavAuth(); }
 function toggleMobileNav() { document.getElementById('_mobileNav')?.classList.toggle('open'); }
 function openModal(v) { window.location.href = v === 'register' ? 'auth.html?tab=register' : 'auth.html'; }
