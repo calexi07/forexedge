@@ -168,7 +168,8 @@ async function doForgot(){
 
 async function doDiscord(){
   const sb=await getSB();
-  await sb.auth.signInWithOAuth({provider:'discord',options:{redirectTo:window.location.origin+'/forexedge/hub.html'}});
+  const base = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/');
+  await sb.auth.signInWithOAuth({provider:'discord',options:{redirectTo: base + 'hub.html'}});
 }
 
 // Redirect if already logged in

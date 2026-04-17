@@ -645,21 +645,7 @@ footer {
 <body>
 
 <!-- NAV -->
-<nav>
-  <a href="/" class="nav-brand">
-    <div class="nav-eagle">🦅</div>
-    <div class="nav-name">Eagle<span>Pips</span></div>
-  </a>
-  <ul class="nav-links" id="navLinks">
-    <li><a href="#journal">Journal</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="market-updates.html" style="color:var(--gold)">Market Updates</a></li>
-  </ul>
-  <div id="navCta">
-    <a href="auth.html" class="btn-nav btn-ghost-nav">Sign In</a>
-    <a href="auth.html?tab=register" class="btn-nav btn-gold-nav">Get Access →</a>
-  </div>
-</nav>
+<div id="navMount"></div>
 
 <!-- ═══ HERO ═══ -->
 <section class="hero">
@@ -1045,7 +1031,8 @@ async function signOutIndex() {
   window.location.reload();
 }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="loadSiteSettings();checkIndexAuth()"></script>
+<script src="nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="renderNav('');loadSiteSettings();checkIndexAuth()"></script>
 <script>
 
 /* ── Email capture ── */
