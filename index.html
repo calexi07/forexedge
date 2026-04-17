@@ -270,17 +270,10 @@ nav {
   display: block;
 }
 .hero-h1 .outline {
-  -webkit-text-stroke: 1.5px rgba(200,169,110,0.5);
-  color: transparent;
+  color: var(--white);
   font-style: normal;
 }
-.hero-eyebrow {
-  font-family: var(--font-mono);
-  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--gold); opacity: 0.8;
-  margin-bottom: 18px; display: block;
-  animation: heroIn 1s 0.05s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
+
 .hero-sub {
   font-size: clamp(15px, 1.6vw, 18px);
   font-weight: 400; line-height: 1.7;
@@ -713,7 +706,7 @@ footer {
   <!-- Video background -->
   <div class="hero-video-wrap">
     <video class="hero-video" autoplay muted loop playsinline poster="">
-      <source src="https://www.pexels.com/download/video/3571264/" type="video/mp4">
+      <source src="hero-bg.mp4" type="video/mp4">
     </video>
     <div class="hero-video-overlay"></div>
   </div>
@@ -721,7 +714,6 @@ footer {
   <div class="hero-orb1"></div>
 
   <div class="hero-content">
-    <span class="hero-eyebrow">// Professional Trading Platform</span>
     <h1 class="hero-h1">
       <span id="heroL1">See what</span><br>
       <em id="heroL2">others miss.</em><br>
