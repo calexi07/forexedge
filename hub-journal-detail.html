@@ -203,10 +203,69 @@
   </div>
 </div>
 
+<!-- DAY MODAL -->
+<div class="et-modal-overlay" id="dayModal">
+  <div class="et-modal" style="max-width:620px;max-height:92vh;overflow-y:auto;padding:0;border-radius:6px;border-color:rgba(200,169,110,0.2)">
+    <!-- Header -->
+    <div style="padding:18px 24px;border-bottom:1px solid rgba(255,255,255,0.06);position:sticky;top:0;background:#0c0e13;z-index:10;border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--white)" id="dmDate">—</div>
+        <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:500;margin-top:2px" id="dmPnl">—</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="et-btn-gold" onclick="etCloseModal('dayModal');openAddTrade()" style="padding:6px 14px;font-size:11px">+ Log Trade</button>
+        <button onclick="etCloseModal('dayModal')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.background='rgba(224,92,92,0.2)';this.style.color='var(--bear)'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='rgba(255,255,255,0.5)'">✕</button>
+      </div>
+    </div>
+    <input type="hidden" id="dmDateHidden">
+
+    <div style="padding:18px 24px;display:flex;flex-direction:column;gap:16px">
+
+      <!-- Trades on this day -->
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Trades</div>
+        <div style="overflow-x:auto;border-radius:4px;border:1px solid var(--border2)">
+          <table class="et-table" style="min-width:400px">
+            <thead><tr>
+              <th>Pair</th><th>Dir</th><th>Entry</th><th>PnL</th><th>Status</th><th></th>
+            </tr></thead>
+            <tbody id="dmTrades"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Notes sections -->
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:4px;overflow:hidden">
+        <!-- Thoughts -->
+        <div style="padding:12px 14px;border-bottom:1px solid var(--border2)">
+          <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--white3);display:block;margin-bottom:6px">💭 Thoughts & Notes</label>
+          <textarea id="dmThoughts" class="et-form-input" rows="3" style="resize:none;background:transparent;border:none;padding:0;font-size:13px;color:var(--white2)" placeholder="What happened today? What did you think about the market?"></textarea>
+        </div>
+        <!-- Miss trades -->
+        <div style="padding:12px 14px;border-bottom:1px solid var(--border2)">
+          <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--white3);display:block;margin-bottom:6px">❌ Missed Trades</label>
+          <textarea id="dmMissTrades" class="et-form-input" rows="3" style="resize:none;background:transparent;border:none;padding:0;font-size:13px;color:var(--white2)" placeholder="Setups you saw but didn't take. What stopped you?"></textarea>
+        </div>
+        <!-- Feelings -->
+        <div style="padding:12px 14px">
+          <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--white3);display:block;margin-bottom:6px">🧠 Emotional State</label>
+          <textarea id="dmFeelings" class="et-form-input" rows="2" style="resize:none;background:transparent;border:none;padding:0;font-size:13px;color:var(--white2)" placeholder="How were you feeling? Confident, anxious, distracted?"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="padding:14px 24px;border-top:1px solid rgba(255,255,255,0.06);display:flex;gap:8px;position:sticky;bottom:0;background:#0c0e13;border-radius:0 0 6px 6px">
+      <button class="et-btn-gold" onclick="saveDayNote()" style="padding:8px 20px;font-size:12px">💾 Save Notes</button>
+      <span id="saveStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3);align-self:center"></span>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="hub-sidebar.js"></script>
 <script>
-let _user,_sb,_j=null,trades=[],payouts=[],analyses=[],pairHist=[],ctTrade=null;
+let _user,_sb,_j=null,trades=[],payouts=[],analyses=[],pairHist=[],ctTrade=null,dayNotes={};
 let calY=new Date().getFullYear(),calM=new Date().getMonth();
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const EMO=['','😰','😟','😐','🙂','😎'];
@@ -220,7 +279,7 @@ async function main(){
   const{data:j,error}=await _sb.from('journals').select('*').eq('id',id).eq('user_id',_user.id).single();
   if(error||!j){window.location.href='hub-journal.html';return;}
   _j=j;document.getElementById('topbarTitle').innerHTML=`<strong>${j.name}</strong>`;
-  await Promise.all([loadTrades(),loadPayouts(),loadPairHist(),loadAnalyses(),loadStrategies()]);
+  await Promise.all([loadTrades(),loadPayouts(),loadPairHist(),loadAnalyses(),loadStrategies(),loadDayNotes()]);
 }
 
 async function loadTrades(){
@@ -379,6 +438,83 @@ async function closeTrade(){
   etCloseModal('closeTradeModal');await loadTrades();
 }
 
+// ── Day Modal ─────────────────────────────────────────────────────────────
+function openDayModal(dateStr){
+  const dayTrades=trades.filter(t=>t.trade_date===dateStr||t.close_date===dateStr);
+  const note=dayNotes[dateStr]||{};
+  const d=new Date(dateStr+'T12:00:00');
+  const label=d.toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const pnl=dayTrades.filter(t=>['win','loss','be'].includes(t.status)).reduce((s,t)=>s+(parseFloat(t.pnl)||0),0);
+  const pnlColor=pnl>0?'var(--bull)':pnl<0?'var(--bear)':'var(--white3)';
+
+  document.getElementById('dmDate').textContent=label;
+  document.getElementById('dmPnl').textContent=pnl!==0?((pnl>0?'+':'')+'$'+pnl.toFixed(2)):'—';
+  document.getElementById('dmPnl').style.color=pnlColor;
+  document.getElementById('dmDateHidden').value=dateStr;
+
+  // Trades list
+  const tbody=document.getElementById('dmTrades');
+  if(!dayTrades.length){
+    tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--white3);font-size:12px">No trades on this day.</td></tr>`;
+  } else {
+    tbody.innerHTML=dayTrades.map(t=>{
+      const open=t.status==='open';
+      const pc=open?'var(--white2)':(t.pnl||0)>=0?'var(--bull)':'var(--bear)';
+      const pt=open?'Open':((t.pnl||0)>=0?'+':'')+'$'+Math.abs(t.pnl||0).toFixed(2);
+      return`<tr>
+        <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white)">${t.pair}</td>
+        <td><span class="pill ${t.direction}">${(t.direction||'').toUpperCase()}</span></td>
+        <td style="font-family:'DM Mono',monospace;font-size:10px">${t.entry_price||'—'}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:10px;color:${pc};font-weight:600">${pt}</td>
+        <td><span class="pill ${t.status}">${open?'OPEN':(t.status||'').toUpperCase()}</span></td>
+        <td>
+          ${open?`<button class="close-trade-btn" onclick="openClose(JSON.parse(this.dataset.t));etCloseModal('dayModal')" data-t="${JSON.stringify(t).replace(/"/g,'&quot;')}">Close</button>`:''}
+          <button onclick="delTrade('${t.id}');etCloseModal('dayModal')" style="background:none;border:none;color:var(--white3);cursor:pointer;font-size:11px;transition:color 0.15s" onmouseover="this.style.color='var(--bear)'" onmouseout="this.style.color='var(--white3)'">✕</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Notes
+  document.getElementById('dmThoughts').value=note.thoughts||'';
+  document.getElementById('dmMissTrades').value=note.miss_trades||'';
+  document.getElementById('dmFeelings').value=note.feelings||'';
+
+  // Pre-fill Add Trade date
+  document.getElementById('atDate').value=dateStr;
+
+  etOpenModal('dayModal');
+}
+
+async function saveDayNote(){
+  const dateStr=document.getElementById('dmDateHidden').value;
+  const thoughts=document.getElementById('dmThoughts').value.trim();
+  const miss=document.getElementById('dmMissTrades').value.trim();
+  const feelings=document.getElementById('dmFeelings').value.trim();
+  if(!thoughts&&!miss&&!feelings){
+    // Delete note if all empty
+    if(dayNotes[dateStr]?.id){
+      await _sb.from('journal_day_notes').delete().eq('id',dayNotes[dateStr].id);
+      delete dayNotes[dateStr];
+    }
+    setSaveStatus('Cleared');return;
+  }
+  const existing=dayNotes[dateStr];
+  const payload={journal_id:_j.id,user_id:_user.id,date:dateStr,thoughts:thoughts||null,miss_trades:miss||null,feelings:feelings||null,updated_at:new Date().toISOString()};
+  let err;
+  if(existing?.id){
+    const r=await _sb.from('journal_day_notes').update(payload).eq('id',existing.id);err=r.error;
+  } else {
+    const r=await _sb.from('journal_day_notes').insert(payload).select().single();
+    err=r.error;if(!err&&r.data)dayNotes[dateStr]=r.data;
+  }
+  if(err){alert(err.message);return;}
+  setSaveStatus('✓ Saved');
+  await loadDayNotes();
+  renderCalendar();
+  setTimeout(()=>setSaveStatus(''),2000);
+}
+
 // Resolve strategy names in table
 async function resolveStrategyNames(){
   const ids=[...new Set(trades.filter(t=>t.strategy_id).map(t=>t.strategy_id))];
@@ -487,6 +623,12 @@ function renderEquity(){
   document.getElementById('eqFill').setAttribute('d',d+` L${W},${H} L0,${H} Z`);
 }
 
+async function loadDayNotes(){
+  const{data}=await _sb.from('journal_day_notes').select('*').eq('journal_id',_j.id).eq('user_id',_user.id);
+  dayNotes={};
+  (data||[]).forEach(n=>{dayNotes[n.date]=n;});
+}
+
 function renderCalendar(){
   document.getElementById('calTitle').textContent=MONTHS[calM]+' '+calY;
   const first=new Date(calY,calM,1).getDay(),dim=new Date(calY,calM+1,0).getDate();
@@ -500,7 +642,10 @@ function renderCalendar(){
     const border=it?'1px solid var(--gold)':p>0?'1px solid rgba(76,175,125,0.2)':p<0?'1px solid rgba(224,92,92,0.2)':'1px solid transparent';
     const color=it?'var(--gold)':p>0?'var(--bull)':p<0?'var(--bear)':'var(--white3)';
     const pnlHtml=p!==undefined?`<div style="font-family:'DM Mono',monospace;font-size:7px">${p>=0?'+':''}$${Math.abs(p).toFixed(0)}</div>`:'';
-    h+=`<div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:9px;background:${bg};border:${border};cursor:pointer;transition:all 0.15s;gap:1px;border-radius:3px;color:${color}">${d}${pnlHtml}</div>`;
+    const dateStr=`${calY}-${String(calM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const hasNote=dayNotes[dateStr];
+    const noteDot=hasNote?`<div style="width:4px;height:4px;border-radius:50%;background:var(--gold);opacity:0.7;flex-shrink:0"></div>`:'';
+    h+=`<div onclick="openDayModal('${dateStr}')" style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:9px;background:${bg};border:${border};cursor:pointer;transition:all 0.15s;gap:1px;border-radius:3px;color:${color}" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">${d}${pnlHtml}${noteDot}</div>`;
   }
   document.getElementById('calGrid').innerHTML=h;
 }
