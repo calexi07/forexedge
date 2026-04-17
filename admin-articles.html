@@ -8,58 +8,91 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="hub.css">
 <style>
-.admin-layout{display:grid;grid-template-columns:280px 1fr;gap:18px;align-items:start}
-.art-list{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;position:sticky;top:74px;max-height:calc(100vh - 100px);display:flex;flex-direction:column}
-.art-list-hdr{padding:12px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;background:var(--bg3);flex-shrink:0}
-.art-list-body{overflow-y:auto;flex:1}
-.al-item{padding:11px 14px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background 0.15s}
-.al-item:last-child{border-bottom:none}
+.al-item{padding:10px 14px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background 0.15s}
 .al-item:hover{background:var(--gold-dim)}
 .al-item.active{background:var(--gold-dim);border-left:2px solid var(--gold)}
-.al-title{font-size:12px;font-weight:500;color:var(--white);line-height:1.3;margin-bottom:4px}
-.al-meta{font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.al-title{font-size:12px;font-weight:500;color:var(--white);line-height:1.3;margin-bottom:3px}
+.al-meta{font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);display:flex;gap:8px}
 .spill{font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;border-radius:100px;letter-spacing:0.06em;text-transform:uppercase}
 .spill.live{background:var(--bull-bg);color:var(--bull);border:1px solid rgba(76,175,125,0.2)}
 .spill.draft{background:rgba(255,255,255,0.04);color:var(--white3);border:1px solid var(--border2)}
-.editor-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;overflow:hidden}
-.md-bar{padding:8px 14px;border-bottom:1px solid var(--border2);display:flex;gap:3px;flex-wrap:wrap;align-items:center;background:rgba(0,0,0,0.15)}
-.tb{padding:4px 9px;background:transparent;border:1px solid var(--border2);color:var(--white2);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;border-radius:3px;transition:all 0.15s;white-space:nowrap}
-.tb:hover{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
-.tb-sep{width:1px;height:16px;background:var(--border2);margin:0 3px;flex-shrink:0}
-.tb-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.1em;text-transform:uppercase;padding:0 3px;white-space:nowrap}
-.ed-body{padding:18px;display:flex;flex-direction:column;gap:13px}
-.r2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
-.keynotes-wrap{display:flex;flex-direction:column;gap:6px}
-.kn-row{display:flex;gap:6px;align-items:center}
-.kn-del{width:28px;height:36px;background:none;border:1px solid var(--border2);color:var(--white3);cursor:pointer;border-radius:3px;font-size:12px;flex-shrink:0;transition:all 0.15s}
+/* Palette */
+.wpal{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:5px;margin-bottom:10px}
+.wpal-btn{padding:9px 5px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;cursor:grab;transition:all 0.15s;text-align:center;user-select:none;display:flex;flex-direction:column;align-items:center;gap:3px}
+.wpal-btn:hover{border-color:var(--gold-border);background:var(--gold-dim)}
+.wpal-btn:active{cursor:grabbing;opacity:0.7}
+.wpal-icon{font-size:16px}
+.wpal-lbl{font-family:'DM Mono',monospace;font-size:8px;color:var(--white2);letter-spacing:0.03em}
+/* Canvas */
+.canvas{background:var(--bg);border:1px solid var(--border2);border-radius:3px;min-height:260px;padding:10px}
+.c-section{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:4px;margin-bottom:9px;transition:border-color 0.15s}
+.c-section:hover{border-color:rgba(200,169,110,0.25)}
+.c-section.selected{border-color:var(--gold)!important;box-shadow:0 0 0 2px rgba(200,169,110,0.1)}
+.c-sbar{padding:5px 9px;background:rgba(0,0,0,0.25);display:flex;align-items:center;gap:5px;border-bottom:1px solid rgba(255,255,255,0.04);border-radius:4px 4px 0 0;cursor:pointer}
+.c-sbar:hover{background:rgba(200,169,110,0.06)}
+.c-slbl{font-family:'DM Mono',monospace;font-size:8px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;flex:1}
+.cbtn{width:19px;height:19px;background:none;border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.3);cursor:pointer;border-radius:2px;font-size:9px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0}
+.cbtn:hover{border-color:var(--gold-border);color:var(--gold)}
+.cbtn.del:hover{border-color:var(--bear);color:var(--bear)}
+.c-cols{display:grid;gap:7px;padding:7px}
+.c-col{min-height:44px;border:1px dashed rgba(255,255,255,0.07);border-radius:3px;padding:3px;transition:all 0.15s}
+.c-col.drag-over{border-color:var(--gold);background:rgba(200,169,110,0.05)}
+.c-col-e{font-family:'DM Mono',monospace;font-size:8px;color:rgba(255,255,255,0.15);text-align:center;padding:8px;letter-spacing:0.1em;text-transform:uppercase;pointer-events:none}
+.c-widget{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:6px;margin-bottom:4px;cursor:pointer;transition:all 0.15s;user-select:none}
+.c-widget:last-child{margin-bottom:0}
+.c-widget:hover{border-color:rgba(200,169,110,0.3)}
+.c-widget.selected{border-color:var(--gold);background:rgba(200,169,110,0.05)}
+.c-wbar{display:flex;align-items:center;gap:4px;margin-bottom:2px}
+.c-wtype{font-family:'DM Mono',monospace;font-size:8px;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase}
+.c-wprev{font-size:11px;color:rgba(255,255,255,0.5);line-height:1.4;overflow:hidden;max-height:44px}
+.add-row-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;border:1px dashed rgba(200,169,110,0.15);border-radius:3px;background:transparent;color:rgba(200,169,110,0.4);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;transition:all 0.15s;margin-top:5px}
+.add-row-btn:hover{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
+/* Props */
+.props-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;position:sticky;top:74px;max-height:calc(100vh - 100px);overflow-y:auto}
+.props-hdr{padding:9px 13px;border-bottom:1px solid var(--border2);background:var(--bg3);font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.12em;text-transform:uppercase}
+.pg{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;overflow:hidden;margin-bottom:5px}
+.pg-h{padding:7px 10px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--white3);cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all 0.15s}
+.pg-h:hover{background:var(--gold-dim);color:var(--gold)}
+.pg-b{padding:9px;display:flex;flex-direction:column;gap:7px}
+.pg-b.collapsed{display:none}
+.pl{font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px}
+.pi{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--white);font-family:'Syne',sans-serif;font-size:12px;padding:6px 8px;border-radius:3px;outline:none;transition:border-color 0.2s}
+.pi:focus{border-color:var(--gold-border)}
+.pta{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--white);font-family:'Syne',sans-serif;font-size:12px;padding:6px 8px;border-radius:3px;outline:none;resize:vertical;min-height:65px;line-height:1.6}
+.pta:focus{border-color:var(--gold-border)}
+.pta.code{font-family:'DM Mono',monospace;font-size:11px}
+.psel{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--white);font-family:'Syne',sans-serif;font-size:12px;padding:6px 8px;border-radius:3px;outline:none}
+.pr2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+/* Layout picker */
+.lp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.lp-opt{padding:10px 6px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;cursor:pointer;text-align:center;transition:all 0.15s}
+.lp-opt:hover{border-color:var(--gold-border);background:var(--gold-dim)}
+.lp-prev{display:flex;gap:3px;height:18px;margin-bottom:5px}
+.lp-col{background:rgba(200,169,110,0.2);border-radius:2px;flex:1}
+.lp-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--white2)}
+/* Preview */
+.pc h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--white);margin:24px 0 10px}
+.pc h3{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--white);margin:18px 0 8px}
+.pc p{font-size:15px;color:#dedad4;line-height:1.85;margin-bottom:14px}
+.pc strong{color:var(--white)}.pc em{color:var(--gold)}
+.pc ul{padding-left:20px;margin-bottom:14px}.pc li{font-size:14px;color:#dedad4;margin-bottom:5px;line-height:1.7}
+.pc blockquote{border-left:3px solid var(--gold);padding:10px 16px;background:rgba(200,169,110,0.06);margin:14px 0;font-style:italic;color:#a09880}
+.pc hr{border:none;border-top:1px solid rgba(255,255,255,0.07);margin:20px 0}
+.pc img{max-width:100%;border-radius:4px;margin:10px 0;border:1px solid rgba(255,255,255,0.07);display:block}
+.pc pre{background:#0a0b0e;border:1px solid var(--border2);border-radius:3px;padding:12px;font-family:'DM Mono',monospace;font-size:12px;color:#a8d8a8;overflow-x:auto;margin:12px 0;line-height:1.7}
+.pc table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+.pc th{padding:8px 11px;background:var(--bg3);border:1px solid var(--border2);color:var(--white);font-weight:600;text-align:left}
+.pc td{padding:8px 11px;border:1px solid var(--border2);color:#dedad4}
+/* Keynotes */
+.kn-row{display:flex;gap:6px;align-items:center;margin-bottom:5px}
+.kn-del{width:28px;height:36px;background:none;border:1px solid var(--border2);color:var(--white3);cursor:pointer;border-radius:3px;font-size:12px;transition:all 0.15s;flex-shrink:0}
 .kn-del:hover{border-color:var(--bear);color:var(--bear)}
-.kn-add{width:100%;padding:7px;background:transparent;border:1px dashed rgba(200,169,110,0.2);color:rgba(200,169,110,0.5);font-family:'Syne',sans-serif;font-size:12px;cursor:pointer;border-radius:3px;transition:all 0.15s}
+.kn-add{width:100%;padding:6px;background:transparent;border:1px dashed rgba(200,169,110,0.2);color:rgba(200,169,110,0.5);font-family:'Syne',sans-serif;font-size:12px;cursor:pointer;border-radius:3px;transition:all 0.15s;margin-top:2px}
 .kn-add:hover{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
-.content-ta{width:100%;min-height:460px;background:var(--bg);border:1px solid var(--border2);color:var(--white);font-family:'Syne',sans-serif;font-size:14px;line-height:1.85;font-weight:300;padding:14px;border-radius:3px;outline:none;resize:vertical;transition:border-color 0.2s}
-.content-ta:focus{border-color:var(--gold-border);box-shadow:0 0 0 3px var(--gold-dim)}
-.md-ref{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:12px 14px}
-.md-ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:5px;margin-top:8px}
-.md-row{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--white2)}
-.mc{font-family:'DM Mono',monospace;font-size:10px;background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:2px;color:var(--gold);white-space:nowrap}
-.preview-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:28px;display:none}
-.preview-wrap.open{display:block}
-.pc h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--white);margin:28px 0 12px}
-.pc h3{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--white);margin:20px 0 10px}
-.pc p{font-size:15px;color:#c8c4bc;line-height:1.85;margin-bottom:14px}
-.pc strong{color:var(--white)}.pc em{color:var(--gold);font-style:italic}
-.pc ul,.pc ol{padding-left:20px;margin-bottom:14px}
-.pc li{font-size:14px;color:#c8c4bc;margin-bottom:5px;line-height:1.7}
-.pc blockquote{border-left:3px solid var(--gold);padding:10px 16px;background:rgba(200,169,110,0.06);margin:16px 0;font-style:italic;color:#a09880}
-.pc hr{border:none;border-top:1px solid rgba(255,255,255,0.06);margin:28px 0}
-.pc img{max-width:100%;border-radius:4px;margin:16px 0;border:1px solid rgba(255,255,255,0.06);display:block}
-.pc .cb{padding:12px 16px;border-radius:3px;margin:16px 0;font-size:14px;line-height:1.7}
-.pc .cb-bull{border-left:3px solid var(--bull);background:rgba(76,175,125,0.07);color:#c8c4bc}
-.pc .cb-bear{border-left:3px solid var(--bear);background:rgba(224,92,92,0.07);color:#c8c4bc}
-.pc .cb-note{border-left:3px solid var(--gold);background:rgba(200,169,110,0.07);color:#c8c4bc}
-.pc .img-split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
-.pc .img-split img{margin:0}
-@media(max-width:900px){.admin-layout{grid-template-columns:1fr}.art-list{position:relative;top:auto;max-height:260px}}
+/* Tabs */
+.btab{padding:9px 16px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--white3);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;background:none;border-top:none;border-left:none;border-right:none}
+.btab:hover{color:var(--white2)}
+.btab.active{color:var(--gold);border-bottom-color:var(--gold)}
 </style>
 </head>
 <body class="et-loading">
@@ -71,120 +104,177 @@
 <div id="etSidebarMount"></div>
 <div class="hub-main">
   <div class="hub-topbar">
-    <a href="admin.html" style="background:none;border:1px solid var(--border2);color:var(--white3);padding:5px 12px;border-radius:3px;font-family:'DM Mono',monospace;font-size:11px;text-decoration:none;transition:all 0.2s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">← Admin</a>
-    <div class="hub-topbar-title" style="flex:1;margin-left:14px">✍️ <strong>Articles</strong></div>
+    <a href="admin.html" style="background:none;border:1px solid var(--border2);color:var(--white3);padding:5px 10px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px;text-decoration:none;transition:all 0.2s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">← Admin</a>
+    <div class="hub-topbar-title" style="flex:1;margin-left:12px">📝 <strong>Articles</strong></div>
     <span id="saveStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)"></span>
-    <button class="et-btn-ghost" onclick="togglePreview()" style="padding:6px 12px;font-size:11px">👁 Preview</button>
     <button class="et-btn-ghost" onclick="saveArticle(false)" style="padding:6px 12px;font-size:11px">💾 Draft</button>
-    <button class="et-btn-gold" onclick="saveArticle(true)" style="padding:6px 12px;font-size:11px">🚀 Publish</button>
+    <button class="et-btn-gold" onclick="saveArticle(true)" style="padding:6px 14px;font-size:11px">🚀 Publish</button>
   </div>
   <div class="hub-content" id="adminContent">
     <div style="text-align:center;padding:60px"><div class="et-spinner"></div></div>
   </div>
 </div>
 
+<!-- Row layout modal -->
+<div class="et-modal-overlay" id="rowModal">
+  <div class="et-modal" style="max-width:440px">
+    <button class="et-modal-close" onclick="etCloseModal('rowModal')">✕</button>
+    <div class="et-modal-title">Choose Layout</div>
+    <div class="lp-grid" id="lpGrid"></div>
+    <div style="margin-top:14px;padding:11px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:7px">Custom</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="number" id="customCols" min="1" max="5" value="2" class="et-form-input" style="width:70px;padding:6px 10px">
+        <button class="et-btn-gold" onclick="addCustomRow()" style="padding:7px 14px;font-size:11px">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-let _user,_sb,articles=[],editingId=null,keynotes=[],previewOpen=false;
+let _user,_sb,articles=[],editingId=null,keynotes=[],rows=[],selW=null,selS=null,palType=null,dragW=null,excerptAuto=true;
+
+const WD={
+  heading:{text:'Your Heading',level:'h2',align:'left',size:'28'},
+  text:{content:'Write your content here...'},
+  image:{src:'',alt:'',caption:'',width:'100%'},
+  button:{text:'Read More →',url:'#',style:'gold',align:'left'},
+  quote:{text:'Quote here.',author:''},
+  callout:{text:'Important note.',type:'note'},
+  code:{code:'// your code',lang:'javascript'},
+  table:{headers:'Column 1,Column 2,Column 3',rows:'Cell 1,Cell 2,Cell 3\nCell A,Cell B,Cell C'},
+  video:{url:'',type:'youtube'},
+  divider:{color:'rgba(255,255,255,0.08)'},
+  html:{code:'<p>Custom HTML</p>'},
+};
+
+const LAYOUTS=[
+  {cols:[1],label:'Full'},
+  {cols:[1,1],label:'2 Equal'},
+  {cols:[1,2],label:'1/3+2/3'},
+  {cols:[2,1],label:'2/3+1/3'},
+  {cols:[1,1,1],label:'3 Equal'},
+  {cols:[1,1,1,1],label:'4 Equal'},
+];
 
 async function main(){
-  const res=await initEtSidebar('admin');
-  if(!res)return;
+  const res=await initEtSidebar('admin');if(!res)return;
   _user=res.user;_sb=res.sb;
   if(!_user.user_metadata?.is_admin){document.getElementById('adminContent').innerHTML='<div style="text-align:center;padding:60px;color:var(--white3)">Access denied.</div>';return;}
-  renderLayout();
-  await loadArticles();
+  renderLayout();await loadArticles();
 }
 
 function renderLayout(){
   document.getElementById('adminContent').innerHTML=`
-    <div class="admin-layout">
+    <div style="display:grid;grid-template-columns:240px 1fr 250px;gap:12px;align-items:start">
+      <!-- List -->
       <div>
-        <div class="art-list">
-          <div class="art-list-hdr">
+        <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;position:sticky;top:74px;max-height:calc(100vh - 100px);display:flex;flex-direction:column">
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;background:var(--bg3);flex-shrink:0">
             <span style="font-size:12px;font-weight:600;color:var(--white)">Articles</span>
             <button class="et-btn-gold" onclick="newArticle()" style="padding:4px 10px;font-size:10px">+ New</button>
           </div>
-          <div class="art-list-body" id="artList"><div style="padding:20px;text-align:center"><div class="et-spinner"></div></div></div>
+          <div style="overflow-y:auto;flex:1" id="artList"><div style="padding:20px;text-align:center"><div class="et-spinner"></div></div></div>
         </div>
       </div>
+
+      <!-- Editor -->
       <div>
-        <div class="editor-wrap" id="editorWrap">
-          <div class="md-bar">
-            <span class="tb-lbl">Text</span>
-            <button class="tb" onclick="ins('**','**')"><b>B</b></button>
-            <button class="tb" onclick="ins('*','*')"><i>I</i></button>
-            <button class="tb" onclick="ins('\\n## ','\\n')">H2</button>
-            <button class="tb" onclick="ins('\\n### ','\\n')">H3</button>
-            <div class="tb-sep"></div>
-            <span class="tb-lbl">Block</span>
-            <button class="tb" onclick="ins('\\n- ','')">• List</button>
-            <button class="tb" onclick="ins('\\n> ','')">❝ Quote</button>
-            <button class="tb" onclick="ins('\\n---\\n','')">— Line</button>
-            <div class="tb-sep"></div>
-            <span class="tb-lbl">Callout</span>
-            <button class="tb" onclick="ins('\\n[BULL]\\n','\\n[/BULL]\\n')">🟢 Bull</button>
-            <button class="tb" onclick="ins('\\n[BEAR]\\n','\\n[/BEAR]\\n')">🔴 Bear</button>
-            <button class="tb" onclick="ins('\\n[NOTE]\\n','\\n[/NOTE]\\n')">📝 Note</button>
-            <div class="tb-sep"></div>
-            <span class="tb-lbl">Media</span>
-            <button class="tb" onclick="insertImg()">🖼 Image</button>
-            <button class="tb" onclick="ins('\\n[SPLIT]\\n![Left](URL1)\\n![Right](URL2)\\n[/SPLIT]\\n','')">⊞ 2-col</button>
+        <!-- Meta -->
+        <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:14px;margin-bottom:10px;display:flex;flex-direction:column;gap:9px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+            <div><label class="et-form-label">Title *</label><input type="text" class="et-form-input" id="eTitle" placeholder="EUR/USD Weekly Analysis..." oninput="autoSlug();autoExcerpt()"></div>
+            <div><label class="et-form-label">Slug *</label><input type="text" class="et-form-input" id="eSlug" placeholder="eurusd-weekly-2026"></div>
           </div>
-          <div class="ed-body">
-            <div><label class="et-form-label">Title *</label><input type="text" class="et-form-input" id="eTitle" placeholder="e.g. EUR/USD Weekly Analysis — April 2026" oninput="autoSlug()"></div>
-            <div class="r2">
-              <div><label class="et-form-label">Slug (URL) *</label><input type="text" class="et-form-input" id="eSlug" placeholder="eurusd-weekly-april-2026"></div>
-              <div><label class="et-form-label">Category</label>
-                <select class="et-form-input" id="eCategory">
-                  <option>Market Update</option><option>Technical Analysis</option><option>Fundamental Analysis</option>
-                </select>
-              </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+            <div><label class="et-form-label">Category</label>
+              <select class="et-form-input" id="eCategory"><option>Market Update</option><option>Technical Analysis</option><option>Fundamental Analysis</option></select>
             </div>
-            <div class="r2">
-              <div><label class="et-form-label">Author Name</label><input type="text" class="et-form-input" id="eAuthor" placeholder="Your name"></div>
-              <div><label class="et-form-label">Cover Image URL</label><input type="url" class="et-form-input" id="eCover" placeholder="https://..."></div>
+            <div><label class="et-form-label">Author</label><input type="text" class="et-form-input" id="eAuthor"></div>
+          </div>
+          <div><label class="et-form-label">Cover Image URL</label><input type="url" class="et-form-input" id="eCover" placeholder="https://..."></div>
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+              <label class="et-form-label" style="margin:0">Excerpt</label>
+              <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-family:'DM Mono',monospace;font-size:9px;color:var(--white3)">
+                <input type="checkbox" id="excerptAutoCheck" checked onchange="toggleExcerptAuto()" style="accent-color:var(--gold)"> Auto from content
+              </label>
             </div>
-            <div><label class="et-form-label">Excerpt (short preview shown in feed)</label><input type="text" class="et-form-input" id="eExcerpt" placeholder="Brief summary of the analysis..."></div>
-            <div>
-              <label class="et-form-label">Key Points (Keynotes)</label>
-              <div class="keynotes-wrap" id="keynotesWrap"></div>
-              <button class="kn-add" onclick="addKeynote()">+ Add Key Point</button>
-            </div>
-            <div><label class="et-form-label">Tags (comma separated)</label><input type="text" class="et-form-input" id="eTags" placeholder="EUR/USD, Weekly, COT Data"></div>
-            <div>
-              <label class="et-form-label">Content *</label>
-              <textarea class="content-ta" id="eContent" placeholder="## Overview&#10;&#10;Write your analysis here...&#10;&#10;[BULL]&#10;Price is above the 200 EMA — bullish bias.&#10;[/BULL]&#10;&#10;![Chart](https://image-url.com/chart.png)&#10;&#10;## Key Levels&#10;&#10;- Support: 1.0820&#10;- Resistance: 1.0950"></textarea>
-            </div>
-            <div class="md-ref">
-              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.12em;text-transform:uppercase">Markdown Reference</div>
-              <div class="md-ref-grid">
-                <div class="md-row"><code class="mc">**text**</code><span>Bold</span></div>
-                <div class="md-row"><code class="mc">*text*</code><span>Italic</span></div>
-                <div class="md-row"><code class="mc">## Heading</code><span>H2 Title</span></div>
-                <div class="md-row"><code class="mc">### Heading</code><span>H3 Title</span></div>
-                <div class="md-row"><code class="mc">- item</code><span>Bullet list</span></div>
-                <div class="md-row"><code class="mc">> text</code><span>Quote block</span></div>
-                <div class="md-row"><code class="mc">---</code><span>Divider line</span></div>
-                <div class="md-row"><code class="mc">![alt](url)</code><span>Image</span></div>
-                <div class="md-row"><code class="mc">[BULL]...[/BULL]</code><span>Bullish callout</span></div>
-                <div class="md-row"><code class="mc">[BEAR]...[/BEAR]</code><span>Bearish callout</span></div>
-                <div class="md-row"><code class="mc">[NOTE]...[/NOTE]</code><span>Note callout</span></div>
-                <div class="md-row"><code class="mc">[SPLIT]![](u)![](u)[/SPLIT]</code><span>2-col images</span></div>
-              </div>
-            </div>
+            <textarea class="et-form-input" id="eExcerpt" rows="2" style="resize:none" placeholder="Auto-generated..." disabled></textarea>
+          </div>
+          <div><label class="et-form-label">Tags</label><input type="text" class="et-form-input" id="eTags" placeholder="EUR/USD, Weekly, COT Data"></div>
+          <div>
+            <label class="et-form-label">Key Points</label>
+            <div id="keynotesWrap"></div>
+            <button class="kn-add" onclick="addKeynote()">+ Add Key Point</button>
           </div>
         </div>
-        <div class="preview-wrap" id="previewWrap">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-            <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase">Preview</span>
-            <button onclick="togglePreview()" style="background:none;border:none;color:var(--white3);cursor:pointer;font-size:12px;font-family:'Syne',sans-serif">✕ Close Preview</button>
+
+        <!-- Builder -->
+        <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;overflow:hidden">
+          <div style="display:flex;border-bottom:1px solid var(--border2);background:var(--bg3)">
+            <button class="btab active" id="tab-build" onclick="switchTab('build')">⚙ Builder</button>
+            <button class="btab" id="tab-prev" onclick="switchTab('prev')">👁 Preview</button>
           </div>
-          <div id="previewContent" class="pc"></div>
+          <!-- Builder panel -->
+          <div id="panel-build" style="padding:11px">
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px">Drag onto canvas</div>
+            <div class="wpal">
+              <div class="wpal-btn" draggable="true" ondragstart="pd(event,'heading')"><div class="wpal-icon">H</div><div class="wpal-lbl">Heading</div></div>
+              <div class="wpal-btn" draggable="true" ondragstart="pd(event,'text')"><div class="wpal-icon">T</div><div class="wpal-lbl">Text</div></div>
+              <div class="wpal-btn" draggable="true" ondragstart="pd(event,'image')"><div class="wpal-icon">🖼</div><div class="wpal-lbl">Image</div></div>
+              <div class="wpal-btn" draggable="true" ondragstart="pd(event,'button')"><div class="wpal-icon">⬜</div><div class="wpal-lbl">Button</div></div>
+              <div class="wpal-btn" draggable="true" ondragstart="pd(event,'quote')"><div class="wpal-icon">❝</div><div class="wpal-lbl">Quote</div></div>
+              <div class="wpal-btn" draggable="true" ondragstart="pd(event,'callout')"><div class="wpal-icon">📋</div><div class="wpal-lbl">Callout</div></div>
+              <div class="wpal-btn" draggable="true" ondragstart="pd(event,'code')"><div class="wpal-icon">&lt;/&gt;</div><div class="wpal-lbl">Code</div></div>
+              <div class="wpal-btn" draggable="true" ondragstart="pd(event,'table')"><div class="wpal-icon">⊞</div><div class="wpal-lbl">Table</div></div>
+              <div class="wpal-btn" draggable="true" ondragstart="pd(event,'video')"><div class="wpal-icon">▶</div><div class="wpal-lbl">Video</div></div>
+              <div class="wpal-btn" draggable="true" ondragstart="pd(event,'divider')"><div class="wpal-icon">—</div><div class="wpal-lbl">Divider</div></div>
+              <div class="wpal-btn" draggable="true" ondragstart="pd(event,'html')"><div class="wpal-icon">{ }</div><div class="wpal-lbl">HTML</div></div>
+            </div>
+            <div class="canvas" id="canvas" onclick="desel()">
+              <div class="c-col-e" id="canvasEmpty" style="padding:30px">Drag widgets here or click + Add Row</div>
+            </div>
+            <button class="add-row-btn" onclick="etOpenModal('rowModal')">＋ Add Row</button>
+          </div>
+          <!-- Preview panel -->
+          <div id="panel-prev" style="display:none;padding:20px">
+            <div class="pc" id="previewContent"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Properties -->
+      <div>
+        <div class="props-wrap">
+          <div class="props-hdr" id="propsTitle">Properties</div>
+          <div style="padding:11px" id="propsBody">
+            <div style="text-align:center;padding:28px 14px;color:var(--white3);font-size:12px">
+              <div style="font-size:22px;opacity:0.15;margin-bottom:7px">✏️</div>Click a widget to edit
+            </div>
+          </div>
         </div>
       </div>
     </div>`;
+
+  // Build layout picker
+  const lp=document.getElementById('lpGrid');
+  lp.innerHTML=LAYOUTS.map(l=>`
+    <div class="lp-opt" onclick="addRow(${JSON.stringify(l.cols)})">
+      <div class="lp-prev">${l.cols.map(w=>`<div class="lp-col" style="flex:${w}"></div>`).join('')}</div>
+      <div class="lp-lbl">${l.label}</div>
+    </div>`).join('');
+
   addKeynote();
   document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveArticle(false);}});
+}
+
+function switchTab(t){
+  document.querySelectorAll('.btab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  document.getElementById('panel-build').style.display=t==='build'?'block':'none';
+  document.getElementById('panel-prev').style.display=t==='prev'?'block':'none';
+  if(t==='prev')document.getElementById('previewContent').innerHTML=buildPreview();
 }
 
 async function loadArticles(){
@@ -197,28 +287,28 @@ function renderList(){
   if(!articles.length){el.innerHTML='<div style="padding:20px;text-align:center;font-size:12px;color:var(--white3)">No articles yet.</div>';return;}
   el.innerHTML=articles.map(a=>`
     <div class="al-item ${editingId===a.id?'active':''}" onclick="loadArt('${a.id}')">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:4px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:5px;margin-bottom:3px">
         <div class="al-title">${a.title||'Untitled'}</div>
         <span class="spill ${a.published?'live':'draft'}">${a.published?'Live':'Draft'}</span>
       </div>
-      <div class="al-meta">
-        <span>${a.category||'—'}</span>
-        <span>${new Date(a.created_at).toLocaleDateString('en-US',{day:'numeric',month:'short'})}</span>
-      </div>
-      <div style="margin-top:5px;display:flex;gap:8px">
+      <div class="al-meta"><span>${a.category||'—'}</span><span>${new Date(a.created_at).toLocaleDateString('en-US',{day:'numeric',month:'short'})}</span></div>
+      <div style="display:flex;gap:8px;margin-top:4px">
         ${a.published?`<a href="article.html?slug=${a.slug}" target="_blank" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);text-decoration:none">↗ View</a>`:''}
-        <button onclick="event.stopPropagation();delArt('${a.id}')" style="background:none;border:none;color:var(--white3);cursor:pointer;font-size:9px;padding:0;font-family:'DM Mono',monospace;transition:color 0.15s" onmouseover="this.style.color='var(--bear)'" onmouseout="this.style.color='var(--white3)'">🗑 Delete</button>
+        <button onclick="event.stopPropagation();delArt('${a.id}')" style="background:none;border:none;color:var(--white3);cursor:pointer;font-size:9px;font-family:'DM Mono',monospace;transition:color 0.15s" onmouseover="this.style.color='var(--bear)'" onmouseout="this.style.color='var(--white3)'">🗑 Delete</button>
       </div>
     </div>`).join('');
 }
 
 function newArticle(){
-  editingId=null;
-  ['eTitle','eSlug','eExcerpt','eCover','eTags','eContent'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  editingId=null;rows=[];selW=null;selS=null;
+  ['eTitle','eSlug','eCover','eTags'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('eExcerpt').value='';
   document.getElementById('eCategory').value='Market Update';
-  document.getElementById('eAuthor').value=_user.user_metadata?.full_name||_user.email?.split('@')[0]||'EaglePips';
-  keynotes=[];renderKeynotes();addKeynote();
-  setSaveStatus('');renderList();
+  document.getElementById('eAuthor').value=_user.user_metadata?.full_name||'EaglePips Team';
+  document.getElementById('excerptAutoCheck').checked=true;
+  document.getElementById('eExcerpt').disabled=true;
+  excerptAuto=true;keynotes=[];renderKeynotes();addKeynote();
+  renderCanvas();setSS('');renderList();
 }
 
 function loadArt(id){
@@ -227,50 +317,219 @@ function loadArt(id){
   document.getElementById('eTitle').value=a.title||'';
   document.getElementById('eSlug').value=a.slug||'';
   document.getElementById('eCategory').value=a.category||'Market Update';
-  document.getElementById('eExcerpt').value=a.excerpt||'';
+  document.getElementById('eAuthor').value=a.author_name||'EaglePips Team';
   document.getElementById('eCover').value=a.cover_url||'';
   document.getElementById('eTags').value=a.tags?a.tags.join(', '):'';
-  document.getElementById('eContent').value=a.content||'';
-  document.getElementById('eAuthor').value=a.author_name||'EaglePips';
-  keynotes=[...(a.keynotes||[])];renderKeynotes();
-  if(!keynotes.length)addKeynote();
-  setSaveStatus('');renderList();
-  previewOpen=false;
-  document.getElementById('previewWrap').classList.remove('open');
-  document.getElementById('editorWrap').style.display='';
+  excerptAuto=!a.excerpt;
+  document.getElementById('excerptAutoCheck').checked=excerptAuto;
+  document.getElementById('eExcerpt').value=a.excerpt||'';
+  document.getElementById('eExcerpt').disabled=excerptAuto;
+  try{const p=JSON.parse(a.content||'[]');rows=Array.isArray(p)?p:[];}
+  catch{rows=a.content?[{id:uid(),cols:[{id:uid(),flex:'1fr',widgets:[{id:uid(),type:'text',props:{content:a.content}}]}]}]:[];}
+  keynotes=[...(a.keynotes||[])];renderKeynotes();if(!keynotes.length)addKeynote();
+  renderCanvas();setSS('');renderList();
 }
 
+function toggleExcerptAuto(){
+  excerptAuto=document.getElementById('excerptAutoCheck').checked;
+  document.getElementById('eExcerpt').disabled=excerptAuto;
+  if(excerptAuto)autoExcerpt();
+}
+function autoExcerpt(){
+  if(!excerptAuto)return;
+  for(const row of rows)for(const col of row.cols||[])for(const w of col.widgets||[])
+    if(w.type==='text'&&w.props?.content){document.getElementById('eExcerpt').value=w.props.content.replace(/<[^>]+>/g,'').slice(0,160);return;}
+  const t=document.getElementById('eTitle').value;if(t)document.getElementById('eExcerpt').value=t;
+}
+
+function renderCanvas(){
+  const canvas=document.getElementById('canvas');
+  const empty=document.getElementById('canvasEmpty');
+  if(empty)empty.style.display=rows.length?'none':'block';
+  document.querySelectorAll('.c-section').forEach(e=>e.remove());
+  document.querySelector('.add-row-btn')?.remove();
+  rows.forEach((row,ri)=>canvas.appendChild(mkSec(row,ri)));
+  const btn=document.createElement('button');btn.className='add-row-btn';btn.innerHTML='＋ Add Row';btn.onclick=()=>etOpenModal('rowModal');
+  canvas.appendChild(btn);
+}
+
+function mkSec(row,ri){
+  const el=document.createElement('div');
+  el.className='c-section';el.id='row-'+row.id;el.dataset.ri=ri;
+  el.onclick=e=>{e.stopPropagation();selSec(row.id);};
+  const fr=row.cols.map(c=>c.flex||'1fr').join(' ');
+  el.innerHTML=`
+    <div class="c-sbar">
+      <span class="c-slbl">Row · ${row.cols.length} col${row.cols.length>1?'s':''}</span>
+      <div style="display:flex;gap:3px">
+        ${ri>0?`<button class="cbtn" onclick="event.stopPropagation();mvRow('${row.id}',-1)">↑</button>`:''}
+        ${ri<rows.length-1?`<button class="cbtn" onclick="event.stopPropagation();mvRow('${row.id}',1)">↓</button>`:''}
+        <button class="cbtn" onclick="event.stopPropagation();cpRow('${row.id}')">⧉</button>
+        <button class="cbtn del" onclick="event.stopPropagation();rmRow('${row.id}')">✕</button>
+      </div>
+    </div>
+    <div class="c-cols" style="grid-template-columns:${fr}">
+      ${row.cols.map((col,ci)=>`
+        <div class="c-col" id="col-${col.id}" data-ri="${ri}" data-ci="${ci}"
+          ondragover="cdo(event,'${col.id}')" ondragleave="cdl(event,'${col.id}')" ondrop="cdrop(event,'${col.id}','${row.id}')">
+          ${col.widgets?.length?col.widgets.map(w=>mkW(w,col.id,row.id)).join(''):`<div class="c-col-e">Drop here</div>`}
+        </div>`).join('')}
+    </div>`;
+  return el;
+}
+
+function mkW(w,cId,rId){
+  const d=document.createElement('div');
+  d.className=`c-widget${selW===w.id?' selected':''}`;d.id='w-'+w.id;d.draggable=true;
+  d.ondragstart=e=>wds(e,w.id,cId,rId);
+  d.onclick=e=>{e.stopPropagation();selWidget(w.id,cId,rId);};
+  d.innerHTML=`<div class="c-wbar"><span style="cursor:grab;color:rgba(255,255,255,0.2);font-size:10px">⠿</span><span class="c-wtype">${w.type}</span><div style="display:flex;gap:2px;margin-left:auto"><button class="cbtn" onclick="event.stopPropagation();cpW('${w.id}','${cId}','${rId}')" style="width:16px;height:16px;font-size:8px">⧉</button><button class="cbtn del" onclick="event.stopPropagation();rmW('${w.id}','${cId}','${rId}')" style="width:16px;height:16px;font-size:8px">✕</button></div></div><div class="c-wprev">${getPrev(w)}</div>`;
+  return d;
+}
+
+function getPrev(w){
+  const p=w.props||{};
+  switch(w.type){
+    case'heading': return`<div style="font-family:'Playfair Display',serif;font-size:${Math.min(parseInt(p.size)||20,20)}px;font-weight:700;color:#fff">${p.text||'Heading'}</div>`;
+    case'text':    return`<div style="font-size:11px;color:#c8c4bc;line-height:1.5">${(p.content||'').slice(0,90)}</div>`;
+    case'image':   return p.src?`<img src="${p.src}" style="max-width:100%;max-height:44px;object-fit:cover;border-radius:2px" onerror="this.style.display='none'">`:`<div style="background:rgba(255,255,255,0.05);padding:8px;text-align:center;font-size:10px;color:rgba(255,255,255,0.3)">🖼 Image</div>`;
+    case'button':  return`<span style="display:inline-flex;padding:4px 10px;background:var(--gold);color:#08090c;font-size:10px;border-radius:2px">${p.text||'Button'}</span>`;
+    case'quote':   return`<div style="border-left:3px solid var(--gold);padding:5px 9px;font-size:11px;color:#a09880;font-style:italic">${(p.text||'').slice(0,70)}</div>`;
+    case'callout': const cc={note:'var(--gold)',bull:'var(--bull)',bear:'var(--bear)',info:'#6ba3ff'}[p.type||'note'];return`<div style="border-left:3px solid ${cc};padding:5px 9px;font-size:11px;color:#c8c4bc">${(p.text||'').slice(0,70)}</div>`;
+    case'code':    return`<div style="font-family:'DM Mono',monospace;font-size:10px;color:#a8d8a8;background:#0a0b0e;padding:5px 7px;border-radius:2px">${(p.code||'').slice(0,50)}</div>`;
+    case'table':   return`<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold)">⊞ ${(p.headers||'').split(',').length} cols</div>`;
+    case'video':   return`<div style="background:rgba(255,255,255,0.05);padding:8px;text-align:center;font-size:10px;color:rgba(255,255,255,0.3)">▶ ${p.url?'Video':'Add URL'}</div>`;
+    case'divider': return`<hr style="border:none;border-top:1px solid rgba(255,255,255,0.15);margin:3px 0">`;
+    case'html':    return`<div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold)">{ } ${(p.code||'').slice(0,35)}</div>`;
+    default:       return`<div style="font-size:10px;color:rgba(255,255,255,0.3)">${w.type}</div>`;
+  }
+}
+
+// Row ops
+function addRow(cols){etCloseModal('rowModal');rows.push({id:uid(),cols:cols.map(f=>({id:uid(),flex:f+'fr',widgets:[]}))});renderCanvas();}
+function addCustomRow(){addRow(Array(parseInt(document.getElementById('customCols').value)||2).fill(1));}
+function mvRow(id,d){const i=rows.findIndex(r=>r.id===id);const n=i+d;if(n<0||n>=rows.length)return;[rows[i],rows[n]]=[rows[n],rows[i]];renderCanvas();}
+function cpRow(id){const i=rows.findIndex(r=>r.id===id);if(i<0)return;const c=JSON.parse(JSON.stringify(rows[i]));c.id=uid();c.cols.forEach(col=>{col.id=uid();col.widgets.forEach(w=>w.id=uid());});rows.splice(i+1,0,c);renderCanvas();}
+function rmRow(id){if(!confirm('Delete row?'))return;rows=rows.filter(r=>r.id!==id);if(selS===id){selS=null;rProps(null,null,null);}renderCanvas();}
+
+// Widget ops
+function addW(type,cId,rId){const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);if(!col)return;col.widgets.push({id:uid(),type,props:{...WD[type]}});renderCanvas();autoExcerpt();}
+function rmW(wId,cId,rId){const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);if(!col)return;col.widgets=col.widgets.filter(w=>w.id!==wId);if(selW===wId){selW=null;rProps(null,null,null);}renderCanvas();}
+function cpW(wId,cId,rId){const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);if(!col)return;const wi=col.widgets.findIndex(w=>w.id===wId);if(wi<0)return;const c={...JSON.parse(JSON.stringify(col.widgets[wi])),id:uid()};col.widgets.splice(wi+1,0,c);renderCanvas();}
+function upd(wId,cId,rId,k,v){const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);const w=col?.widgets.find(x=>x.id===wId);if(!w)return;w.props={...w.props,[k]:v};const el=document.getElementById('w-'+wId);if(el){const pv=el.querySelector('.c-wprev');if(pv)pv.innerHTML=getPrev(w);}autoExcerpt();}
+
+// Selection
+function selWidget(wId,cId,rId){selW=wId;selS=null;document.querySelectorAll('.c-widget,.c-section').forEach(e=>e.classList.remove('selected'));document.getElementById('w-'+wId)?.classList.add('selected');const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);const w=col?.widgets.find(x=>x.id===wId);if(w)rProps(w,cId,rId);}
+function selSec(rId){selS=rId;selW=null;document.querySelectorAll('.c-widget,.c-section').forEach(e=>e.classList.remove('selected'));document.getElementById('row-'+rId)?.classList.add('selected');const row=rows.find(r=>r.id===rId);if(row)rRowProps(row);}
+function desel(){selW=null;selS=null;document.querySelectorAll('.c-widget,.c-section').forEach(e=>e.classList.remove('selected'));rProps(null,null,null);}
+
+// Props
+function rProps(w,cId,rId){
+  document.getElementById('propsTitle').textContent=w?w.type.toUpperCase()+' Props':'Properties';
+  const el=document.getElementById('propsBody');
+  if(!w){el.innerHTML='<div style="text-align:center;padding:28px 14px;color:var(--white3);font-size:12px"><div style="font-size:22px;opacity:0.15;margin-bottom:7px">✏️</div>Click a widget to edit</div>';return;}
+  const p=w.props||{};
+  const H=(lbl,c)=>`<div class="pg"><div class="pg-h" onclick="this.nextElementSibling.classList.toggle('collapsed')">${lbl}<span>▾</span></div><div class="pg-b">${c}</div></div>`;
+  const I=(k,l,v,t='text')=>`<div><div class="pl">${l}</div><input type="${t}" class="pi" value="${String(v||'').replace(/"/g,'&quot;')}" oninput="upd('${w.id}','${cId}','${rId}','${k}',this.value)"></div>`;
+  const TA=(k,l,v,r=4,code=false)=>`<div><div class="pl">${l}</div><textarea class="pta${code?' code':''}" rows="${r}" oninput="upd('${w.id}','${cId}','${rId}','${k}',this.value)">${String(v||'').replace(/</g,'&lt;')}</textarea></div>`;
+  const SE=(k,l,opts,v)=>`<div><div class="pl">${l}</div><select class="psel" onchange="upd('${w.id}','${cId}','${rId}','${k}',this.value)">${opts.map(([val,label])=>`<option value="${val}" ${v===val?'selected':''}>${label}</option>`).join('')}</select></div>`;
+  const R2=(a,b)=>`<div class="pr2">${a}${b}</div>`;
+  let html='';
+  switch(w.type){
+    case'heading': html=H('Content',TA('text','Text',p.text,2)+R2(I('size','Size px',p.size||'28','number'),SE('level','Tag',[['h1','H1'],['h2','H2'],['h3','H3'],['h4','H4']],p.level||'h2'))+SE('align','Align',[['left','Left'],['center','Center'],['right','Right']],p.align||'left'));break;
+    case'text': html=H('Content',TA('content','Content (Markdown)',p.content,6));break;
+    case'image': html=H('Image',I('src','Image URL',p.src,'url')+I('alt','Alt',p.alt)+I('caption','Caption',p.caption)+I('width','Width',p.width||'100%'));break;
+    case'button': html=H('Button',I('text','Label',p.text)+I('url','URL',p.url,'url')+R2(SE('style','Style',[['gold','Gold'],['outline','Outline'],['ghost','Ghost']],p.style||'gold'),SE('align','Align',[['left','Left'],['center','Center'],['right','Right']],p.align||'left')));break;
+    case'quote': html=H('Quote',TA('text','Text',p.text,3)+I('author','Author',p.author));break;
+    case'callout': html=H('Callout',TA('text','Content',p.text,3)+SE('type','Type',[['note','📝 Note'],['bull','🟢 Bullish'],['bear','🔴 Bearish'],['info','ℹ️ Info']],p.type||'note'));break;
+    case'code': html=H('Code',TA('code','Code',p.code,6,true)+I('lang','Language',p.lang||'javascript'));break;
+    case'table': html=H('Table',I('headers','Headers (comma sep)',p.headers)+TA('rows','Rows (1/line, comma sep)',p.rows,5));break;
+    case'video': html=H('Video',I('url','URL / ID',p.url,'url')+SE('type','Type',[['youtube','YouTube'],['vimeo','Vimeo'],['direct','Direct MP4']],p.type||'youtube'));break;
+    case'divider': html=H('Divider',I('color','Color',p.color||'rgba(255,255,255,0.08)'));break;
+    case'html': html=H('HTML',TA('code','HTML',p.code,6,true));break;
+  }
+  html+=`<button onclick="rmW('${w.id}','${cId}','${rId}')" style="width:100%;padding:6px;background:transparent;border:1px solid rgba(224,92,92,0.2);color:var(--bear);font-family:'Syne',sans-serif;font-size:11px;cursor:pointer;border-radius:3px;transition:all 0.2s;margin-top:4px" onmouseover="this.style.background='var(--bear-bg)'" onmouseout="this.style.background='transparent'">🗑 Remove</button>`;
+  el.innerHTML=html;
+}
+
+function rRowProps(row){
+  document.getElementById('propsTitle').textContent='ROW Props';
+  document.getElementById('propsBody').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${row.cols.map((c,i)=>`<div style="display:flex;align-items:center;gap:6px"><span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);min-width:38px">Col ${i+1}</span><input type="number" value="${parseInt(c.flex)||1}" min="1" max="6" class="pi" style="padding:5px 7px" onchange="upColFlex('${row.id}',${i},this.value)"></div>`).join('')}
+    </div>
+    <button onclick="rmRow('${row.id}')" style="width:100%;padding:6px;background:transparent;border:1px solid rgba(224,92,92,0.2);color:var(--bear);font-family:'Syne',sans-serif;font-size:11px;cursor:pointer;border-radius:3px;margin-top:6px" onmouseover="this.style.background='var(--bear-bg)'" onmouseout="this.style.background='transparent'">🗑 Delete Row</button>`;
+}
+
+function upColFlex(rId,ci,v){const row=rows.find(r=>r.id===rId);if(!row?.cols[ci])return;row.cols[ci].flex=v+'fr';const el=document.getElementById('row-'+rId);if(el){const c=el.querySelector('.c-cols');if(c)c.style.gridTemplateColumns=row.cols.map(x=>x.flex||'1fr').join(' ');}}
+
+// Drag & Drop
+function pd(e,type){palType=type;dragW=null;e.dataTransfer.effectAllowed='copy';}
+function wds(e,wId,cId,rId){dragW={wId,cId,rId};palType=null;e.dataTransfer.effectAllowed='move';e.stopPropagation();}
+function cdo(e,cId){e.preventDefault();document.getElementById('col-'+cId)?.classList.add('drag-over');}
+function cdl(e,cId){document.getElementById('col-'+cId)?.classList.remove('drag-over');}
+function cdrop(e,cId,rId){
+  e.preventDefault();e.stopPropagation();
+  document.getElementById('col-'+cId)?.classList.remove('drag-over');
+  if(palType){addW(palType,cId,rId);palType=null;}
+  else if(dragW){
+    const{wId,cId:fc,rId:fr}=dragW;if(fc===cId)return;
+    const fromR=rows.find(r=>r.id===fr);const fromC=fromR?.cols.find(c=>c.id===fc);
+    const toR=rows.find(r=>r.id===rId);const toC=toR?.cols.find(c=>c.id===cId);
+    if(!fromC||!toC)return;
+    const wi=fromC.widgets.findIndex(w=>w.id===wId);if(wi<0)return;
+    const[w]=fromC.widgets.splice(wi,1);toC.widgets.push(w);
+    renderCanvas();dragW=null;
+  }
+}
+
+// Build preview HTML
+function buildPreview(){
+  if(!rows.length)return'<div style="text-align:center;padding:40px;color:var(--white3)">No content yet.</div>';
+  return rows.map(row=>`<div style="display:grid;grid-template-columns:${row.cols.map(c=>c.flex||'1fr').join(' ')};gap:20px;margin-bottom:20px">${row.cols.map(col=>`<div>${(col.widgets||[]).map(wHTML).join('')}</div>`).join('')}</div>`).join('');
+}
+
+function wHTML(w){
+  const p=w.props||{};
+  switch(w.type){
+    case'heading': return`<${p.level||'h2'} style="font-family:'Playfair Display',serif;font-size:${p.size||28}px;font-weight:700;color:#fff;text-align:${p.align||'left'};margin:0 0 12px">${p.text||''}</${p.level||'h2'}>`;
+    case'text':    return`<div style="font-size:15px;color:#dedad4;line-height:1.85;margin-bottom:12px">${parseMd(p.content||'')}</div>`;
+    case'image':   return p.src?`<figure style="margin:0 0 14px"><img src="${p.src}" alt="${p.alt||''}" style="width:${p.width||'100%'};max-width:100%;border-radius:4px;display:block;border:1px solid rgba(255,255,255,0.07)">${p.caption?`<figcaption style="font-family:'DM Mono',monospace;font-size:11px;color:#7a7570;text-align:center;margin-top:5px">${p.caption}</figcaption>`:''}</figure>`:'';
+    case'button':  const bs={gold:`background:var(--gold);color:#08090c;border:1px solid var(--gold)`,outline:`background:transparent;color:#c8c4bc;border:1px solid rgba(255,255,255,0.15)`,ghost:`background:transparent;color:rgba(255,255,255,0.6);border:none`}[p.style||'gold'];return`<div style="text-align:${p.align||'left'};margin-bottom:12px"><a href="${p.url||'#'}" style="${bs};display:inline-flex;padding:10px 22px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;text-decoration:none;border-radius:3px;letter-spacing:0.06em">${p.text||'Button'}</a></div>`;
+    case'quote':   return`<blockquote style="border-left:3px solid var(--gold);padding:11px 16px;background:rgba(200,169,110,0.06);margin:0 0 14px;font-style:italic;color:#a09880;border-radius:0 3px 3px 0"><p style="margin:0 0 5px;font-size:15px;line-height:1.7">${p.text||''}</p>${p.author?`<cite style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);font-style:normal">— ${p.author}</cite>`:''}</blockquote>`;
+    case'callout': const ct={note:'var(--gold)',bull:'var(--bull)',bear:'var(--bear)',info:'#6ba3ff'}[p.type||'note'];const cb={note:'rgba(200,169,110,0.07)',bull:'rgba(76,175,125,0.07)',bear:'rgba(224,92,92,0.07)',info:'rgba(74,158,255,0.07)'}[p.type||'note'];return`<div style="border-left:3px solid ${ct};background:${cb};padding:11px 15px;border-radius:0 3px 3px 0;font-size:14px;color:#dedad4;line-height:1.7;margin:0 0 14px">${p.text||''}</div>`;
+    case'code':    return`<pre style="background:#0a0b0e;border:1px solid var(--border2);border-radius:3px;padding:12px;font-family:'DM Mono',monospace;font-size:12px;color:#a8d8a8;overflow-x:auto;margin:0 0 14px;line-height:1.7"><code>${(p.code||'').replace(/</g,'&lt;')}</code></pre>`;
+    case'table':{const hs=(p.headers||'Col 1,Col 2').split(',');const tr=(p.rows||'').split('\n').filter(Boolean).map(r=>`<tr>${r.split(',').map(c=>`<td style="padding:8px 11px;border:1px solid var(--border2);color:#dedad4">${c.trim()}</td>`).join('')}</tr>`).join('');return`<div style="overflow-x:auto;margin:0 0 14px"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr>${hs.map(h=>`<th style="padding:8px 11px;background:var(--bg3);border:1px solid var(--border2);color:var(--white);font-weight:600;text-align:left">${h.trim()}</th>`).join('')}</tr></thead><tbody>${tr}</tbody></table></div>`;}
+    case'video':{if(!p.url)return'';let em='';if(p.type==='youtube'){const v=p.url.match(/(?:v=|youtu\.be\/)([^&\s]+)/)?.[1]||p.url;em=`<iframe src="https://www.youtube.com/embed/${v}" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none"></iframe>`;}else if(p.type==='vimeo'){const v=p.url.match(/vimeo\.com\/(\d+)/)?.[1]||p.url;em=`<iframe src="https://player.vimeo.com/video/${v}" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none"></iframe>`;}else em=`<video src="${p.url}" controls style="position:absolute;inset:0;width:100%;height:100%"></video>`;return`<div style="position:relative;padding-bottom:56.25%;border-radius:4px;overflow:hidden;margin:0 0 14px">${em}</div>`;}
+    case'divider': return`<hr style="border:none;border-top:1px solid ${p.color||'rgba(255,255,255,0.08)'};margin:18px 0">`;
+    case'html':    return`<div style="margin:0 0 14px">${p.code||''}</div>`;
+    default:       return'';
+  }
+}
+
+function parseMd(c){
+  if(!c)return'';
+  return c.replace(/^### (.+)$/gm,'<h3 style="font-family:\'Playfair Display\',serif;font-size:18px;font-weight:700;color:#fff;margin:18px 0 8px">$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2 style="font-family:\'Playfair Display\',serif;font-size:22px;font-weight:700;color:#fff;margin:22px 0 10px">$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong style="color:#fff">$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em style="color:var(--gold)">$1</em>')
+    .replace(/^- (.+)$/gm,'<li style="margin-bottom:5px">$1</li>')
+    .replace(/(<li[\s\S]+?<\/li>)/g,'<ul style="padding-left:20px;margin-bottom:14px">$1</ul>')
+    .replace(/^---$/gm,'<hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:20px 0">')
+    .replace(/\[(.+?)\]\((.+?)\)/g,'<a href="$2" style="color:var(--gold);text-decoration:underline;text-underline-offset:3px">$1</a>')
+    .split('\n\n').map(b=>{b=b.trim();if(!b||b.startsWith('<'))return b;return'<p style="margin-bottom:14px">'+b.replace(/\n/g,'<br>')+'</p>';}).join('');
+}
+
+// Keynotes
 function renderKeynotes(){
-  const w=document.getElementById('keynotesWrap');
-  if(!w)return;
-  w.innerHTML=keynotes.map((k,i)=>`
-    <div class="kn-row">
-      <input type="text" class="et-form-input keynote-input" value="${(k||'').replace(/"/g,'&quot;')}" placeholder="Key point #${i+1}" oninput="keynotes[${i}]=this.value">
-      <button class="kn-del" onclick="keynotes.splice(${i},1);renderKeynotes()">✕</button>
-    </div>`).join('');
+  const w=document.getElementById('keynotesWrap');if(!w)return;
+  w.innerHTML=keynotes.map((k,i)=>`<div class="kn-row"><input type="text" class="et-form-input keynote-input" value="${(k||'').replace(/"/g,'&quot;')}" placeholder="Key point #${i+1}" oninput="keynotes[${i}]=this.value"><button class="kn-del" onclick="keynotes.splice(${i},1);renderKeynotes()">✕</button></div>`).join('');
 }
-function addKeynote(){
-  keynotes.push('');renderKeynotes();
-  setTimeout(()=>{const els=document.querySelectorAll('.keynote-input');els[els.length-1]?.focus();},50);
-}
+function addKeynote(){keynotes.push('');renderKeynotes();setTimeout(()=>{const els=document.querySelectorAll('.keynote-input');els[els.length-1]?.focus();},50);}
 
 function autoSlug(){
   if(editingId)return;
   document.getElementById('eSlug').value=document.getElementById('eTitle').value.toLowerCase().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').slice(0,60);
-}
-
-function ins(b,a){
-  const ta=document.getElementById('eContent');
-  const s=ta.selectionStart,e=ta.selectionEnd,sel=ta.value.substring(s,e);
-  const bf=b.replace(/\\n/g,'\n'),af=a.replace(/\\n/g,'\n');
-  ta.value=ta.value.substring(0,s)+bf+sel+af+ta.value.substring(e);
-  ta.focus();ta.setSelectionRange(s+bf.length,s+bf.length+sel.length);
-}
-
-function insertImg(){
-  const url=prompt('Image URL:');if(!url)return;
-  const alt=prompt('Alt text:','Chart')||'Image';
-  ins(`\n![${alt}](${url})\n`,'');
 }
 
 async function saveArticle(publish){
@@ -287,21 +546,17 @@ async function saveArticle(publish){
     tags:tags.length?tags:null,
     keynotes:kn.length?kn:null,
     author_name:document.getElementById('eAuthor').value.trim()||'EaglePips',
-    content:document.getElementById('eContent').value,
+    content:JSON.stringify(rows),
     published:publish,
     published_at:publish?new Date().toISOString():null,
     updated_at:new Date().toISOString()
   };
-  setSaveStatus('Saving...');
+  setSS('Saving...');
   let err;
-  if(editingId){
-    const r=await _sb.from('articles').update(payload).eq('id',editingId);err=r.error;
-  } else {
-    const r=await _sb.from('articles').insert(payload).select().single();
-    err=r.error;if(!err&&r.data)editingId=r.data.id;
-  }
-  if(err){alert(err.message);setSaveStatus('Error saving');return;}
-  setSaveStatus(publish?'✓ Published':'✓ Saved as draft');
+  if(editingId){const r=await _sb.from('articles').update(payload).eq('id',editingId);err=r.error;}
+  else{const r=await _sb.from('articles').insert(payload).select().single();err=r.error;if(!err&&r.data)editingId=r.data.id;}
+  if(err){alert(err.message);setSS('Error');return;}
+  setSS(publish?'✓ Published':'✓ Draft saved');
   await loadArticles();
 }
 
@@ -312,41 +567,9 @@ async function delArt(id){
   await loadArticles();
 }
 
-function parseContent(c){
-  if(!c)return'';
-  return c
-    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
-    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
-    .replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>')
-    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g,'<em>$1</em>')
-    .replace(/^---$/gm,'<hr>')
-    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
-    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g,'<img src="$2" alt="$1">')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" style="color:var(--gold)">$1</a>')
-    .replace(/^- (.+)$/gm,'<li>$1</li>')
-    .replace(/(<li>[\s\S]+?<\/li>)/g,'<ul>$1</ul>')
-    .replace(/\[SPLIT\]([\s\S]+?)\[\/SPLIT\]/g,'<div class="img-split">$1</div>')
-    .replace(/\[BULL\]([\s\S]+?)\[\/BULL\]/g,'<div class="cb cb-bull">$1</div>')
-    .replace(/\[BEAR\]([\s\S]+?)\[\/BEAR\]/g,'<div class="cb cb-bear">$1</div>')
-    .replace(/\[NOTE\]([\s\S]+?)\[\/NOTE\]/g,'<div class="cb cb-note">$1</div>')
-    .split('\n\n').map(b=>{b=b.trim();if(!b||b.startsWith('<'))return b;return'<p>'+b.replace(/\n/g,'<br>')+'</p>';}).join('');
-}
-
-function togglePreview(){
-  previewOpen=!previewOpen;
-  if(previewOpen){
-    document.getElementById('previewContent').innerHTML=parseContent(document.getElementById('eContent').value);
-    document.getElementById('previewWrap').classList.add('open');
-    document.getElementById('editorWrap').style.display='none';
-  } else {
-    document.getElementById('previewWrap').classList.remove('open');
-    document.getElementById('editorWrap').style.display='';
-  }
-}
-
-function setSaveStatus(m){const el=document.getElementById('saveStatus');if(el)el.textContent=m;}
-main();
+function setSS(m){const el=document.getElementById('saveStatus');if(el)el.textContent=m;}
+function uid(){return Math.random().toString(36).slice(2,10);}
+document.addEventListener('click',e=>{if(e.target.classList.contains('et-modal-overlay'))etCloseModal(e.target.id);});
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="hub-sidebar.js" onload="main()"></script>
