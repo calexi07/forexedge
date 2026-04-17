@@ -1,15 +1,14 @@
-
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
 
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     :root {
-      --bg:#08090c; --bg2:#0c0e13; --bg3:#111318; --bg4:#161b24;
+      --bg:#08090c; --bg2:#0d0f15; --bg3:#13161f; --bg4:#191d28;
       --gold:#c8a96e; --gold2:#e8cc94; --gold3:#f5e4bc;
-      --gold-dim:rgba(200,169,110,0.08); --gold-border:rgba(200,169,110,0.18);
-      --white:#ffffff; --white2:#c8c4bc; --white3:#7a7570;
-      --bull:#4caf7d; --bull-bg:rgba(76,175,125,0.12);
-      --bear:#e05c5c; --bear-bg:rgba(224,92,92,0.12);
-      --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.04);
+      --gold-dim:rgba(200,169,110,0.1); --gold-border:rgba(200,169,110,0.25);
+      --white:#ffffff; --white2:#dedad4; --white3:#9a9590;
+      --bull:#4caf7d; --bull-bg:rgba(76,175,125,0.14);
+      --bear:#e05c5c; --bear-bg:rgba(224,92,92,0.14);
+      --border:rgba(255,255,255,0.1); --border2:rgba(255,255,255,0.07);
       --radius:4px; --sidebar-w:252px;
       --font-display:'Playfair Display',Georgia,serif;
       --font-ui:'Syne',sans-serif;
@@ -148,22 +147,22 @@
     .et-card-gold { background:var(--bg2); border:1px solid var(--gold-border); border-radius:var(--radius); }
 
     /* ── Stats ── */
-    .et-stat { background:var(--bg2); border:1px solid var(--border2); padding:14px 16px; border-radius:var(--radius); }
-    .et-stat-lbl { font-family:var(--font-mono); font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--white3); margin-bottom:6px; }
-    .et-stat-val { font-family:var(--font-display); font-size:26px; font-weight:700; line-height:1; color:var(--white); }
+    .et-stat { background:var(--bg2); border:1px solid var(--border2); padding:18px 20px; border-radius:var(--radius); }
+    .et-stat-lbl { font-family:var(--font-mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--white2); margin-bottom:8px; }
+    .et-stat-val { font-family:var(--font-display); font-size:28px; font-weight:700; line-height:1; color:var(--white); }
     .et-stat-val.g { color:var(--bull); } .et-stat-val.r { color:var(--bear); } .et-stat-val.o { color:var(--gold2); }
-    .et-stat-sub { font-size:11px; color:var(--white3); margin-top:3px; }
+    .et-stat-sub { font-size:12px; color:var(--white2); margin-top:4px; }
 
     /* ── Table ── */
     .et-table-wrap { overflow-x:auto; }
     .et-table { width:100%; border-collapse:collapse; min-width:520px; }
-    .et-table th { font-family:var(--font-mono); font-size:9px; color:var(--white3); letter-spacing:0.1em; text-transform:uppercase; padding:9px 12px; text-align:left; border-bottom:1px solid var(--border2); background:var(--bg3); white-space:nowrap; }
-    .et-table td { font-size:12px; color:var(--white2); padding:9px 12px; border-bottom:1px solid var(--border2); white-space:nowrap; }
+    .et-table th { font-family:var(--font-mono); font-size:10px; color:var(--white2); letter-spacing:0.08em; text-transform:uppercase; padding:11px 14px; text-align:left; border-bottom:1px solid var(--border); background:var(--bg3); white-space:nowrap; font-weight:500; }
+    .et-table td { font-size:13px; color:var(--white); padding:12px 14px; border-bottom:1px solid var(--border2); white-space:nowrap; }
     .et-table tr:last-child td { border-bottom:none; }
-    .et-table tr:hover td { background:var(--gold-dim); }
+    .et-table tr:hover td { background:rgba(200,169,110,0.06); }
 
     /* ── Badge pills ── */
-    .pill { font-family:var(--font-mono); font-size:9px; padding:2px 8px; border-radius:100px; font-weight:500; letter-spacing:0.05em; text-transform:uppercase; }
+    .pill { font-family:var(--font-mono); font-size:10px; padding:3px 9px; border-radius:100px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; }
     .pill.live { background:var(--bull-bg); color:var(--bull); border:1px solid rgba(76,175,125,0.2); }
     .pill.p2 { background:rgba(61,139,255,0.12); color:#6ba3ff; border:1px solid rgba(61,139,255,0.2); }
     .pill.p1 { background:rgba(255,140,66,0.12); color:#ff9d5c; border:1px solid rgba(255,140,66,0.2); }
@@ -184,7 +183,7 @@
     .et-modal-close:hover { border-color:var(--bear); color:var(--bear); }
     .et-modal-title { font-family:var(--font-display); font-size:22px; font-weight:700; color:var(--white); margin-bottom:20px; }
     .et-form-group { margin-bottom:14px; }
-    .et-form-label { display:block; font-family:var(--font-mono); font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--white3); margin-bottom:6px; }
+    .et-form-label { display:block; font-family:var(--font-mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--white2); margin-bottom:7px; }
     .et-form-input { width:100%; background:var(--bg); border:1px solid var(--border2); color:var(--white); font-family:var(--font-ui); font-size:14px; font-weight:400; padding:10px 13px; border-radius:var(--radius); transition:border-color 0.2s; outline:none; }
     .et-form-input:focus { border-color:var(--gold-border); box-shadow:0 0 0 3px var(--gold-dim); }
     .et-form-input option { background:var(--bg3); }
