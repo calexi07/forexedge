@@ -112,6 +112,41 @@ function tagClass(cat){
 function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long',year:'numeric'});}
 function fmtDateShort(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'});}
 
+function renderWidget(w){
+  const p=w.props||{};
+  switch(w.type){
+    case'heading': return`<${p.level||'h2'} style="font-family:'Playfair Display',serif;font-size:${p.size||28}px;font-weight:700;color:#fff;text-align:${p.align||'left'};margin:0 0 14px;line-height:1.1">${p.text||''}</${p.level||'h2'}>`;
+    case'text':    return`<div style="font-size:16px;color:#dedad4;line-height:1.9;margin-bottom:14px">${parseContent(p.content||'')}</div>`;
+    case'image':   return p.src?`<figure style="margin:0 0 16px"><img src="${p.src}" alt="${p.alt||''}" style="width:${p.width||'100%'};max-width:100%;border-radius:4px;display:block;border:1px solid rgba(255,255,255,0.07)" loading="lazy">${p.caption?`<figcaption style="font-family:'DM Mono',monospace;font-size:11px;color:#7a7570;text-align:center;margin-top:6px">${p.caption}</figcaption>`:''}</figure>`:'';
+    case'button':  {const bs={gold:`background:#c8a96e;color:#08090c;border:1px solid #c8a96e`,outline:`background:transparent;color:#c8c4bc;border:1px solid rgba(255,255,255,0.15)`,ghost:`background:transparent;color:rgba(255,255,255,0.6);border:none`}[p.style||'gold'];return`<div style="text-align:${p.align||'left'};margin-bottom:14px"><a href="${p.url||'#'}" style="${bs};display:inline-flex;padding:11px 24px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;text-decoration:none;border-radius:3px;letter-spacing:0.06em;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">${p.text||'Button'}</a></div>`;}
+    case'quote':   return`<blockquote style="border-left:3px solid #c8a96e;padding:12px 18px;background:rgba(200,169,110,0.06);margin:0 0 16px;border-radius:0 4px 4px 0"><p style="font-size:16px;line-height:1.75;color:#a09880;font-style:italic;margin:0 0 6px">${p.text||''}</p>${p.author?`<cite style="font-family:'DM Mono',monospace;font-size:11px;color:#c8a96e;font-style:normal">— ${p.author}</cite>`:''}</blockquote>`;
+    case'callout': {const ct={note:'#c8a96e',bull:'#4caf7d',bear:'#e05c5c',info:'#6ba3ff'}[p.type||'note'];const cb={note:'rgba(200,169,110,0.07)',bull:'rgba(76,175,125,0.07)',bear:'rgba(224,92,92,0.07)',info:'rgba(74,158,255,0.07)'}[p.type||'note'];return`<div style="border-left:3px solid ${ct};background:${cb};padding:13px 16px;border-radius:0 4px 4px 0;font-size:15px;color:#dedad4;line-height:1.75;margin:0 0 16px">${p.text||''}</div>`;}
+    case'code':    return`<pre style="background:#0a0b0e;border:1px solid rgba(255,255,255,0.07);border-radius:4px;padding:16px;font-family:'DM Mono',monospace;font-size:13px;color:#a8d8a8;overflow-x:auto;margin:0 0 16px;line-height:1.75"><code>${(p.code||'').replace(/</g,'&lt;')}</code></pre>`;
+    case'table':   {const hs=(p.headers||'Col 1,Col 2').split(',');const tr=(p.rows||'').split('\n').filter(Boolean).map(r=>`<tr>${r.split(',').map(c=>`<td style="padding:10px 13px;border:1px solid rgba(255,255,255,0.07);color:#dedad4">${c.trim()}</td>`).join('')}</tr>`).join('');return`<div style="overflow-x:auto;margin:0 0 16px"><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr>${hs.map(h=>`<th style="padding:10px 13px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#fff;font-weight:600;text-align:left">${h.trim()}</th>`).join('')}</tr></thead><tbody>${tr}</tbody></table></div>`;}
+    case'video':   {if(!p.url)return'';let em='';if(p.type==='youtube'){const v=p.url.match(/(?:v=|youtu\.be\/)([^&\s]+)/)?.[1]||p.url;em=`<iframe src="https://www.youtube.com/embed/${v}" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none"></iframe>`;}else if(p.type==='vimeo'){const v=p.url.match(/vimeo\.com\/(\d+)/)?.[1]||p.url;em=`<iframe src="https://player.vimeo.com/video/${v}" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none"></iframe>`;}else em=`<video src="${p.url}" controls style="position:absolute;inset:0;width:100%;height:100%"></video>`;return`<div style="position:relative;padding-bottom:56.25%;border-radius:4px;overflow:hidden;margin:0 0 16px">${em}</div>`;}
+    case'divider': return`<hr style="border:none;border-top:1px solid ${p.color||'rgba(255,255,255,0.08)'};margin:24px 0">`;
+    case'html':    return`<div style="margin:0 0 16px">${p.code||''}</div>`;
+    default:       return'';
+  }
+}
+
+function renderArticleContent(raw){
+  if(!raw)return'';
+  // Try JSON builder format first
+  try{
+    const parsed=JSON.parse(raw);
+    if(Array.isArray(parsed)&&parsed.length){
+      return parsed.map(row=>{
+        const colFr=row.cols.map(c=>c.flex||'1fr').join(' ');
+        const cols=row.cols.map(col=>`<div style="min-width:0">${(col.widgets||[]).map(w=>renderWidget(w)).join('')}</div>`).join('');
+        return`<div style="display:grid;grid-template-columns:${colFr};gap:28px;margin-bottom:20px">${cols}</div>`;
+      }).join('');
+    }
+  }catch(e){}
+  // Fallback: legacy markdown
+  return parseContent(raw);
+}
+
 function parseContent(c){
   if(!c)return'';
   return c
@@ -241,7 +276,7 @@ async function initPage(){
         ${article.cover_url?`<div class="art-cover">${coverHtml}</div>`:''}
 
         <!-- Content -->
-        <div class="art-content">${parseContent(article.content)}</div>
+        <div class="art-content">${renderArticleContent(article.content)}</div>
 
         <!-- Article nav -->
         ${(prevArt||nextArt)?`
