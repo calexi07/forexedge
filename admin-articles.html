@@ -597,7 +597,7 @@ function setSS(m){const el=document.getElementById('saveStatus');if(el)el.textCo
 function uid(){return Math.random().toString(36).slice(2,10);}
 
 // ── Media Picker ─────────────────────────────────────
-const BUCKET='media';
+const BUCKET='EaglePips';
 let mpFiles=[],mpSelected=null,mpCallback=null,mpSearch='';
 
 function openMediaPicker(callback){
@@ -609,13 +609,13 @@ function openMediaPicker(callback){
 }
 
 async function mpLoad(){
-  const{data}=await _sb.storage.from(BUCKET).list('',{limit:500,sortBy:{column:'created_at',order:'desc'}});
+  const{data}=await _sb.storage.from('EaglePips').list('',{limit:500,sortBy:{column:'created_at',order:'desc'}});
   mpFiles=(data||[]).filter(f=>f.name!=='.emptyFolderPlaceholder'&&/\.(png|jpg|jpeg|gif|webp|svg)$/i.test(f.name));
   mpRender();
 }
 
 function mpGetUrl(name){
-  const{data}=_sb.storage.from(BUCKET).getPublicUrl(name);
+  const{data}=_sb.storage.from('EaglePips').getPublicUrl(name);
   return data.publicUrl;
 }
 
@@ -662,7 +662,7 @@ async function mpUpload(files){
     const base=file.name.replace(/\.[^.]+$/,'').replace(/[^a-z0-9-_]/gi,'-').toLowerCase();
     const fname=`${base}-${Date.now()}.${ext}`;
     status.textContent=`Uploading ${file.name}...`;
-    const{error}=await _sb.storage.from(BUCKET).upload(fname,file,{cacheControl:'3600',upsert:false});
+    const{error}=await _sb.storage.from('EaglePips').upload(fname,file,{cacheControl:'3600',upsert:false});
     if(error)status.textContent=`Error: ${error.message}`;
   }
   status.textContent='Done!';
