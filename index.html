@@ -703,11 +703,8 @@ footer {
 
 <!-- ═══ HERO ═══ -->
 <section class="hero" id="hero">
-  <!-- Video background -->
-  <div class="hero-video-wrap">
-    <video class="hero-video" autoplay muted loop playsinline poster="">
-      <source src="hero-bg.mp4" type="video/mp4">
-    </video>
+  <!-- Video background — lazy loaded after page paint -->
+  <div class="hero-video-wrap" id="heroVideoBg">
     <div class="hero-video-overlay"></div>
   </div>
   <div class="hero-grid"></div>
@@ -968,6 +965,42 @@ footer {
 </footer>
 
 <script>
+
+/* ── Lazy load hero video ── */
+(function(){
+  // Wait until page is fully painted, then inject video
+  function loadHeroVideo(){
+    const wrap = document.getElementById('heroVideoBg');
+    if(!wrap) return;
+    const v = document.createElement('video');
+    v.className = 'hero-video';
+    v.autoplay = true;
+    v.muted = true;
+    v.loop = true;
+    v.playsInline = true;
+    v.setAttribute('playsinline','');
+    // Fade in video once it can play
+    v.style.opacity = '0';
+    v.style.transition = 'opacity 1.5s ease';
+    const s = document.createElement('source');
+    s.src = 'hero-bg.mp4';
+    s.type = 'video/mp4';
+    v.appendChild(s);
+    wrap.insertBefore(v, wrap.firstChild);
+    v.addEventListener('canplay', function(){
+      v.play().catch(()=>{});
+      requestAnimationFrame(()=>{ v.style.opacity = '0.18'; });
+    }, {once:true});
+    // If video fails to load, silently ignore — bg stays dark
+    v.addEventListener('error', ()=>{ v.remove(); }, {once:true});
+  }
+  // Use requestIdleCallback if available, otherwise setTimeout
+  if('requestIdleCallback' in window){
+    requestIdleCallback(loadHeroVideo, {timeout:2000});
+  } else {
+    setTimeout(loadHeroVideo, 500);
+  }
+})();
 
 /* ── Load settings from Supabase ── */
 async function loadSiteSettings() {
