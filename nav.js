@@ -11,7 +11,7 @@ async function renderNav(activePage) {
       #_nav{position:sticky!important;top:0!important;z-index:900!important;display:flex!important;align-items:center!important;gap:0!important;padding:0 32px!important;height:62px!important;background:rgba(8,9,12,0.95)!important;backdrop-filter:blur(20px)!important;border-bottom:1px solid rgba(255,255,255,0.06)!important;box-sizing:border-box!important;width:100%!important}
       #_nav .nav-logo{display:flex!important;align-items:center!important;gap:10px!important;text-decoration:none!important;font-family:'Playfair Display',serif!important;font-size:18px!important;font-weight:700!important;color:#fff!important;letter-spacing:-0.02em!important;margin-right:32px!important;flex-shrink:0!important;border-bottom:none!important}
       #_nav .nav-logo span{color:#c8a96e!important;font-style:italic!important}
-      #_nav .nav-logo-mark{width:28px!important;height:28px!important;background:linear-gradient(135deg,#c8a96e,#8a6a32)!important;clip-path:polygon(50% 0%,85% 15%,100% 50%,85% 85%,50% 100%,15% 85%,0% 50%,15% 15%)!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:13px!important;flex-shrink:0!important}
+      #_nav .nav-logo-mark{width:32px!important;height:32px!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-shrink:0!important;background:none!important;clip-path:none!important}
       #_nav .nav-links{display:flex!important;list-style:none!important;gap:0!important;margin:0!important;padding:0!important;align-items:center!important}
       #_nav .nav-link{font-family:'Syne',sans-serif!important;font-size:11px!important;font-weight:700!important;letter-spacing:0.1em!important;text-transform:uppercase!important;color:#7a7570!important;text-decoration:none!important;padding:6px 14px!important;border-radius:3px!important;transition:color 0.2s!important;border-bottom:none!important}
       #_nav .nav-link:hover{color:#c8c4bc!important;border-bottom:none!important}
@@ -86,7 +86,7 @@ async function renderNav(activePage) {
   mount.innerHTML = `
     <nav id="_nav">
       <a href="index.html" class="nav-logo">
-        <div class="nav-logo-mark">🦅</div>
+        <img src="https://vaimxhgqcdhjhdiaampa.supabase.co/storage/v1/object/public/EaglePips/5ea59b4e-0457-450f-bce1-b5389c0a97fa-1776493148502.png" style="width:32px;height:32px;object-fit:contain;flex-shrink:0" alt="EaglePips">
         Eagle<span>Pips</span>
       </a>
       <ul class="nav-links" id="_navLinks">${buildLinks(items)}</ul>

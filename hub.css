@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
+
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
 
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     :root {
@@ -46,10 +47,10 @@
     }
     .et-logo-mark {
       width:30px; height:30px;
-      background:linear-gradient(135deg,#c8a96e,#8a6a32);
-      clip-path:polygon(50% 0%,85% 15%,100% 50%,85% 85%,50% 100%,15% 85%,0% 50%,15% 15%);
+      background: none;
+      clip-path: none;
       display:flex; align-items:center; justify-content:center;
-      font-size:14px; flex-shrink:0;
+      flex-shrink:0;
     }
     .et-logo-name {
       font-family:var(--font-display);
@@ -239,12 +240,9 @@
   display: flex; align-items: center; gap: 10px;
 }
 .et-loader-eagle {
-  width: 40px; height: 40px;
-  background: linear-gradient(135deg, #c8a96e, #8a6a32);
-  clip-path: polygon(50% 0%,85% 15%,100% 50%,85% 85%,50% 100%,15% 85%,0% 50%,15% 15%);
+  width: 48px; height: 48px;
+  background: none;
   display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-  animation: etLoaderPulse 1.5s ease-in-out infinite;
 }
 @keyframes etLoaderPulse {
   0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(200,169,110,0); }

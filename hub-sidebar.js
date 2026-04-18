@@ -37,14 +37,14 @@ function renderEtSidebar(activePage, userName, userId, journals=[], activeAnalys
 
   const html = `
     <a href="index.html" class="et-logo">
-      <div class="et-logo-mark">🦅</div>
+      <img src="https://vaimxhgqcdhjhdiaampa.supabase.co/storage/v1/object/public/EaglePips/5ea59b4e-0457-450f-bce1-b5389c0a97fa-1776493148502.png" style="width:28px;height:28px;object-fit:contain;flex-shrink:0" alt="EaglePips">
       <div class="et-logo-name">Eagle<span>Pips</span></div>
     </a>
     <a href="hub.html#profile" class="et-user">
       <div class="et-avatar" id="etAvatar">${avHtml}</div>
       <div>
         <div class="et-uname">${userName||'Trader'}</div>
-        <div class="et-uplan">Free Plan</div>
+        
       </div>
     </a>
     <nav class="et-nav">
