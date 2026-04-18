@@ -1497,32 +1497,39 @@ function epDiscardAll() {
 /* ══ NEWS FEED ══════════════════════════════════════════════════════════ */
 const NEWS_SOURCES = [
   {
-    id: 'forexlive',
-    name: 'ForexLive',
-    color: '#4c8fc9',
-    icon: '📰',
-    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://www.forexlive.com/feed/news&count=10'
-  },
-  {
-    id: 'fxstreet',
-    name: 'FXStreet',
-    color: '#e8a020',
-    icon: '📈',
-    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://www.fxstreet.com/rss/news&count=10'
-  },
-  {
-    id: 'marketwatch',
-    name: 'MarketWatch',
-    color: '#4caf7d',
-    icon: '🌐',
-    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://feeds.marketwatch.com/marketwatch/marketpulse&count=10'
-  },
-  {
     id: 'yahoo',
     name: 'Yahoo Finance',
     color: '#a78bfa',
     icon: '📡',
-    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://finance.yahoo.com/rss/topstories&count=10'
+    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://finance.yahoo.com/rss/topstories&count=12'
+  },
+  {
+    id: 'cnbc',
+    name: 'CNBC',
+    color: '#4c8fc9',
+    icon: '📺',
+    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114&count=12'
+  },
+  {
+    id: 'seeking',
+    name: 'Seeking Alpha',
+    color: '#e8a020',
+    icon: '🔍',
+    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://seekingalpha.com/feed/tag/forex&count=12'
+  },
+  {
+    id: 'mw',
+    name: 'MarketWatch',
+    color: '#4caf7d',
+    icon: '📊',
+    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://feeds.marketwatch.com/marketwatch/topstories&count=12'
+  },
+  {
+    id: 'wsj',
+    name: 'WSJ Markets',
+    color: '#e05c5c',
+    icon: '📰',
+    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://feeds.wsj.com/xml/rss/3_7031.xml&count=12'
   }
 ];
 
@@ -1598,52 +1605,71 @@ async function loadNews(forceRefresh) {
 function renderNews() {
   if (!allNewsItems.length) return;
 
-  // Featured section — all items with image + excerpt (left column)
   const featured = document.getElementById('newsFeatured');
   const grid = document.getElementById('newsGrid');
 
-  const withImg = allNewsItems.filter(i => i.image).slice(0, 5);
-  const latest = allNewsItems.slice(0, 5);
+  // Sort: newest first
+  allNewsItems.sort((a,b) => new Date(b.date) - new Date(a.date));
 
-  // Featured stories (left) — ForexFactory style with image + excerpt
+  // Right column: latest 5 (any source)
+  const latestFive = allNewsItems.slice(0, 5);
+  // Left column: next items with images (skip first 5 already in right)
+  const featuredItems = allNewsItems.slice(5).filter(i => i.image).slice(0, 6);
+  // Fallback: if not enough with images, use any
+  const leftItems = featuredItems.length >= 3 ? featuredItems : allNewsItems.slice(5, 11);
+
+  // ── Left: Hot Stories ───────────────────────────────────────────────
   if (featured) {
-    if (!withImg.length) {
-      featured.innerHTML = '<div style="padding:20px;text-align:center;color:var(--white3);font-size:13px">Loading stories...</div>';
+    if (!leftItems.length) {
+      featured.innerHTML = '<div style="padding:20px;color:var(--white3);font-size:13px">Loading stories...</div>';
     } else {
-      featured.innerHTML = withImg.map((item, i) => {
+      featured.innerHTML = leftItems.map((item, i) => {
         const isFirst = i === 0;
         const thumb = item.image
-          ? `<img style="width:${isFirst?'140px':'90px'};height:${isFirst?'96px':'64px'};object-fit:cover;border-radius:4px;flex-shrink:0;border:1px solid var(--border2)" src="${item.image}" alt="" loading="lazy" onerror="this.style.display='none'">`
-          : `<div style="width:${isFirst?'140px':'90px'};height:${isFirst?'96px':'64px'};background:var(--bg3);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:${isFirst?'28px':'20px'};border:1px solid var(--border2)">${item.icon}</div>`;
+          ? `<img style="width:${isFirst?'160px':'100px'};height:${isFirst?'108px':'70px'};object-fit:cover;border-radius:4px;flex-shrink:0;border:1px solid var(--border2)" src="${item.image}" alt="" loading="lazy" onerror="this.style.display='none'">`
+          : `<div style="width:${isFirst?'160px':'100px'};height:${isFirst?'108px':'70px'};background:var(--bg3);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:${isFirst?'30px':'22px'};border:1px solid var(--border2)">${item.icon}</div>`;
 
-        return `<a href="${item.url}" target="_blank" rel="noopener" style="display:flex;gap:${isFirst?'16px':'12px'};padding:${isFirst?'0 0 20px':'14px 0'};border-bottom:1px solid rgba(255,255,255,0.05);text-decoration:none;transition:all 0.15s;cursor:pointer" onmouseover="this.style.paddingLeft='8px'" onmouseout="this.style.paddingLeft='0'">
+        const domain = (() => { try { return new URL(item.url).hostname.replace('www.',''); } catch { return item.source; } })();
+        const excerptHtml = item.excerpt
+          ? `<div style="font-size:${isFirst?'14px':'12px'};color:var(--white2);line-height:1.65;display:-webkit-box;-webkit-line-clamp:${isFirst?'3':'2'};-webkit-box-orient:vertical;overflow:hidden;margin-top:5px">${item.excerpt}</div>`
+          : '';
+
+        return `<div style="display:flex;gap:${isFirst?'18px':'14px'};padding:${isFirst?'0 0 22px':'14px 0'};border-bottom:1px solid rgba(255,255,255,0.05)">
           ${thumb}
           <div style="flex:1;min-width:0">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:${isFirst?'8px':'5px'}">
               <span style="font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;border-radius:100px;background:${item.color}18;color:${item.color};border:1px solid ${item.color}35;letter-spacing:0.06em">${item.source}</span>
               <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3)">${timeAgo(item.date)}</span>
             </div>
-            <div style="font-family:'Playfair Display',serif;font-size:${isFirst?'18px':'14px'};font-weight:700;color:var(--white);line-height:1.35;margin-bottom:${isFirst?'8px':'0'};display:-webkit-box;-webkit-line-clamp:${isFirst?'3':'2'};-webkit-box-orient:vertical;overflow:hidden">${item.title}</div>
-            ${isFirst && item.excerpt ? `<div style="font-size:13px;color:var(--white2);line-height:1.65;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-top:4px">${item.excerpt}</div>` : ''}
+            <a href="${item.url}" target="_blank" rel="noopener" style="text-decoration:none">
+              <div style="font-family:'Playfair Display',serif;font-size:${isFirst?'19px':'14px'};font-weight:700;color:var(--white);line-height:1.35;display:-webkit-box;-webkit-line-clamp:${isFirst?'3':'2'};-webkit-box-orient:vertical;overflow:hidden;transition:color 0.15s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--white)'">${item.title}</div>
+            </a>
+            ${excerptHtml}
+            <a href="${item.url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;margin-top:7px;font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);text-decoration:none;letter-spacing:0.06em;opacity:0.8;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+              Read more on ${domain} →
+            </a>
           </div>
-        </a>`;
+        </div>`;
       }).join('');
     }
   }
 
-  // Latest 5 (right column) — compact list, no images
+  // ── Right: Latest 5 ─────────────────────────────────────────────────
   if (grid) {
-    if (!latest.length) {
-      grid.innerHTML = '<div style="color:var(--white3);font-size:12px;padding:10px 0">No news yet</div>';
+    if (!latestFive.length) {
+      grid.innerHTML = '<div style="color:var(--white3);font-size:12px">No news yet</div>';
     } else {
-      grid.innerHTML = latest.map((item, i) => `
-        <a href="${item.url}" target="_blank" rel="noopener" style="display:block;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);text-decoration:none;transition:all 0.15s" onmouseover="this.style.paddingLeft='6px'" onmouseout="this.style.paddingLeft='0'">
+      grid.innerHTML = latestFive.map(item => {
+        const domain = (() => { try { return new URL(item.url).hostname.replace('www.',''); } catch { return item.source; } })();
+        return `<a href="${item.url}" target="_blank" rel="noopener" style="display:block;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);text-decoration:none;transition:all 0.15s" onmouseover="this.style.paddingLeft='6px'" onmouseout="this.style.paddingLeft='0'">
           <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
             <span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 6px;border-radius:100px;background:${item.color}18;color:${item.color};border:1px solid ${item.color}35">${item.source}</span>
             <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3)">${timeAgo(item.date)}</span>
           </div>
           <div style="font-size:13px;font-weight:600;color:var(--white);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${item.title}</div>
-        </a>`).join('');
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);margin-top:4px">via ${domain}</div>
+        </a>`;
+      }).join('');
     }
   }
 
@@ -1652,7 +1678,7 @@ function renderNews() {
   if (ts) ts.textContent = 'Updated ' + new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
 }
 
-function renderSourcesList() { /* no-op — sidebar removed */ }
+function renderSourcesList() {}
 
 /* ── Load settings from Supabase ── */
 /* ══ NEWS FEED ══════════════════════════════════════════════════════════ */
