@@ -1049,18 +1049,12 @@ body.ep-edit-mode [data-ep].ep-selected {
   <div style="max-width:1300px;margin:0 auto">
 
     <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px">
+    <div style="display:flex;align-items:flex-end;margin-bottom:28px">
       <div>
         <span class="section-eyebrow" style="margin-bottom:8px;display:block">// Market News</span>
         <h2 class="section-title" style="margin:0;font-size:clamp(26px,3vw,38px)">Hot <em>Stories</em></h2>
       </div>
-      <div style="display:flex;align-items:center;gap:12px">
-        <div style="display:flex;align-items:center;gap:7px">
-          <div style="width:7px;height:7px;border-radius:50%;background:var(--bull);box-shadow:0 0 7px rgba(76,175,125,0.6);animation:pulse 2s ease-in-out infinite"></div>
-          <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3)" id="newsLastUpdated">Live</span>
-        </div>
-        <button onclick="loadNews(true)" style="background:none;border:1px solid var(--border2);color:var(--white3);padding:5px 12px;border-radius:3px;cursor:pointer;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.06em;transition:all 0.15s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">↺ Refresh</button>
-      </div>
+
     </div>
 
     <!-- Main grid: featured story left + list right -->
@@ -1540,10 +1534,10 @@ function stripHtml(html) {
 // Check if article is forex/macro relevant
 function isRelevant(item) {
   const text = ((item.title||'') + ' ' + (item.description||'')).toLowerCase();
-  // Exclude sports/entertainment
+  // Exclude only clear non-financial content
   if (EXCLUDE_KEYWORDS.some(k => text.includes(k))) return false;
-  // Must contain at least one forex keyword
-  return FOREX_KEYWORDS.some(k => text.includes(k));
+  // Accept all finance/business news — the search query already filtered
+  return true;
 }
 
 // Deduplication — remove similar titles (>60% word overlap)
@@ -1580,6 +1574,7 @@ async function fetchCategory(category, keywords) {
     const res = await fetch(url);
     if (!res.ok) { console.warn('[News] fetch failed', res.status); return []; }
     const data = await res.json();
+    console.log('[News] received', (data.news||[]).length, 'items from', keywords||category);
     return (data.news || []).map(item => ({
       title: item.title || '',
       description: stripHtml(item.description || ''),
@@ -1616,8 +1611,7 @@ async function loadNews(forceRefresh) {
   newsLoaded = true;
   renderNews();
 
-  const ts = document.getElementById('newsLastUpdated');
-  if (ts) ts.textContent = 'Updated ' + new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) + ' · ' + allNewsItems.length + ' stories';
+
 
   // Auto-refresh every 10 minutes (save API credits)
   setTimeout(() => { newsLoaded = false; loadNews(false); }, 10 * 60 * 1000);
@@ -1715,7 +1709,7 @@ function renderSourcesList() {}
 /* ══ NEWS FEED ══════════════════════════════════════════════════════════ */
 async function loadSiteSettings() {
   try {
-    const _sb = window.supabase.createClient(
+    const _sb = getNavSB() || window.supabase.createClient(
       'https://vaimxhgqcdhjhdiaampa.supabase.co',
       'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH'
     );
