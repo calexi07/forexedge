@@ -10,7 +10,7 @@ async function renderNav(activePage) {
     const s = document.createElement('style');
     s.id = '_navCss';
     s.textContent = `
-      #_nav{position:sticky!important;top:0!important;z-index:900!important;display:flex!important;align-items:center!important;gap:0!important;padding:0 40px!important;height:88px!important;background:rgba(8,9,12,0.95)!important;backdrop-filter:blur(20px)!important;border-bottom:1px solid rgba(255,255,255,0.06)!important;box-sizing:border-box!important;width:100%!important}
+      #_nav{position:sticky!important;top:0!important;z-index:900!important;display:flex!important;align-items:center!important;gap:0!important;padding:0 40px!important;height:70px!important;background:rgba(8,9,12,0.95)!important;backdrop-filter:blur(20px)!important;border-bottom:1px solid rgba(255,255,255,0.06)!important;box-sizing:border-box!important;width:100%!important}
       #_nav .nav-logo{display:flex!important;align-items:center!important;gap:0!important;text-decoration:none!important;margin-right:48px!important;flex-shrink:0!important;border-bottom:none!important}
       #_nav .nav-logo span{display:none!important}
       #_nav .nav-logo-mark{width:32px!important;height:32px!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-shrink:0!important;background:none!important;clip-path:none!important}
@@ -88,7 +88,7 @@ async function renderNav(activePage) {
   mount.innerHTML = `
     <nav id="_nav">
       <a href="index.html" class="nav-logo">
-        <img src="https://vaimxhgqcdhjhdiaampa.supabase.co/storage/v1/object/public/EaglePips/5ea59b4e-0457-450f-bce1-b5389c0a97fa-1776493148502.png" style="height:80px;width:auto;max-width:200px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 0 6px rgba(200,169,110,0.4)) brightness(1.15);transform:scale(1.4);transform-origin:left center" alt="EaglePips">
+        <img src="https://vaimxhgqcdhjhdiaampa.supabase.co/storage/v1/object/public/EaglePips/design-f-r--titlu-1776494279309.png" style="height:52px;width:auto;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 0 6px rgba(200,169,110,0.35)) brightness(1.1)" alt="EaglePips">
       </a>
       <ul class="nav-links" id="_navLinks">${buildLinks(items)}</ul>
       <div class="nav-cta" id="navCta">
