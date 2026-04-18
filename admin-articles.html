@@ -52,8 +52,6 @@
 .add-row-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;border:1px dashed rgba(200,169,110,0.15);border-radius:3px;background:transparent;color:rgba(200,169,110,0.4);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;transition:all 0.15s;margin-top:5px}
 .add-row-btn:hover{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
 /* Props */
-.props-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:4px;position:sticky;top:74px;max-height:calc(100vh - 100px);overflow-y:auto}
-.props-hdr{padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg3);font-family:'DM Mono',monospace;font-size:10px;color:var(--white2);letter-spacing:0.12em;text-transform:uppercase;font-weight:500}
 .pg{background:var(--bg3);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-bottom:6px}
 .pg-h{padding:9px 12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--white2);cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all 0.15s;font-weight:500}
 .pg-h:hover{background:var(--gold-dim);color:var(--gold)}
@@ -117,6 +115,27 @@
   </div>
   <div class="hub-content" id="adminContent">
     <div style="text-align:center;padding:60px"><div class="et-spinner"></div></div>
+  </div>
+</div>
+
+<!-- Props Modal -->
+<div class="et-modal-overlay" id="propsModal" onclick="if(event.target===this)closePropModal()">
+  <div class="et-modal" style="max-width:520px;max-height:88vh;display:flex;flex-direction:column;padding:0;border-radius:6px" onclick="event.stopPropagation()">
+    <!-- Header -->
+    <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--bg3);border-radius:6px 6px 0 0">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="propsModalIcon" style="font-size:18px">✏️</span>
+        <span id="propsModalTitle" style="font-size:14px;font-weight:600;color:var(--white)">Properties</span>
+      </div>
+      <button onclick="closePropModal()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:13px;transition:all 0.15s" onmouseover="this.style.background='rgba(224,92,92,0.2)';this.style.color='var(--bear)'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='rgba(255,255,255,0.5)'">✕</button>
+    </div>
+    <!-- Body -->
+    <div id="propsBody" style="overflow-y:auto;flex:1;padding:16px;display:flex;flex-direction:column;gap:8px"></div>
+    <!-- Footer -->
+    <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0;background:var(--bg3);border-radius:0 0 6px 6px">
+      <button onclick="closePropModal()" class="et-btn-ghost" style="padding:7px 18px;font-size:12px">Close</button>
+      <button onclick="closePropModal()" class="et-btn-gold" style="padding:7px 18px;font-size:12px">✓ Done</button>
+    </div>
   </div>
 </div>
 
@@ -334,7 +353,7 @@ async function main(){
 
 function renderLayout(){
   document.getElementById('adminContent').innerHTML=`
-    <div style="display:grid;grid-template-columns:240px 1fr 250px;gap:12px;align-items:start">
+    <div style="display:grid;grid-template-columns:240px 1fr;gap:12px;align-items:start">
       <!-- List -->
       <div>
         <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;position:sticky;top:74px;max-height:calc(100vh - 100px);display:flex;flex-direction:column">
@@ -417,17 +436,6 @@ function renderLayout(){
         </div>
       </div>
 
-      <!-- Properties -->
-      <div>
-        <div class="props-wrap">
-          <div class="props-hdr" id="propsTitle">Properties</div>
-          <div style="padding:11px" id="propsBody">
-            <div style="text-align:center;padding:28px 14px;color:var(--white3);font-size:12px">
-              <div style="font-size:22px;opacity:0.15;margin-bottom:7px">✏️</div>Click a widget to edit
-            </div>
-          </div>
-        </div>
-      </div>
     </div>`;
 
   // Build layout picker
@@ -651,11 +659,11 @@ function addRow(cols){etCloseModal('rowModal');rows.push({id:uid(),cols:cols.map
 function addCustomRow(){addRow(Array(parseInt(document.getElementById('customCols').value)||2).fill(1));}
 function mvRow(id,d){const i=rows.findIndex(r=>r.id===id);const n=i+d;if(n<0||n>=rows.length)return;[rows[i],rows[n]]=[rows[n],rows[i]];renderCanvas();}
 function cpRow(id){const i=rows.findIndex(r=>r.id===id);if(i<0)return;const c=JSON.parse(JSON.stringify(rows[i]));c.id=uid();c.cols.forEach(col=>{col.id=uid();col.widgets.forEach(w=>w.id=uid());});rows.splice(i+1,0,c);renderCanvas();}
-function rmRow(id){if(!confirm('Delete row?'))return;rows=rows.filter(r=>r.id!==id);if(selS===id){selS=null;rProps(null,null,null);}renderCanvas();}
+function rmRow(id){if(!confirm('Delete row?'))return;rows=rows.filter(r=>r.id!==id);if(selS===id){selS=null;}renderCanvas();}
 
 // Widget ops
 function addW(type,cId,rId){const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);if(!col)return;col.widgets.push({id:uid(),type,props:{...WD[type]}});renderCanvas();autoExcerpt();}
-function rmW(wId,cId,rId){const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);if(!col)return;col.widgets=col.widgets.filter(w=>w.id!==wId);if(selW===wId){selW=null;rProps(null,null,null);}renderCanvas();}
+function rmW(wId,cId,rId){const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);if(!col)return;col.widgets=col.widgets.filter(w=>w.id!==wId);if(selW===wId){selW=null;}renderCanvas();}
 function cpW(wId,cId,rId){const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);if(!col)return;const wi=col.widgets.findIndex(w=>w.id===wId);if(wi<0)return;const c={...JSON.parse(JSON.stringify(col.widgets[wi])),id:uid()};col.widgets.splice(wi+1,0,c);renderCanvas();}
 function upd(wId,cId,rId,k,v){
   const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);const w=col?.widgets.find(x=>x.id===wId);
@@ -669,11 +677,23 @@ function upd(wId,cId,rId,k,v){
 // Selection
 function selWidget(wId,cId,rId){selW=wId;selS=null;document.querySelectorAll('.c-widget,.c-section').forEach(e=>e.classList.remove('selected'));document.getElementById('w-'+wId)?.classList.add('selected');const row=rows.find(r=>r.id===rId);const col=row?.cols.find(c=>c.id===cId);const w=col?.widgets.find(x=>x.id===wId);if(w)rProps(w,cId,rId);}
 function selSec(rId){selS=rId;selW=null;document.querySelectorAll('.c-widget,.c-section').forEach(e=>e.classList.remove('selected'));document.getElementById('row-'+rId)?.classList.add('selected');const row=rows.find(r=>r.id===rId);if(row)rRowProps(row);}
-function desel(){selW=null;selS=null;document.querySelectorAll('.c-widget,.c-section').forEach(e=>e.classList.remove('selected'));rProps(null,null,null);}
+function desel(){selW=null;selS=null;document.querySelectorAll('.c-widget,.c-section').forEach(e=>e.classList.remove('selected'));}
 
 // Props
+function closePropModal(){
+  document.getElementById('propsModal').style.display='none';
+  document.querySelectorAll('.c-widget,.c-section').forEach(e=>e.classList.remove('selected'));
+  selW=null;selS=null;
+}
+
+function openPropModal(title, icon){
+  document.getElementById('propsModalTitle').textContent=title;
+  document.getElementById('propsModalIcon').textContent=icon||'✏️';
+  document.getElementById('propsModal').style.display='flex';
+}
+
 function rProps(w,cId,rId){
-  document.getElementById('propsTitle').textContent=w?w.type.toUpperCase()+' Props':'Properties';
+  if(!w){ return; }
   const el=document.getElementById('propsBody');
   if(!w){el.innerHTML='<div style="text-align:center;padding:28px 14px;color:var(--white3);font-size:12px"><div style="font-size:22px;opacity:0.15;margin-bottom:7px">✏️</div>Click a widget to edit</div>';return;}
   const p=w.props||{};
@@ -745,17 +765,19 @@ function rProps(w,cId,rId){
       </div>`
     );break;
   }
-  html+=`<button onclick="rmW('${w.id}','${cId}','${rId}')" style="width:100%;padding:6px;background:transparent;border:1px solid rgba(224,92,92,0.2);color:var(--bear);font-family:'Syne',sans-serif;font-size:11px;cursor:pointer;border-radius:3px;transition:all 0.2s;margin-top:4px" onmouseover="this.style.background='var(--bear-bg)'" onmouseout="this.style.background='transparent'">🗑 Remove</button>`;
+  html+=`<button onclick="rmW('${w.id}','${cId}','${rId}');closePropModal()" style="width:100%;padding:6px;background:transparent;border:1px solid rgba(224,92,92,0.2);color:var(--bear);font-family:'Syne',sans-serif;font-size:11px;cursor:pointer;border-radius:3px;transition:all 0.2s;margin-top:4px" onmouseover="this.style.background='var(--bear-bg)'" onmouseout="this.style.background='transparent'">🗑 Remove Widget</button>`;
   el.innerHTML=html;
+  const icons={'heading':'H','text':'T','image':'🖼','button':'⬜','quote':'❝','callout':'📋','code':'</>','table':'⊞','video':'▶','divider':'—','html':'{}','stats':'📊','currency':'💱','scenarios':'⚡','calendar_day':'📅','toc':'📋'};
+  openPropModal(w.type.charAt(0).toUpperCase()+w.type.slice(1).replace('_',' ')+' Properties', icons[w.type]||'✏️');
 }
 
 function rRowProps(row){
-  document.getElementById('propsTitle').textContent='ROW Props';
   document.getElementById('propsBody').innerHTML=`
     <div style="display:flex;flex-direction:column;gap:6px">
       ${row.cols.map((c,i)=>`<div style="display:flex;align-items:center;gap:6px"><span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);min-width:38px">Col ${i+1}</span><input type="number" value="${parseInt(c.flex)||1}" min="1" max="6" class="pi" style="padding:5px 7px" onchange="upColFlex('${row.id}',${i},this.value)"></div>`).join('')}
     </div>
-    <button onclick="rmRow('${row.id}')" style="width:100%;padding:6px;background:transparent;border:1px solid rgba(224,92,92,0.2);color:var(--bear);font-family:'Syne',sans-serif;font-size:11px;cursor:pointer;border-radius:3px;margin-top:6px" onmouseover="this.style.background='var(--bear-bg)'" onmouseout="this.style.background='transparent'">🗑 Delete Row</button>`;
+    <button onclick="rmRow('${row.id}');closePropModal()" style="width:100%;padding:6px;background:transparent;border:1px solid rgba(224,92,92,0.2);color:var(--bear);font-family:'Syne',sans-serif;font-size:11px;cursor:pointer;border-radius:3px;margin-top:6px" onmouseover="this.style.background='var(--bear-bg)'" onmouseout="this.style.background='transparent'">🗑 Delete Row</button>`;
+  openPropModal('Row Properties', '⬛');
 }
 
 function upColFlex(rId,ci,v){const row=rows.find(r=>r.id===rId);if(!row?.cols[ci])return;row.cols[ci].flex=v+'fr';const el=document.getElementById('row-'+rId);if(el){const c=el.querySelector('.c-cols');if(c)c.style.gridTemplateColumns=row.cols.map(x=>x.flex||'1fr').join(' ');}}
