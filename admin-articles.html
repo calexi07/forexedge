@@ -681,7 +681,7 @@ function desel(){selW=null;selS=null;document.querySelectorAll('.c-widget,.c-sec
 
 // Props
 function closePropModal(){
-  document.getElementById('propsModal').style.display='none';
+  etCloseModal('propsModal');
   document.querySelectorAll('.c-widget,.c-section').forEach(e=>e.classList.remove('selected'));
   selW=null;selS=null;
 }
@@ -689,7 +689,7 @@ function closePropModal(){
 function openPropModal(title, icon){
   document.getElementById('propsModalTitle').textContent=title;
   document.getElementById('propsModalIcon').textContent=icon||'✏️';
-  document.getElementById('propsModal').style.display='flex';
+  etOpenModal('propsModal');
 }
 
 function rProps(w,cId,rId){
