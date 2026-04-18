@@ -1257,7 +1257,7 @@ body.ep-edit-mode [data-ep].ep-selected {
 /* ── Load Market Updates on homepage ── */
 async function loadMarketUpdates(){
   try{
-    const _sb=window.supabase.createClient('https://vaimxhgqcdhjhdiaampa.supabase.co','sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH');
+    const _sb=getNavSB()||window.supabase.createClient('https://vaimxhgqcdhjhdiaampa.supabase.co','sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH');
     const{data}=await _sb.from('articles').select('id,title,slug,excerpt,cover_url,category,author_name,published_at,tags').eq('published',true).order('published_at',{ascending:false}).limit(4);
     if(!data||!data.length)return;
 
@@ -1515,36 +1515,32 @@ function epDiscardAll() {
 /* ══ NEWS FEED ══════════════════════════════════════════════════════════ */
 const NEWS_SOURCES = [
   {
-    id: 'fxstreet',
-    name: 'FXStreet',
+    id: 'forexlive',
+    name: 'ForexLive',
     color: '#4c8fc9',
     icon: '📰',
-    rss: 'https://www.fxstreet.com/rss/news',
-    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://www.fxstreet.com/rss/news&count=8'
+    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://www.forexlive.com/feed/news&count=10'
   },
   {
-    id: 'investing',
-    name: 'Investing.com',
+    id: 'fxstreet',
+    name: 'FXStreet',
     color: '#e8a020',
     icon: '📈',
-    rss: 'https://www.investing.com/rss/news_25.rss',
-    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://www.investing.com/rss/news_25.rss&count=8'
+    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://www.fxstreet.com/rss/news&count=10'
   },
   {
-    id: 'dailyfx',
-    name: 'DailyFX',
+    id: 'marketwatch',
+    name: 'MarketWatch',
     color: '#4caf7d',
     icon: '🌐',
-    rss: 'https://www.dailyfx.com/feeds/all',
-    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://www.dailyfx.com/feeds/all&count=8'
+    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://feeds.marketwatch.com/marketwatch/marketpulse&count=10'
   },
   {
-    id: 'reuters',
-    name: 'Reuters FX',
-    color: '#e05c5c',
+    id: 'yahoo',
+    name: 'Yahoo Finance',
+    color: '#a78bfa',
     icon: '📡',
-    rss: 'https://feeds.reuters.com/reuters/UKbusinessNews',
-    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://feeds.reuters.com/reuters/UKbusinessNews&count=8'
+    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://finance.yahoo.com/rss/topstories&count=10'
   }
 ];
 
@@ -1737,14 +1733,21 @@ function applySettings(s) {
       if (sec) sec.style.display = 'none';
     }
   });
-  // Apply section order
+  // Apply section order — skip if not set, prevents sections jumping to top
   if (s.section_order) {
-    const body = document.body;
-    const order = s.section_order.split(',');
-    order.forEach(id => {
-      const sec = document.getElementById(id);
-      if (sec) body.appendChild(sec);
-    });
+    try {
+      const order = s.section_order.split(',').filter(Boolean);
+      if (order.length > 1) {
+        const firstSec = document.getElementById(order[0]);
+        const parent = firstSec?.parentNode;
+        if (parent) {
+          order.forEach(id => {
+            const sec = document.getElementById(id);
+            if (sec && sec.parentNode === parent) parent.appendChild(sec);
+          });
+        }
+      }
+    } catch(e) { console.warn('Section order error:', e); }
   }
 }
 
@@ -1779,10 +1782,8 @@ function applyNav(items) {
 /* ── Auth state check for nav ── */
 async function checkIndexAuth() {
   try {
-    const _sb = getNavSB() || window.supabase.createClient(
-      'https://vaimxhgqcdhjhdiaampa.supabase.co',
-      'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH'
-    );
+    const _sb = getNavSB();
+    if (!_sb) return;
     const { data: { session } } = await _sb.auth.getSession();
     if (!session?.user) return;
 
