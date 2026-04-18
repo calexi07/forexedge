@@ -1495,42 +1495,29 @@ function epDiscardAll() {
 }
 
 /* ══ NEWS FEED ══════════════════════════════════════════════════════════ */
-const NEWS_SOURCES = [
-  {
-    id: 'yahoo',
-    name: 'Yahoo Finance',
-    color: '#a78bfa',
-    icon: '📡',
-    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://finance.yahoo.com/rss/topstories&count=12'
-  },
-  {
-    id: 'cnbc',
-    name: 'CNBC',
-    color: '#4c8fc9',
-    icon: '📺',
-    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114&count=12'
-  },
-  {
-    id: 'seeking',
-    name: 'Seeking Alpha',
-    color: '#e8a020',
-    icon: '🔍',
-    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://seekingalpha.com/feed/tag/forex&count=12'
-  },
-  {
-    id: 'mw',
-    name: 'MarketWatch',
-    color: '#4caf7d',
-    icon: '📊',
-    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://feeds.marketwatch.com/marketwatch/topstories&count=12'
-  },
-  {
-    id: 'wsj',
-    name: 'WSJ Markets',
-    color: '#e05c5c',
-    icon: '📰',
-    fallback: 'https://api.rss2json.com/v1/api.json?rss_url=https://feeds.wsj.com/xml/rss/3_7031.xml&count=12'
-  }
+/* ══ NEWS FEED — Currents API ══════════════════════════════════════════════ */
+const CURRENTS_KEY = 'bNpB6lPWKZmfoxpLW7WlRSjc_yNrFnPs6wMYD47kOvoJogm8';
+const CURRENTS_BASE = 'https://api.currentsapi.services/v1';
+
+// Forex & macro keywords — only keep stories mentioning these
+const FOREX_KEYWORDS = [
+  'forex','currency','dollar','euro','pound','yen','usd','eur','gbp','jpy','aud','cad','chf','nzd',
+  'fed','federal reserve','ecb','european central bank','bank of england','boe','boj','rba','rbnz',
+  'interest rate','rate hike','rate cut','inflation','cpi','gdp','monetary policy',
+  'central bank','powell','lagarde','treasury','dxy','eurusd','gbpusd','usdjpy',
+  'oil price','crude','opec','commodity','gold price','xau',
+  'iran','strait of hormuz','ceasefire','sanctions','tariff','trade war','geopolit',
+  'nato','ukraine','russia','china','taiwan','middle east','conflict','war','nuclear',
+  'recession','stagflation','jobs','unemployment','payroll','nonfarm',
+  'imf','world bank','g7','g20','davos'
+];
+
+// Topics to EXCLUDE (not forex relevant)
+const EXCLUDE_KEYWORDS = [
+  'nba','nfl','soccer','football','basketball','baseball','hockey','tennis','golf','olympic',
+  'celebrity','kardashian','oscar','emmy','grammy','netflix','disney','movie','tv show',
+  'iphone','android','samsung','apple watch','gaming','fortnite','minecraft',
+  'diet','recipe','weight loss','fitness','workout','makeup','fashion','style'
 ];
 
 let allNewsItems = [];
@@ -1547,135 +1534,179 @@ function timeAgo(dateStr) {
 }
 
 function stripHtml(html) {
-  return (html||'').replace(/<[^>]*>/g, '').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#039;/g,"'").replace(/&nbsp;/g,' ').trim();
+  return (html||'').replace(/<[^>]*>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#039;/g,"'").replace(/&nbsp;/g,' ').trim();
 }
 
-async function fetchSource(src) {
+// Check if article is forex/macro relevant
+function isRelevant(item) {
+  const text = ((item.title||'') + ' ' + (item.description||'')).toLowerCase();
+  // Exclude sports/entertainment
+  if (EXCLUDE_KEYWORDS.some(k => text.includes(k))) return false;
+  // Must contain at least one forex keyword
+  return FOREX_KEYWORDS.some(k => text.includes(k));
+}
+
+// Deduplication — remove similar titles (>60% word overlap)
+function deduplicate(items) {
+  const unique = [];
+  const seen = new Set();
+  
+  for (const item of items) {
+    // Simple fingerprint: first 6 significant words of title
+    const words = (item.title||'').toLowerCase()
+      .replace(/[^a-z0-9\s]/g,'').split(/\s+/)
+      .filter(w => w.length > 3).slice(0, 6).join(' ');
+    
+    // Check for near-duplicates
+    let isDup = false;
+    for (const s of seen) {
+      const overlap = words.split(' ').filter(w => s.includes(w)).length;
+      const total = words.split(' ').length;
+      if (total > 0 && overlap / total > 0.6) { isDup = true; break; }
+    }
+    if (!isDup) { unique.push(item); seen.add(words); }
+  }
+  return unique;
+}
+
+async function fetchCategory(category, keywords) {
   try {
-    const res = await fetch(src.fallback);
+    let url;
+    if (keywords) {
+      url = `${CURRENTS_BASE}/search?keywords=${encodeURIComponent(keywords)}&language=en&apiKey=${CURRENTS_KEY}`;
+    } else {
+      url = `${CURRENTS_BASE}/latest-news?category=${category}&language=en&apiKey=${CURRENTS_KEY}`;
+    }
+    const res = await fetch(url);
+    if (!res.ok) { console.warn('[News] fetch failed', res.status); return []; }
     const data = await res.json();
-    if (!data.items?.length) return [];
-    return data.items.map(item => ({
-      id: src.id,
-      source: src.name,
-      color: src.color,
-      icon: src.icon,
-      title: stripHtml(item.title || ''),
-      excerpt: stripHtml(item.description || item.content || '').slice(0, 180),
-      url: item.link || item.url || '#',
-      image: item.thumbnail || item.enclosure?.link || '',
-      date: item.pubDate || item.published || new Date().toISOString(),
+    return (data.news || []).map(item => ({
+      title: item.title || '',
+      description: stripHtml(item.description || ''),
+      url: item.url || '#',
+      image: item.image && item.image !== 'None' ? item.image : '',
+      source: item.author || 'News',
+      date: item.published || new Date().toISOString(),
+      category: category || 'forex'
     }));
   } catch(e) {
-    console.warn('News fetch failed for', src.name, e.message);
+    console.warn('[News] error:', e.message);
     return [];
   }
 }
 
 async function loadNews(forceRefresh) {
   if (newsLoaded && !forceRefresh) return;
-  
-  // Show loading state
-  const grid = document.getElementById('newsGrid');
-  if (!grid) return;
 
-  // Fetch all sources in parallel
-  const results = await Promise.allSettled(NEWS_SOURCES.map(s => fetchSource(s)));
-  
-  allNewsItems = [];
-  results.forEach((r, i) => {
-    if (r.status === 'fulfilled') allNewsItems.push(...r.value);
-  });
+  // Fetch forex search + world/geopolitical in parallel (2 API calls)
+  const [forexNews, geoNews] = await Promise.all([
+    fetchCategory(null, 'forex dollar euro pound central bank interest rate inflation oil'),
+    fetchCategory(null, 'iran war sanctions ceasefire geopolitical nato trade tariff')
+  ]);
 
-  // Sort by date newest first
-  allNewsItems.sort((a,b) => new Date(b.date) - new Date(a.date));
+  const combined = [...forexNews, ...geoNews];
+
+  // Filter for relevance
+  const relevant = combined.filter(isRelevant);
+
+  // Deduplicate
+  allNewsItems = deduplicate(relevant)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
 
   newsLoaded = true;
   renderNews();
-  renderSourcesList();
 
-  // Update timestamp
   const ts = document.getElementById('newsLastUpdated');
-  if (ts) ts.textContent = 'Updated ' + new Date().toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
+  if (ts) ts.textContent = 'Updated ' + new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) + ' · ' + allNewsItems.length + ' stories';
 
-  // Auto-refresh every 5 minutes
-  setTimeout(() => loadNews(true), 5 * 60 * 1000);
+  // Auto-refresh every 10 minutes (save API credits)
+  setTimeout(() => { newsLoaded = false; loadNews(false); }, 10 * 60 * 1000);
 }
 
 function renderNews() {
-  if (!allNewsItems.length) return;
+  if (!allNewsItems.length) {
+    const featured = document.getElementById('newsFeatured');
+    const grid = document.getElementById('newsGrid');
+    if (featured) featured.innerHTML = '<div style="padding:20px;color:var(--white3);font-size:13px">Loading forex news...</div>';
+    if (grid) grid.innerHTML = '';
+    return;
+  }
 
   const featured = document.getElementById('newsFeatured');
   const grid = document.getElementById('newsGrid');
 
-  // Sort: newest first
-  allNewsItems.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-  // Right column: latest 5 (any source)
-  const latestFive = allNewsItems.slice(0, 5);
-  // Left column: next items with images (skip first 5 already in right)
-  const featuredItems = allNewsItems.slice(5).filter(i => i.image).slice(0, 6);
-  // Fallback: if not enough with images, use any
-  const leftItems = featuredItems.length >= 3 ? featuredItems : allNewsItems.slice(5, 11);
-
-  // ── Left: Hot Stories ───────────────────────────────────────────────
-  if (featured) {
-    if (!leftItems.length) {
-      featured.innerHTML = '<div style="padding:20px;color:var(--white3);font-size:13px">Loading stories...</div>';
-    } else {
-      featured.innerHTML = leftItems.map((item, i) => {
-        const isFirst = i === 0;
-        const thumb = item.image
-          ? `<img style="width:${isFirst?'160px':'100px'};height:${isFirst?'108px':'70px'};object-fit:cover;border-radius:4px;flex-shrink:0;border:1px solid var(--border2)" src="${item.image}" alt="" loading="lazy" onerror="this.style.display='none'">`
-          : `<div style="width:${isFirst?'160px':'100px'};height:${isFirst?'108px':'70px'};background:var(--bg3);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:${isFirst?'30px':'22px'};border:1px solid var(--border2)">${item.icon}</div>`;
-
-        const domain = (() => { try { return new URL(item.url).hostname.replace('www.',''); } catch { return item.source; } })();
-        const excerptHtml = item.excerpt
-          ? `<div style="font-size:${isFirst?'14px':'12px'};color:var(--white2);line-height:1.65;display:-webkit-box;-webkit-line-clamp:${isFirst?'3':'2'};-webkit-box-orient:vertical;overflow:hidden;margin-top:5px">${item.excerpt}</div>`
-          : '';
-
-        return `<div style="display:flex;gap:${isFirst?'18px':'14px'};padding:${isFirst?'0 0 22px':'14px 0'};border-bottom:1px solid rgba(255,255,255,0.05)">
-          ${thumb}
-          <div style="flex:1;min-width:0">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:${isFirst?'8px':'5px'}">
-              <span style="font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;border-radius:100px;background:${item.color}18;color:${item.color};border:1px solid ${item.color}35;letter-spacing:0.06em">${item.source}</span>
-              <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3)">${timeAgo(item.date)}</span>
-            </div>
-            <a href="${item.url}" target="_blank" rel="noopener" style="text-decoration:none">
-              <div style="font-family:'Playfair Display',serif;font-size:${isFirst?'19px':'14px'};font-weight:700;color:var(--white);line-height:1.35;display:-webkit-box;-webkit-line-clamp:${isFirst?'3':'2'};-webkit-box-orient:vertical;overflow:hidden;transition:color 0.15s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--white)'">${item.title}</div>
-            </a>
-            ${excerptHtml}
-            <a href="${item.url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;margin-top:7px;font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);text-decoration:none;letter-spacing:0.06em;opacity:0.8;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
-              Read more on ${domain} →
-            </a>
-          </div>
-        </div>`;
-      }).join('');
-    }
+  // Source colors based on domain
+  function srcColor(url) {
+    const d = (() => { try { return new URL(url).hostname; } catch { return ''; } })();
+    if (d.includes('reuters')) return '#e05c5c';
+    if (d.includes('bloomberg')) return '#4c8fc9';
+    if (d.includes('ft.com')) return '#ff7e1d';
+    if (d.includes('cnbc')) return '#e8a020';
+    if (d.includes('bbc')) return '#4caf7d';
+    if (d.includes('wsj')) return '#a78bfa';
+    if (d.includes('guardian')) return '#4caf7d';
+    if (d.includes('marketwatch')) return '#e8a020';
+    if (d.includes('yahoo')) return '#a78bfa';
+    if (d.includes('morningstar')) return '#e05c5c';
+    return '#c8a96e';
   }
 
-  // ── Right: Latest 5 ─────────────────────────────────────────────────
-  if (grid) {
-    if (!latestFive.length) {
-      grid.innerHTML = '<div style="color:var(--white3);font-size:12px">No news yet</div>';
-    } else {
-      grid.innerHTML = latestFive.map(item => {
-        const domain = (() => { try { return new URL(item.url).hostname.replace('www.',''); } catch { return item.source; } })();
-        return `<a href="${item.url}" target="_blank" rel="noopener" style="display:block;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);text-decoration:none;transition:all 0.15s" onmouseover="this.style.paddingLeft='6px'" onmouseout="this.style.paddingLeft='0'">
-          <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
-            <span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 6px;border-radius:100px;background:${item.color}18;color:${item.color};border:1px solid ${item.color}35">${item.source}</span>
+  function srcName(url, fallback) {
+    try {
+      const h = new URL(url).hostname.replace('www.','');
+      const parts = h.split('.');
+      return parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+    } catch { return fallback || 'News'; }
+  }
+
+  // Left: stories 6-11 with images preferred
+  const withImg = allNewsItems.filter(i => i.image).slice(0, 8);
+  const leftItems = withImg.length >= 3 ? withImg.slice(0, 6) : allNewsItems.slice(5, 11);
+  // Right: latest 5
+  const latestFive = allNewsItems.slice(0, 5);
+
+  if (featured) {
+    featured.innerHTML = leftItems.map((item, i) => {
+      const isFirst = i === 0;
+      const color = srcColor(item.url);
+      const name = srcName(item.url, item.source);
+      const domain = (() => { try { return new URL(item.url).hostname.replace('www.',''); } catch { return name; } })();
+      const thumb = item.image
+        ? `<img style="width:${isFirst?'160px':'100px'};height:${isFirst?'110px':'72px'};object-fit:cover;border-radius:4px;flex-shrink:0;border:1px solid var(--border2)" src="${item.image}" alt="" loading="lazy" onerror="this.style.display='none'">`
+        : `<div style="width:${isFirst?'160px':'100px'};height:${isFirst?'110px':'72px'};background:var(--bg3);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:26px;border:1px solid var(--border2)">📰</div>`;
+
+      return `<div style="display:flex;gap:${isFirst?'18px':'14px'};padding:${isFirst?'0 0 22px':'14px 0'};border-bottom:1px solid rgba(255,255,255,0.05)">
+        ${thumb}
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:${isFirst?'8px':'5px'}">
+            <span style="font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;border-radius:100px;background:${color}18;color:${color};border:1px solid ${color}35;letter-spacing:0.06em">${name}</span>
             <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3)">${timeAgo(item.date)}</span>
           </div>
-          <div style="font-size:13px;font-weight:600;color:var(--white);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${item.title}</div>
-          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);margin-top:4px">via ${domain}</div>
-        </a>`;
-      }).join('');
-    }
+          <a href="${item.url}" target="_blank" rel="noopener" style="text-decoration:none">
+            <div style="font-family:'Playfair Display',serif;font-size:${isFirst?'18px':'14px'};font-weight:700;color:var(--white);line-height:1.35;display:-webkit-box;-webkit-line-clamp:${isFirst?'3':'2'};-webkit-box-orient:vertical;overflow:hidden;transition:color 0.15s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--white)'">${item.title}</div>
+          </a>
+          ${isFirst && item.description ? `<div style="font-size:13px;color:var(--white2);line-height:1.65;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px">${item.description}</div>` : ''}
+          <a href="${item.url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;margin-top:7px;font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);text-decoration:none;opacity:0.75;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.75'">Read more on ${domain} →</a>
+        </div>
+      </div>`;
+    }).join('');
   }
 
-  // Update timestamp
-  const ts = document.getElementById('newsLastUpdated');
-  if (ts) ts.textContent = 'Updated ' + new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  if (grid) {
+    grid.innerHTML = latestFive.map(item => {
+      const color = srcColor(item.url);
+      const name = srcName(item.url, item.source);
+      const domain = (() => { try { return new URL(item.url).hostname.replace('www.',''); } catch { return name; } })();
+      return `<a href="${item.url}" target="_blank" rel="noopener" style="display:block;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);text-decoration:none;transition:all 0.15s" onmouseover="this.style.paddingLeft='6px'" onmouseout="this.style.paddingLeft='0'">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
+          <span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 6px;border-radius:100px;background:${color}18;color:${color};border:1px solid ${color}35">${name}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3)">${timeAgo(item.date)}</span>
+        </div>
+        <div style="font-size:13px;font-weight:600;color:var(--white);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${item.title}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);margin-top:3px">via ${domain}</div>
+      </a>`;
+    }).join('');
+  }
 }
 
 function renderSourcesList() {}
