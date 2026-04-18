@@ -828,51 +828,71 @@ footer {
 </section>
 
 <!-- ═══ MARKET UPDATES SECTION ═══ -->
-<section style="padding:100px 48px;background:rgba(200,169,110,0.03);border-top:1px solid rgba(200,169,110,0.08);border-bottom:1px solid rgba(200,169,110,0.08)" id="market-updates-section">
-  <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center">
-    <div class="fade-in">
-      <span class="section-eyebrow">// Market Updates</span>
-      <h2 class="section-title">Analysis written<br><em>by traders,</em><br>for traders.</h2>
-      <p class="section-sub" style="margin-bottom:28px">We publish deep-dive market analysis every week — not surface-level headlines, but real technical and fundamental breakdowns that help you understand where price is likely to go and why.</p>
-      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:32px">
-        <div style="display:flex;align-items:flex-start;gap:14px;padding:14px 16px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px">
-          <span style="font-size:22px;flex-shrink:0">📊</span>
-          <div>
-            <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:3px">Technical Analysis</div>
-            <div style="font-size:13px;color:var(--white2);line-height:1.6">Weekly breakdown of key levels, market structure, and price action setups across major pairs.</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:14px;padding:14px 16px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px">
-          <span style="font-size:22px;flex-shrink:0">🏦</span>
-          <div>
-            <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:3px">Fundamental Insight</div>
-            <div style="font-size:13px;color:var(--white2);line-height:1.6">Central bank policy, macro data, and geopolitical context — translated into actionable bias.</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:14px;padding:14px 16px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px">
-          <span style="font-size:22px;flex-shrink:0">🆓</span>
-          <div>
-            <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:3px">Always Free</div>
-            <div style="font-size:13px;color:var(--white2);line-height:1.6">All articles are publicly available — no paywall, no subscription required. Read and share freely.</div>
-          </div>
-        </div>
+<section style="padding:80px 48px;background:rgba(200,169,110,0.02);border-top:1px solid rgba(200,169,110,0.08);border-bottom:1px solid rgba(200,169,110,0.08)" id="market-updates-section">
+  <div style="max-width:1300px;margin:0 auto">
+
+    <!-- Header row -->
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px">
+      <div>
+        <span class="section-eyebrow" style="margin-bottom:8px;display:block">// Market Updates</span>
+        <h2 class="section-title" style="margin:0;font-size:clamp(28px,3.5vw,42px)">Latest <em>Analysis</em></h2>
       </div>
-      <a href="market-updates.html" class="btn-gold-lg" style="display:inline-flex;align-items:center;gap:8px">Read Latest Analysis →</a>
+      <a href="market-updates.html" style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);text-decoration:none;display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid rgba(200,169,110,0.3);transition:all 0.2s" onmouseover="this.style.gap='12px'" onmouseout="this.style.gap='6px'">See all articles →</a>
     </div>
-    <!-- Mock article preview -->
-    <div class="fade-in fade-in-delay-2" style="background:var(--bg2);border:1px solid var(--border2);border-radius:6px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.4)">
-      <div style="height:180px;background:linear-gradient(135deg,#0c0e13,#161b24);display:flex;align-items:center;justify-content:center;font-size:48px;border-bottom:1px solid var(--border2)">📈</div>
-      <div style="padding:20px">
-        <div style="display:flex;gap:8px;margin-bottom:12px">
-          <span style="font-family:'DM Mono',monospace;font-size:9px;padding:3px 9px;background:rgba(76,175,125,0.1);border:1px solid rgba(76,175,125,0.2);color:var(--bull);border-radius:100px;letter-spacing:0.06em">Market Update</span>
+
+    <!-- Main grid: articles left, ad right -->
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start">
+
+      <!-- Articles column -->
+      <div>
+        <!-- Featured article (latest) -->
+        <div id="muFeatured" style="margin-bottom:20px">
+          <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:6px;overflow:hidden;display:flex;gap:0;cursor:pointer;transition:all 0.2s;text-decoration:none" id="muFeaturedCard">
+            <div style="height:200px;background:linear-gradient(135deg,#0c0e13,#161b24);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;width:280px;border-right:1px solid var(--border2)" id="muFeaturedImg">📈</div>
+            <div style="padding:24px;flex:1">
+              <div style="display:flex;gap:8px;margin-bottom:12px" id="muFeaturedTag"></div>
+              <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--white);margin-bottom:10px;line-height:1.3" id="muFeaturedTitle">Loading latest article...</div>
+              <div style="font-size:13px;color:var(--white2);line-height:1.7;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden" id="muFeaturedExcerpt"></div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)" id="muFeaturedMeta"></div>
+                <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold)">Read →</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:8px;line-height:1.3">EUR/USD — The Dollar Rally Is Running Out of Steam</div>
-        <div style="font-size:13px;color:var(--white2);line-height:1.7;margin-bottom:16px">DXY is approaching a key resistance zone while EUR sentiment turns more hawkish following ECB commentary. Here's what to watch this week...</div>
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)">📅 April 2026 · EaglePips Team</div>
-          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold)">Read →</span>
+
+        <!-- 3 recent articles grid -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px" id="muGrid">
+          ${[1,2,3].map(()=>`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:6px;overflow:hidden;animation:pulse 1.5s ease-in-out infinite">
+            <div style="height:120px;background:var(--bg3)"></div>
+            <div style="padding:14px">
+              <div style="height:10px;background:var(--bg3);border-radius:3px;margin-bottom:8px;width:60%"></div>
+              <div style="height:36px;background:var(--bg3);border-radius:3px;margin-bottom:8px"></div>
+              <div style="height:8px;background:var(--bg3);border-radius:3px;width:40%"></div>
+            </div>
+          </div>`).join('')}
         </div>
       </div>
+
+      <!-- Ad / promo column -->
+      <div style="position:sticky;top:90px">
+        <!-- Ad placeholder — replace with real ad or promo later -->
+        <div style="background:var(--bg2);border:1px solid var(--gold-border);border-radius:6px;overflow:hidden;margin-bottom:16px" id="muAdSlot">
+          <div style="padding:24px;text-align:center">
+            <div style="font-size:32px;margin-bottom:12px">🏦</div>
+            <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:8px;line-height:1.3">Trade with The5ers</div>
+            <div style="font-size:12px;color:var(--white2);line-height:1.6;margin-bottom:18px">High Stake 100K funding. Keep 80% of profits. No time limits.</div>
+            <a href="https://www.the5ers.com/?afmc=5fu" target="_blank" style="display:block;padding:10px 16px;background:var(--gold);color:#08090c;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border-radius:3px;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Get Funded →</a>
+          </div>
+        </div>
+        <!-- About section -->
+        <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:18px">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">About EaglePips</div>
+          <div style="font-size:13px;color:var(--white2);line-height:1.7;margin-bottom:14px">Professional trading analysis — technical and fundamental insights updated weekly. Written by traders, for traders.</div>
+          <a href="market-updates.html" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);text-decoration:none;letter-spacing:0.06em">Browse all articles →</a>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -1002,6 +1022,67 @@ footer {
   }
 })();
 
+/* ── Load Market Updates on homepage ── */
+async function loadMarketUpdates(){
+  try{
+    const _sb=window.supabase.createClient('https://vaimxhgqcdhjhdiaampa.supabase.co','sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH');
+    const{data}=await _sb.from('articles').select('id,title,slug,excerpt,cover_url,category,author_name,published_at,tags').eq('published',true).order('published_at',{ascending:false}).limit(4);
+    if(!data||!data.length)return;
+
+    const fmt=d=>new Date(d).toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'});
+    const tagColor=cat=>{
+      const c=(cat||'').toLowerCase();
+      if(c.includes('technical'))return{bg:'rgba(74,158,255,0.1)',c:'#6ba3ff',b:'rgba(74,158,255,0.2)'};
+      if(c.includes('fundamental'))return{bg:'rgba(200,169,110,0.1)',c:'#c8a96e',b:'rgba(200,169,110,0.2)'};
+      return{bg:'rgba(76,175,125,0.1)',c:'#4caf7d',b:'rgba(76,175,125,0.2)'};
+    };
+
+    // Featured article (first/latest)
+    const f=data[0];
+    const fc=tagColor(f.category);
+    const fCard=document.getElementById('muFeaturedCard');
+    if(fCard){
+      fCard.onclick=()=>window.location.href=`article.html?slug=${f.slug}`;
+      fCard.onmouseover=()=>{fCard.style.borderColor='rgba(200,169,110,0.3)';fCard.style.transform='translateY(-2px)';fCard.style.boxShadow='0 16px 40px rgba(0,0,0,0.5)';};
+      fCard.onmouseout=()=>{fCard.style.borderColor='var(--border2)';fCard.style.transform='';fCard.style.boxShadow='';};
+    }
+    const fImg=document.getElementById('muFeaturedImg');
+    if(fImg){
+      if(f.cover_url){
+        fImg.innerHTML='';fImg.style.background='none';fImg.style.padding='0';
+        const img=document.createElement('img');img.src=f.cover_url;img.style.cssText='width:100%;height:100%;object-fit:cover;display:block';img.onerror=()=>{fImg.innerHTML='📈';fImg.style.fontSize='40px';};
+        fImg.appendChild(img);
+      } else fImg.textContent='📈';
+    }
+    const el=id=>document.getElementById(id);
+    if(el('muFeaturedTag'))el('muFeaturedTag').innerHTML=`<span style="font-family:'DM Mono',monospace;font-size:9px;padding:3px 9px;background:${fc.bg};border:1px solid ${fc.b};color:${fc.c};border-radius:100px;letter-spacing:0.06em">${f.category||'Market Update'}</span>`;
+    if(el('muFeaturedTitle'))el('muFeaturedTitle').textContent=f.title;
+    if(el('muFeaturedExcerpt'))el('muFeaturedExcerpt').textContent=f.excerpt||'';
+    if(el('muFeaturedMeta'))el('muFeaturedMeta').textContent=`📅 ${fmt(f.published_at)} · ${f.author_name||'EaglePips'}`;
+
+    // Grid: 3 recent articles (skip first)
+    const grid=document.getElementById('muGrid');
+    if(grid){
+      const recent=data.slice(1,4);
+      if(!recent.length){grid.style.display='none';return;}
+      grid.innerHTML=recent.map(a=>{
+        const tc=tagColor(a.category);
+        const cover=a.cover_url
+          ?`<img src="${a.cover_url}" style="width:100%;height:120px;object-fit:cover;display:block" onerror="this.parentElement.innerHTML='<div style=height:120px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:28px>📈</div>'">`
+          :`<div style="height:120px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:28px">📈</div>`;
+        return`<a href="article.html?slug=${a.slug}" style="background:var(--bg2);border:1px solid var(--border2);border-radius:6px;overflow:hidden;text-decoration:none;display:block;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(200,169,110,0.3)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='var(--border2)';this.style.transform=''">
+          ${cover}
+          <div style="padding:14px">
+            <div style="font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;background:${tc.bg};border:1px solid ${tc.b};color:${tc.c};border-radius:100px;letter-spacing:0.06em;display:inline-block;margin-bottom:8px">${a.category||'Update'}</div>
+            <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--white);line-height:1.4;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${a.title}</div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3)">${fmt(a.published_at)}</div>
+          </div>
+        </a>`;
+      }).join('');
+    }
+  }catch(e){console.warn('Market updates load error:',e);}
+}
+
 /* ── Load settings from Supabase ── */
 async function loadSiteSettings() {
   try {
@@ -1129,7 +1210,7 @@ async function signOutIndex() {
 }
 </script>
 <script src="nav.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="renderNav('');loadSiteSettings()"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="renderNav('');loadSiteSettings();loadMarketUpdates()"></script>
 <script>
 
 /* ── Email capture ── */
