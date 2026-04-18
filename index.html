@@ -1089,7 +1089,7 @@ function applyNav(items) {
 /* ── Auth state check for nav ── */
 async function checkIndexAuth() {
   try {
-    const _sb = window.supabase.createClient(
+    const _sb = getNavSB() || window.supabase.createClient(
       'https://vaimxhgqcdhjhdiaampa.supabase.co',
       'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH'
     );
@@ -1129,7 +1129,7 @@ async function signOutIndex() {
 }
 </script>
 <script src="nav.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="renderNav('');loadSiteSettings();checkIndexAuth()"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="renderNav('');loadSiteSettings()"></script>
 <script>
 
 /* ── Email capture ── */
@@ -1170,8 +1170,10 @@ document.querySelectorAll('.rm-card, .journal-text, .journal-mock, .cta-inner, .
 });
 
 /* ── Enter key on email inputs ── */
-document.getElementById('heroEmail').addEventListener('keydown', e => { if (e.key === 'Enter') submitEmail('hero'); });
-document.getElementById('ctaEmail').addEventListener('keydown',  e => { if (e.key === 'Enter') submitEmail('cta'); });
+const _heroEl = document.getElementById('heroEmail');
+const _ctaEl  = document.getElementById('ctaEmail');
+if (_heroEl) _heroEl.addEventListener('keydown', e => { if (e.key === 'Enter') submitEmail('hero'); });
+if (_ctaEl)  _ctaEl.addEventListener('keydown',  e => { if (e.key === 'Enter') submitEmail('cta'); });
 </script>
 
 </body>

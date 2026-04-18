@@ -1,6 +1,8 @@
 /* EaglePips — Universal Nav v2 */
 const _NAV_URL = 'https://vaimxhgqcdhjhdiaampa.supabase.co';
 const _NAV_KEY = 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
+let _navSB = null;
+function getNavSB(){ if(!_navSB && window.supabase) _navSB = window.supabase.createClient(_NAV_URL, _NAV_KEY); return _navSB; }
 
 async function renderNav(activePage) {
   // Inject nav CSS — use #_nav prefix to beat any styles.css specificity
@@ -9,8 +11,8 @@ async function renderNav(activePage) {
     s.id = '_navCss';
     s.textContent = `
       #_nav{position:sticky!important;top:0!important;z-index:900!important;display:flex!important;align-items:center!important;gap:0!important;padding:0 32px!important;height:62px!important;background:rgba(8,9,12,0.95)!important;backdrop-filter:blur(20px)!important;border-bottom:1px solid rgba(255,255,255,0.06)!important;box-sizing:border-box!important;width:100%!important}
-      #_nav .nav-logo{display:flex!important;align-items:center!important;gap:10px!important;text-decoration:none!important;font-family:'Playfair Display',serif!important;font-size:18px!important;font-weight:700!important;color:#fff!important;letter-spacing:-0.02em!important;margin-right:32px!important;flex-shrink:0!important;border-bottom:none!important}
-      #_nav .nav-logo span{color:#c8a96e!important;font-style:italic!important}
+      #_nav .nav-logo{display:flex!important;align-items:center!important;gap:0!important;text-decoration:none!important;margin-right:32px!important;flex-shrink:0!important;border-bottom:none!important}
+      #_nav .nav-logo span{display:none!important}
       #_nav .nav-logo-mark{width:32px!important;height:32px!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-shrink:0!important;background:none!important;clip-path:none!important}
       #_nav .nav-links{display:flex!important;list-style:none!important;gap:0!important;margin:0!important;padding:0!important;align-items:center!important}
       #_nav .nav-link{font-family:'Syne',sans-serif!important;font-size:11px!important;font-weight:700!important;letter-spacing:0.1em!important;text-transform:uppercase!important;color:#7a7570!important;text-decoration:none!important;padding:6px 14px!important;border-radius:3px!important;transition:color 0.2s!important;border-bottom:none!important}
@@ -39,7 +41,7 @@ async function renderNav(activePage) {
   // Load nav items from DB
   let navItems = [];
   try {
-    const _sb = window.supabase.createClient(_NAV_URL, _NAV_KEY);
+    const _sb = getNavSB(); if(!_sb) return;
     const { data } = await _sb.from('nav_items').select('*').eq('active', true).order('sort_order', { ascending: true });
     navItems = data || [];
   } catch(e) {}
@@ -86,8 +88,7 @@ async function renderNav(activePage) {
   mount.innerHTML = `
     <nav id="_nav">
       <a href="index.html" class="nav-logo">
-        <img src="https://vaimxhgqcdhjhdiaampa.supabase.co/storage/v1/object/public/EaglePips/5ea59b4e-0457-450f-bce1-b5389c0a97fa-1776493148502.png" style="width:32px;height:32px;object-fit:contain;flex-shrink:0" alt="EaglePips">
-        Eagle<span>Pips</span>
+        <img src="https://vaimxhgqcdhjhdiaampa.supabase.co/storage/v1/object/public/EaglePips/5ea59b4e-0457-450f-bce1-b5389c0a97fa-1776493148502.png" style="height:38px;width:auto;object-fit:contain;flex-shrink:0" alt="EaglePips">
       </a>
       <ul class="nav-links" id="_navLinks">${buildLinks(items)}</ul>
       <div class="nav-cta" id="navCta">
@@ -106,7 +107,7 @@ async function renderNav(activePage) {
 
 async function _checkNavAuth() {
   try {
-    const _sb = window.supabase.createClient(_NAV_URL, _NAV_KEY);
+    const _sb = getNavSB(); if(!_sb) return;
     const { data: { session } } = await _sb.auth.getSession();
     if (!session?.user) return;
     const user = session.user;
@@ -133,7 +134,7 @@ async function _checkNavAuth() {
 }
 
 async function _navSignOut() {
-  try { const _sb = window.supabase.createClient(_NAV_URL, _NAV_KEY); await _sb.auth.signOut(); } catch(e) {}
+  try { const _sb = getNavSB(); if(!_sb) return; await _sb.auth.signOut(); } catch(e) {}
   window.location.href = 'index.html';
 }
 
