@@ -122,9 +122,94 @@ function renderWidget(w){
     case'quote':   return`<blockquote style="border-left:3px solid #c8a96e;padding:12px 18px;background:rgba(200,169,110,0.06);margin:0 0 16px;border-radius:0 4px 4px 0"><p style="font-size:16px;line-height:1.75;color:#a09880;font-style:italic;margin:0 0 6px">${p.text||''}</p>${p.author?`<cite style="font-family:'DM Mono',monospace;font-size:11px;color:#c8a96e;font-style:normal">— ${p.author}</cite>`:''}</blockquote>`;
     case'callout': {const ct={note:'#c8a96e',bull:'#4caf7d',bear:'#e05c5c',info:'#6ba3ff'}[p.type||'note'];const cb={note:'rgba(200,169,110,0.07)',bull:'rgba(76,175,125,0.07)',bear:'rgba(224,92,92,0.07)',info:'rgba(74,158,255,0.07)'}[p.type||'note'];return`<div style="border-left:3px solid ${ct};background:${cb};padding:13px 16px;border-radius:0 4px 4px 0;font-size:15px;color:#dedad4;line-height:1.75;margin:0 0 16px">${p.text||''}</div>`;}
     case'code':    return`<pre style="background:#0a0b0e;border:1px solid rgba(255,255,255,0.07);border-radius:4px;padding:16px;font-family:'DM Mono',monospace;font-size:13px;color:#a8d8a8;overflow-x:auto;margin:0 0 16px;line-height:1.75"><code>${(p.code||'').replace(/</g,'&lt;')}</code></pre>`;
-    case'table':   {const hs=(p.headers||'Col 1,Col 2').split(',');const tr=(p.rows||'').split('\n').filter(Boolean).map(r=>`<tr>${r.split(',').map(c=>`<td style="padding:10px 13px;border:1px solid rgba(255,255,255,0.07);color:#dedad4">${c.trim()}</td>`).join('')}</tr>`).join('');return`<div style="overflow-x:auto;margin:0 0 16px"><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr>${hs.map(h=>`<th style="padding:10px 13px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#fff;font-weight:600;text-align:left">${h.trim()}</th>`).join('')}</tr></thead><tbody>${tr}</tbody></table></div>`;}
+    case'table':   {
+      const hs=(p.headers||'Col 1,Col 2').split(',');
+      const aligns=(p.align_cols||'').split(',');
+      const st=p.style||'full';
+      const tdBorder=st==='full'?'1px solid rgba(255,255,255,0.07)':'none';
+      const trs=(p.rows||'').split('\n').filter(Boolean).map((r,i)=>{
+        const cells=r.split(',');
+        const bg=i%2===0?'rgba(255,255,255,0.02)':'transparent';
+        return`<tr style="background:${bg}">${hs.map((_,ci)=>`<td style="padding:11px 15px;font-size:14px;color:#dedad4;border-bottom:${tdBorder};text-align:${aligns[ci]||'left'};vertical-align:top;line-height:1.5">${(cells[ci]||'').trim()}</td>`).join('')}</tr>`;
+      }).join('');
+      return`<div style="overflow-x:auto;margin:0 0 20px;border-radius:4px;border:1px solid rgba(255,255,255,0.08);overflow:hidden"><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr>${hs.map((h,i)=>`<th style="padding:12px 15px;background:rgba(200,169,110,0.08);border-bottom:2px solid rgba(200,169,110,0.3);color:#fff;font-weight:700;font-size:13px;text-align:${aligns[i]||'left'}">${h.trim()}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div>`;
+    }
     case'video':   {if(!p.url)return'';let em='';if(p.type==='youtube'){const v=p.url.match(/(?:v=|youtu\.be\/)([^&\s]+)/)?.[1]||p.url;em=`<iframe src="https://www.youtube.com/embed/${v}" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none"></iframe>`;}else if(p.type==='vimeo'){const v=p.url.match(/vimeo\.com\/(\d+)/)?.[1]||p.url;em=`<iframe src="https://player.vimeo.com/video/${v}" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none"></iframe>`;}else em=`<video src="${p.url}" controls style="position:absolute;inset:0;width:100%;height:100%"></video>`;return`<div style="position:relative;padding-bottom:56.25%;border-radius:4px;overflow:hidden;margin:0 0 16px">${em}</div>`;}
-    case'divider': return`<hr style="border:none;border-top:1px solid ${p.color||'rgba(255,255,255,0.08)'};margin:24px 0">`;
+    case'divider': return`<hr style="border:none;border-top:1px solid ${p.color||'rgba(255,255,255,0.08)'};margin:28px 0;position:relative"><span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#0a0b0e;padding:0 12px;color:#c8a96e;font-size:10px">◆</span>`;
+
+    case'stats':{
+      const items=(p.items||'').split(',').filter(Boolean).map(i=>{
+        const[v,l,c]=(i||'').split('|');
+        const color=c==='green'?'#4caf7d':c==='red'?'#e05c5c':c==='blue'?'#6ba3ff':'#c8a96e';
+        return`<div style="background:#111318;padding:20px;text-align:center">
+          <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:${color};margin-bottom:4px">${(v||'').trim()}</div>
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#7a7870">${(l||'').trim()}</div>
+        </div>`;
+      }).join('');
+      return`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.07);border-radius:10px;overflow:hidden;margin:0 0 28px">${items}</div>`;
+    }
+
+    case'currency':{
+      const biasColors={bullish:{bg:'rgba(76,201,138,0.12)',c:'#4caf7d',b:'rgba(76,201,138,0.2)'},bearish:{bg:'rgba(201,76,76,0.12)',c:'#e05c5c',b:'rgba(201,76,76,0.2)'},neutral:{bg:'rgba(201,168,76,0.12)',c:'#c8a96e',b:'rgba(201,168,76,0.2)'},shifting:{bg:'rgba(76,143,201,0.12)',c:'#6ba3ff',b:'rgba(76,143,201,0.2)'}};
+      const bc=biasColors[p.bias||'neutral']||biasColors.neutral;
+      const factors=(p.factors||'').split(',').filter(Boolean).map(f=>`<span style="font-size:11px;font-family:'DM Mono',monospace;padding:3px 8px;border-radius:4px;background:rgba(255,255,255,0.04);color:#7a7870;border:1px solid rgba(255,255,255,0.07)">${f.trim()}</span>`).join('');
+      return`<div style="background:#111318;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:20px;margin:0 0 16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+          <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:#fff;letter-spacing:0.04em">${p.flag||''} ${p.pair||'USD'}</div>
+          <div style="font-size:11px;font-family:'DM Mono',monospace;padding:4px 10px;border-radius:4px;text-transform:uppercase;letter-spacing:0.08em;background:${bc.bg};color:${bc.c};border:1px solid ${bc.b}">${p.biasLabel||'Neutral'}</div>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:12px;color:#7a7870;margin-bottom:10px">${p.rate||''}</div>
+        <div style="font-size:15px;color:#a09e98;line-height:1.7;margin-bottom:12px">${p.body||''}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">${factors}</div>
+      </div>`;
+    }
+
+    case'scenarios':{
+      const mkItems=(txt)=>(txt||'').split('\n').filter(Boolean).map(l=>`<li style="font-size:14px;color:#a09e98;line-height:1.7;list-style:none">→ ${l.replace(/^→\s*/,'')}</li>`).join('');
+      return`<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:0 0 24px">
+        <div style="border-radius:10px;padding:20px;border:1px solid rgba(76,201,138,0.2);background:rgba(76,201,138,0.05)">
+          <div style="font-size:12px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.1em;color:#4caf7d;margin-bottom:10px;font-weight:500">${p.bullTitle||'Bull Scenario'}</div>
+          <ul style="padding:0;margin:0">${mkItems(p.bullItems)}</ul>
+        </div>
+        <div style="border-radius:10px;padding:20px;border:1px solid rgba(201,76,76,0.2);background:rgba(201,76,76,0.05)">
+          <div style="font-size:12px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.1em;color:#e05c5c;margin-bottom:10px;font-weight:500">${p.bearTitle||'Bear Scenario'}</div>
+          <ul style="padding:0;margin:0">${mkItems(p.bearItems)}</ul>
+        </div>
+      </div>`;
+    }
+
+    case'calendar_day':{
+      const events=(p.events||'').split('\n').filter(Boolean).map(e=>{
+        const[flag,imp,name,detail]=(e||'').split('|');
+        const impColor=imp==='high'?'#e05c5c':imp==='medium'?'#c8a96e':'#7a7870';
+        const impShadow=imp==='high'?'0 0 6px rgba(201,76,76,0.5)':'none';
+        return`<div style="display:flex;align-items:flex-start;gap:14px;padding:11px 20px;border-bottom:1px solid rgba(255,255,255,0.03)">
+          <div style="font-size:18px;width:28px;text-align:center;flex-shrink:0">${(flag||'').trim()}</div>
+          <div style="width:8px;height:8px;border-radius:50%;background:${impColor};box-shadow:${impShadow};flex-shrink:0;margin-top:7px"></div>
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:500;color:#e8e6e0;margin-bottom:3px">${(name||'').trim()}</div>
+            <div style="font-size:13px;color:#7a7870;font-family:'DM Mono',monospace;line-height:1.5">${(detail||'').trim()}</div>
+          </div>
+        </div>`;
+      }).join('');
+      const isHot=p.date&&(p.date.includes('22')||p.title&&p.title.includes('⚡'));
+      return`<div style="border:1px solid rgba(255,255,255,0.07);border-radius:10px;overflow:hidden;margin:0 0 12px">
+        <div style="display:flex;align-items:center;gap:12px;padding:13px 20px;background:#181b22;border-bottom:1px solid rgba(255,255,255,0.07)">
+          <div style="font-family:'DM Mono',monospace;font-size:12px;color:#7a7870">${p.date||''}</div>
+          <div style="font-weight:600;font-size:15px;color:${isHot?'#e05c5c':'#fff'}">${p.title||''}</div>
+        </div>
+        <div>${events||''}</div>
+      </div>`;
+    }
+
+    case'toc':{
+      const items=(p.items||'').split('\n').filter(Boolean);
+      const links=items.map((item,i)=>`<li style="line-height:2.1;font-size:15px"><a href="#section-${i+1}" style="color:#a09e98;text-decoration:none" onmouseover="this.style.color='#c8a96e'" onmouseout="this.style.color='#a09e98'">${item.trim()}</a></li>`).join('');
+      return`<div style="background:#111318;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:24px;margin:0 0 28px">
+        <div style="font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#7a7870;margin-bottom:14px">In this article</div>
+        <ol style="padding-left:20px;margin:0">${links}</ol>
+      </div>`;
+    }
     case'html':    return`<div style="margin:0 0 16px">${p.code||''}</div>`;
     default:       return'';
   }
