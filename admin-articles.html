@@ -102,7 +102,7 @@
 </head>
 <body class="et-loading">
 <div id="et-loader">
-  <div class="et-loader-logo"><div class="et-loader-eagle">🦅</div><div class="et-loader-name">Eagle<span>Pips</span></div></div>
+  <div class="et-loader-logo"><img src="https://vaimxhgqcdhjhdiaampa.supabase.co/storage/v1/object/public/EaglePips/design-f-r--titlu-1776494279309.png" style="width:40px;height:40px;object-fit:contain;animation:etLoaderPulse 1.5s ease-in-out infinite" alt="EaglePips"><div class="et-loader-name">Eagle<span>Pips</span></div></div>
   <div class="et-loader-bar"><div class="et-loader-bar-fill"></div></div>
   <div class="et-loader-text">Loading editor...</div>
 </div>
@@ -117,6 +117,32 @@
   </div>
   <div class="hub-content" id="adminContent">
     <div style="text-align:center;padding:60px"><div class="et-spinner"></div></div>
+  </div>
+</div>
+
+<!-- Template picker modal -->
+<div class="et-modal-overlay" id="templateModal">
+  <div class="et-modal" style="max-width:580px">
+    <button class="et-modal-close" onclick="etCloseModal('templateModal')">✕</button>
+    <div class="et-modal-title">Start New Article</div>
+    <p style="font-size:13px;color:var(--white3);margin:-12px 0 20px;line-height:1.6">Choose a template to start with pre-built structure, or start blank.</p>
+
+    <!-- Blank -->
+    <div onclick="newArticle();etCloseModal('templateModal')"
+      style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;cursor:pointer;margin-bottom:8px;transition:all 0.15s"
+      onmouseover="this.style.borderColor='var(--gold-border)';this.style.background='var(--gold-dim)'"
+      onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg3)'">
+      <div style="font-size:28px;flex-shrink:0">📄</div>
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:3px">Blank Article</div>
+        <div style="font-size:12px;color:var(--white3)">Start from scratch with an empty canvas</div>
+      </div>
+    </div>
+
+    <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.12em;text-transform:uppercase;margin:16px 0 8px">Templates</div>
+
+    <!-- Template cards -->
+    <div style="display:flex;flex-direction:column;gap:8px" id="templateList"></div>
   </div>
 </div>
 
@@ -147,7 +173,7 @@ const WD={
   quote:{text:'Quote here.',author:''},
   callout:{text:'Important note.',type:'note'},
   code:{code:'// your code',lang:'javascript'},
-  table:{headers:'Column 1,Column 2,Column 3',rows:'Cell 1,Cell 2,Cell 3\nCell A,Cell B,Cell C'},
+  table:{headers:'Column 1,Column 2,Column 3',rows:'Cell 1,Cell 2,Cell 3\nCell A,Cell B,Cell C',style:'full',align_cols:'left,left,left'},
   video:{url:'',type:'youtube'},
   divider:{color:'rgba(255,255,255,0.08)'},
   html:{code:'<p>Custom HTML</p>'},
@@ -161,6 +187,165 @@ const LAYOUTS=[
   {cols:[1,1,1],label:'3 Equal'},
   {cols:[1,1,1,1],label:'4 Equal'},
 ];
+
+// ── Article Templates ──────────────────────────────────────────────────────
+const TEMPLATES = {
+  weekly_outlook: {
+    label: '📊 Weekly Forex Outlook',
+    category: 'Market Update',
+    tags: 'Weekly, Macro, Fundamentals, G10',
+    keynotes: ['Key macro catalyst for the week', 'Top currency long and short', 'Single most important event / day'],
+    rows: [
+      // TOC
+      { cols: [1], widgets: [{ type:'toc', props:{ items:'What happened last week\nBy the numbers\nThe key tension this week\nTwo scenarios\nDay-by-day calendar\nCurrency breakdown\nBottom line' } }] },
+      // What happened - heading + text
+      { cols: [1], widgets: [
+        { type:'heading', props:{ text:'What happened last week', level:'h2', size:'30', align:'left' } },
+        { type:'text', props:{ content:'The biggest macro event last week was [EVENT]. The reaction across asset classes was immediate. [DESCRIBE KEY MOVES — oil, dollar, equities].' } },
+        { type:'text', props:{ content:'[Second paragraph — context. Was the move expected? What does it mean for next week?]' } },
+      ]},
+      // Key callout
+      { cols: [1], widgets: [{ type:'callout', props:{ text:'⚠️ Key risk: [Describe the main ongoing risk — e.g. ceasefire expiry, central bank meeting, data release that could flip the narrative]', type:'note' } }] },
+      // Chart image
+      { cols: [1], widgets: [{ type:'image', props:{ src:'', alt:'Key chart', caption:'[Pair or asset] — [Timeframe] chart showing [what]', width:'100%' } }] },
+      // Stats bar
+      { cols: [1], widgets: [{ type:'stats', props:{ items:'-X%|Asset Move|red,+X%|Asset Move|green,00.00|DXY Level|gold,Apr 00|Key Date|blue' } }] },
+      // Divider
+      { cols: [1], widgets: [{ type:'divider', props:{ color:'rgba(200,169,110,0.2)' } }] },
+      // Key tension
+      { cols: [1], widgets: [
+        { type:'heading', props:{ text:'The key tension this week', level:'h2', size:'30', align:'left' } },
+        { type:'text', props:{ content:'[Describe the central question markets are wrestling with. What is priced in? What is NOT priced in? What is the market missing?]' } },
+        { type:'quote', props:{ text:'[A sharp one-sentence summary of the trade thesis for the week]', author:'EaglePips Fundamental Model' } },
+      ]},
+      // Scenarios
+      { cols: [1], widgets: [
+        { type:'heading', props:{ text:'Two scenarios driving everything', level:'h3', size:'20', align:'left' } },
+        { type:'scenarios', props:{
+          bullTitle:'🟢 Bull Scenario — [Condition]',
+          bullItems:'[Asset] stays at [range]
+[Currency] continues lower
+[Currency] and [Currency] hold gains
+Risk appetite stays elevated',
+          bearTitle:'🔴 Bear Scenario — [Condition]',
+          bearItems:'[Asset] spikes back to [level]
+[Currency] rebounds toward [level]
+[Safe haven] catches bids
+Equities reverse from highs',
+        }}
+      ]},
+      // Divider
+      { cols: [1], widgets: [{ type:'divider', props:{ color:'rgba(255,255,255,0.07)' } }] },
+      // Calendar heading
+      { cols: [1], widgets: [
+        { type:'heading', props:{ text:'Day-by-day economic calendar', level:'h2', size:'30', align:'left' } },
+        { type:'text', props:{ content:'[X] days, [X] key events, [X] that actually matter. Here is what to watch and when.' } },
+      ]},
+      // Calendar days
+      { cols: [1], widgets: [{ type:'calendar_day', props:{ date:'MON · APR 00', title:'[First trading day — main theme]', events:'🇨🇳|high|[Event Name]|[Expected + impact]
+🇺🇸|medium|[Event Name]|[Context]' } }] },
+      { cols: [1], widgets: [{ type:'calendar_day', props:{ date:'TUE · APR 00', title:'⚡ [KEY EVENT DAY]', events:'🌐|high|[Main binary event]|[Extension = X · Collapse = Y]
+🇬🇧|high|[Data release]|[What to watch]' } }] },
+      { cols: [1], widgets: [{ type:'calendar_day', props:{ date:'WED · APR 00', title:'[Mid-week theme]', events:'🇬🇧|high|[CPI or data]|[Hot vs soft outcome]
+🇪🇺|medium|[PMI or data]|[Context]' } }] },
+      { cols: [1], widgets: [{ type:'calendar_day', props:{ date:'THU · APR 00', title:'[Flash PMI day or key data]', events:'🇺🇸|high|[Event]|[Impact]
+🇬🇧|medium|[Event]|[Context]' } }] },
+      { cols: [1], widgets: [{ type:'calendar_day', props:{ date:'FRI · APR 00', title:'[Quiet close or key release]', events:'🇬🇧|medium|[Event]|[Context]
+🌐|low|Weekend positioning|ECB / Fed / BoE pre-meeting positioning' } }] },
+      // Divider
+      { cols: [1], widgets: [{ type:'divider', props:{ color:'rgba(255,255,255,0.07)' } }] },
+      // Currency section
+      { cols: [1], widgets: [
+        { type:'heading', props:{ text:'Currency-by-currency breakdown', level:'h2', size:'30', align:'left' } },
+      ]},
+      // USD + EUR
+      { cols: [1,1], widgets: [
+        { type:'currency', props:{ flag:'🇺🇸', pair:'USD', rate:'Rate: X.XX% · DXY: ~XX.XX', bias:'neutral', biasLabel:'Neutral', body:'[USD outlook — war premium, rate expectations, key levels, what changes the thesis]', factors:'[Factor 1],[Factor 2],[Factor 3],[Factor 4]' } },
+        { type:'currency', props:{ flag:'🇪🇺', pair:'EUR', rate:'Rate: X.XX% · Meeting: [Date]', bias:'neutral', biasLabel:'Neutral', body:'[EUR outlook — ECB, PMI, energy, rate expectations]', factors:'[ECB hold],[PMI data],[Energy relief],[Key risk]' } },
+      ]},
+      // GBP + JPY
+      { cols: [1,1], widgets: [
+        { type:'currency', props:{ flag:'🇬🇧', pair:'GBP', rate:'Rate: X.XX% · BoE: X-X split', bias:'neutral', biasLabel:'Neutral · Data-dependent', body:'[GBP — BoE split, CPI, rate cut pricing]', factors:'[CPI date],[BoE split],[Rate cut priced],[Key level]' } },
+        { type:'currency', props:{ flag:'🇯🇵', pair:'JPY', rate:'Rate: X.XX% · Carry gap: -X%', bias:'bearish', biasLabel:'Bearish', body:'[JPY — safe haven, carry gap, BoJ stance]', factors:'[Carry gap],[Safe haven],[BoJ on hold],[Key level]' } },
+      ]},
+      // AUD + NOK
+      { cols: [1,1], widgets: [
+        { type:'currency', props:{ flag:'🇦🇺', pair:'AUD', rate:'Rate: X.XX% · RBA: [stance]', bias:'bullish', biasLabel:'Bullish · Best positioned', body:'[AUD — RBA hawkish, commodity exposure, rate advantage]', factors:'[Highest rate],[Hawkish RBA],[Commodity long],[Key risk]' } },
+        { type:'currency', props:{ flag:'🇨🇦', pair:'CAD', rate:'Rate: X.XX% · BoC: [date]', bias:'neutral', biasLabel:'Mildly Bullish', body:'[CAD — oil link, BoC meeting, CPI]', factors:'[CPI date],[BoC meeting],[Oil supportive],[Key risk]' } },
+      ]},
+      // Bottom line
+      { cols: [1], widgets: [
+        { type:'divider', props:{ color:'rgba(200,169,110,0.2)' } },
+        { type:'heading', props:{ text:'Bottom line', level:'h2', size:'30', align:'left' } },
+        { type:'text', props:{ content:'[Paragraph 1 — what changed this week and what it means. Be direct: the setup, the risk, the thesis.]' } },
+        { type:'text', props:{ content:'[Paragraph 2 — specific trade ideas. Which currency is the cleanest long? Which is the cleanest short? What is the key binary to watch?]' } },
+        { type:'callout', props:{ text:'🔴 Position sizing: [Key risk to flag — the one event that could flip everything. Remind readers to size carefully around it.]', type:'bear' } },
+      ]},
+    ]
+  },
+  quick_update: {  quick_update: {
+    label: '⚡ Quick Market Update',
+    category: 'Market Update',
+    tags: 'Update, Breaking',
+    keynotes: ['Main market move', 'Why it happened', 'What to watch next'],
+    rows: [
+      { cols: [1], widgets: [
+        { type:'heading', props:{ text:'[Headline Event]', level:'h1', size:'40', align:'left' } },
+        { type:'callout', props:{ text:'TL;DR — Write a 1-2 sentence summary of exactly what happened and why it matters.', type:'note' } },
+        { type:'text', props:{ content:'[Context paragraph — what led to this, how big is the move, what asset classes are affected]' } }
+      ]},
+      { cols: [1,1], widgets: [
+        { type:'callout', props:{ text:'📈 What's moving UP
+
+[List assets, currencies or pairs that are gaining]', type:'bull' } },
+        { type:'callout', props:{ text:'📉 What's moving DOWN
+
+[List assets, currencies or pairs that are falling]', type:'bear' } }
+      ]},
+      { cols: [1], widgets: [
+        { type:'heading', props:{ text:'What to Watch Next', level:'h2', size:'28', align:'left' } },
+        { type:'text', props:{ content:'[Next event, level, or statement that will confirm or invalidate the current move]' } }
+      ]}
+    ]
+  },
+  technical_analysis: {
+    label: '📈 Technical Analysis',
+    category: 'Technical Analysis',
+    tags: 'Technical, Chart, Setup',
+    keynotes: ['Pair and bias', 'Key levels to watch', 'Entry/SL/TP zones'],
+    rows: [
+      { cols: [1], widgets: [
+        { type:'heading', props:{ text:'[PAIR] — [Timeframe] Analysis', level:'h1', size:'40', align:'left' } },
+        { type:'text', props:{ content:'Brief intro — what is the current market structure and what is this analysis focused on.' } }
+      ]},
+      { cols: [1,1], widgets: [
+        { type:'callout', props:{ text:'📊 Bias: BULLISH / BEARISH / NEUTRAL
+
+One line reason for the bias.', type:'bull' } },
+        { type:'table', props:{ headers:'Level,Type,Notes', rows:'1.0820,Support,Previous structure
+1.0950,Resistance,Weekly high
+1.0780,Stop Zone,Below structure' } }
+      ]},
+      { cols: [1], widgets: [
+        { type:'image', props:{ src:'', alt:'Chart', caption:'[PAIR] [Timeframe] — TradingView', width:'100%' } },
+        { type:'heading', props:{ text:'Structure', level:'h2', size:'28', align:'left' } },
+        { type:'text', props:{ content:'[Describe the chart structure — trend, key highs/lows, patterns, moving averages]' } }
+      ]},
+      { cols: [1], widgets: [
+        { type:'heading', props:{ text:'The Setup', level:'h2', size:'28', align:'left' } },
+        { type:'callout', props:{ text:'Entry: [level]
+Stop Loss: [level]
+Target: [level]
+R:R: [ratio]', type:'note' } },
+        { type:'text', props:{ content:'[Explain the entry logic — what needs to happen for the setup to be valid, what invalidates it]' } }
+      ]},
+      { cols: [1], widgets: [
+        { type:'divider', props:{ color:'rgba(200,169,110,0.2)' } },
+        { type:'callout', props:{ text:'⚠️ Risk Note: [What would invalidate this setup and require you to exit]', type:'bear' } }
+      ]}
+    ]
+  }
+};
 
 async function main(){
   const res=await initEtSidebar('admin');if(!res)return;
@@ -177,7 +362,7 @@ function renderLayout(){
         <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;position:sticky;top:74px;max-height:calc(100vh - 100px);display:flex;flex-direction:column">
           <div style="padding:10px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;background:var(--bg3);flex-shrink:0">
             <span style="font-size:12px;font-weight:600;color:var(--white)">Articles</span>
-            <button class="et-btn-gold" onclick="newArticle()" style="padding:4px 10px;font-size:10px">+ New</button>
+            <button class="et-btn-gold" onclick="buildTemplateList();etOpenModal('templateModal')" style="padding:4px 10px;font-size:10px">+ New</button>
           </div>
           <div style="overflow-y:auto;flex:1" id="artList"><div style="padding:20px;text-align:center"><div class="et-spinner"></div></div></div>
         </div>
@@ -236,6 +421,11 @@ function renderLayout(){
               <div class="wpal-btn" draggable="true" ondragstart="pd(event,'video')"><div class="wpal-icon">▶</div><div class="wpal-lbl">Video</div></div>
               <div class="wpal-btn" draggable="true" ondragstart="pd(event,'divider')"><div class="wpal-icon">—</div><div class="wpal-lbl">Divider</div></div>
               <div class="wpal-btn" draggable="true" ondragstart="pd(event,'html')"><div class="wpal-icon">{ }</div><div class="wpal-lbl">HTML</div></div>
+              <div class="wpal-btn" draggable="true" ondragstart="pd(event,'stats')"><div class="wpal-icon">📊</div><div class="wpal-lbl">Stats Bar</div></div>
+              <div class="wpal-btn" draggable="true" ondragstart="pd(event,'currency')"><div class="wpal-icon">💱</div><div class="wpal-lbl">Currency</div></div>
+              <div class="wpal-btn" draggable="true" ondragstart="pd(event,'scenarios')"><div class="wpal-icon">⚡</div><div class="wpal-lbl">Scenarios</div></div>
+              <div class="wpal-btn" draggable="true" ondragstart="pd(event,'calendar_day')"><div class="wpal-icon">📅</div><div class="wpal-lbl">Cal Day</div></div>
+              <div class="wpal-btn" draggable="true" ondragstart="pd(event,'toc')"><div class="wpal-icon">📋</div><div class="wpal-lbl">Contents</div></div>
             </div>
             <div class="canvas" id="canvas" onclick="desel()">
               <div class="c-col-e" id="canvasEmpty" style="padding:30px">Drag widgets here or click + Add Row</div>
@@ -347,6 +537,61 @@ function autoExcerpt(){
   const t=document.getElementById('eTitle').value;if(t)document.getElementById('eExcerpt').value=t;
 }
 
+function buildTemplateList(){
+  const list=document.getElementById('templateList');if(!list)return;
+  list.innerHTML=Object.entries(TEMPLATES).map(([key,t])=>`
+    <div onclick="applyTemplate('${key}');etCloseModal('templateModal')"
+      style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;cursor:pointer;transition:all 0.15s"
+      onmouseover="this.style.borderColor='var(--gold-border)';this.style.background='var(--gold-dim)'"
+      onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg3)'">
+      <div style="font-size:26px;flex-shrink:0">${t.label.split(' ')[0]}</div>
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:3px">${t.label.substring(t.label.indexOf(' ')+1)}</div>
+        <div style="font-size:12px;color:var(--white3)">${t.category} · Pre-built structure with placeholder content</div>
+        <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">
+          ${t.tags.split(',').map(tag=>`<span style="font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;background:rgba(200,169,110,0.1);border:1px solid rgba(200,169,110,0.2);color:var(--gold);border-radius:100px">${tag.trim()}</span>`).join('')}
+        </div>
+      </div>
+      <div style="margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);flex-shrink:0">Use →</div>
+    </div>`).join('');
+}
+
+function applyTemplate(key){
+  const t=TEMPLATES[key];if(!t)return;
+  newArticle();
+  // Set meta
+  document.getElementById('eCategory').value=t.category||'Market Update';
+  document.getElementById('eTags').value=t.tags||'';
+  // Set keynotes
+  keynotes=[...t.keynotes];renderKeynotes();
+  // Build rows with UIDs
+  rows=t.rows.map(r=>({
+    id:uid(),
+    cols:(r.cols||[1]).map((flex,ci)=>({
+      id:uid(),
+      flex:flex+'fr',
+      widgets:(r.widgets?r.widgets.filter((_,wi)=>wi===ci?true:r.cols.length===1):[]).map(w=>({
+        id:uid(),type:w.type,props:{...WD[w.type],...w.props}
+      }))
+    }))
+  }));
+  // For single-col rows with multiple widgets, put all in first col
+  rows=t.rows.map(r=>{
+    const cols=(r.cols||[1]);
+    if(cols.length===1){
+      return{id:uid(),cols:[{id:uid(),flex:'1fr',widgets:(r.widgets||[]).map(w=>({id:uid(),type:w.type,props:{...WD[w.type],...w.props}}))}]};
+    } else {
+      // multi-col: distribute widgets across cols
+      return{id:uid(),cols:cols.map((flex,ci)=>{
+        const w=r.widgets?r.widgets[ci]:null;
+        return{id:uid(),flex:flex+'fr',widgets:w?[{id:uid(),type:w.type,props:{...WD[w.type],...w.props}}]:[]};
+      })};
+    }
+  });
+  renderCanvas();
+  setSS('Template loaded — customize and save');
+}
+
 function renderCanvas(){
   const canvas=document.getElementById('canvas');
   const empty=document.getElementById('canvasEmpty');
@@ -414,6 +659,11 @@ function getPrev(w){
     case'video':   return`<div style="background:rgba(255,255,255,0.05);padding:8px;text-align:center;font-size:10px;color:rgba(255,255,255,0.3)">▶ ${p.url?'Video':'Add URL'}</div>`;
     case'divider': return`<hr style="border:none;border-top:1px solid rgba(255,255,255,0.15);margin:3px 0">`;
     case'html':    return`<div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold)">{ } ${(p.code||'').slice(0,35)}</div>`;
+    case'stats':   return`<div style="display:flex;gap:6px;flex-wrap:wrap">${(p.items||'').split(',').slice(0,4).map(i=>{const[v,l,c]=i.split('|');return`<div style="background:rgba(255,255,255,0.05);padding:4px 8px;border-radius:3px;font-family:'DM Mono',monospace;font-size:9px;color:${c==='green'?'#4caf7d':c==='red'?'#e05c5c':'#c8a96e'}">${v||'?'}<br><span style="opacity:0.5;font-size:8px">${l||''}</span></div>`}).join('')}</div>`;
+    case'currency':return`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px">${p.flag||'💱'}</span><span style="font-family:'DM Mono',monospace;font-size:11px;color:#fff;font-weight:600">${p.pair||'USD'}</span><span style="font-size:9px;padding:2px 7px;border-radius:100px;background:${p.bias==='bullish'?'rgba(76,175,125,0.15)':p.bias==='bearish'?'rgba(224,92,92,0.15)':'rgba(200,169,110,0.12)'};color:${p.bias==='bullish'?'#4caf7d':p.bias==='bearish'?'#e05c5c':'#c8a96e'}">${p.biasLabel||'Neutral'}</span></div>`;
+    case'scenarios':return`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px"><div style="background:rgba(76,175,125,0.08);padding:6px 8px;border-radius:3px;color:#4caf7d">${(p.bullTitle||'Bull').slice(0,20)}</div><div style="background:rgba(224,92,92,0.08);padding:6px 8px;border-radius:3px;color:#e05c5c">${(p.bearTitle||'Bear').slice(0,20)}</div></div>`;
+    case'calendar_day':return`<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);padding:3px 0">${p.date||'DAY'} — ${(p.title||'Events').slice(0,30)}</div>`;
+    case'toc':     return`<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white2)">📋 Table of Contents — ${(p.items||'').split('\n').length} items</div>`;
     default:       return`<div style="font-size:10px;color:rgba(255,255,255,0.3)">${w.type}</div>`;
   }
 }
@@ -469,10 +719,53 @@ function rProps(w,cId,rId){
     case'quote': html=H('Quote',TA('text','Text',p.text,3)+I('author','Author',p.author));break;
     case'callout': html=H('Callout',TA('text','Content',p.text,3)+SE('type','Type',[['note','📝 Note'],['bull','🟢 Bullish'],['bear','🔴 Bearish'],['info','ℹ️ Info']],p.type||'note'));break;
     case'code': html=H('Code',TA('code','Code',p.code,6,true)+I('lang','Language',p.lang||'javascript'));break;
-    case'table': html=H('Table',I('headers','Headers (comma sep)',p.headers)+TA('rows','Rows (1/line, comma sep)',p.rows,5));break;
+    case'table': html=H('Table',
+      I('headers','Headers (comma sep)',p.headers)+
+      TA('rows','Rows (1 per line, comma sep)',p.rows,6)+
+      SE('style','Style',[['full','Full borders'],['clean','Clean (no row borders)'],['minimal','Minimal']],(p.style||'full'))+
+      I('align_cols','Column align (left/center/right, comma sep)',p.align_cols||'left,left,left')
+    );break;
     case'video': html=H('Video',I('url','URL / ID',p.url,'url')+SE('type','Type',[['youtube','YouTube'],['vimeo','Vimeo'],['direct','Direct MP4']],p.type||'youtube'));break;
     case'divider': html=H('Divider',I('color','Color',p.color||'rgba(255,255,255,0.08)'));break;
     case'html': html=H('HTML',TA('code','HTML',p.code,6,true));break;
+
+    case'stats': html=H('Stats Bar',
+      `<div><div class="pl">Items (value|label|color comma separated)</div>
+       <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3);margin-bottom:6px">Colors: green, red, gold, blue, white</div>
+       <textarea class="pta" rows="5" oninput="upd('${w.id}','${cId}','${rId}','items',this.value)">${(p.items||'').replace(/</g,'&lt;')}</textarea>
+       <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);margin-top:5px">Example: −11.4%|WTI Friday|green,97.63|DXY Low|red</div>
+      </div>`
+    );break;
+
+    case'currency': html=H('Currency Card',
+      `<div class="pr2">${I('flag','Flag emoji',p.flag)}${I('pair','Pair / Currency',p.pair)}</div>`+
+      `<div class="pr2">${I('rate','Rate',p.rate)}${SE('bias','Bias',[['bullish','🟢 Bullish'],['bearish','🔴 Bearish'],['neutral','🟡 Neutral'],['shifting','🔵 Shifting']],(p.bias||'neutral'))}</div>`+
+      I('biasLabel','Bias Label',p.biasLabel)+
+      TA('body','Outlook Text',p.body,4)+
+      I('factors','Factors (comma separated)',p.factors)
+    );break;
+
+    case'scenarios': html=H('Bull & Bear Scenarios',
+      I('bullTitle','Bull Title',p.bullTitle)+
+      TA('bullItems','Bull Points (one per line)',p.bullItems,4)+
+      I('bearTitle','Bear Title',p.bearTitle)+
+      TA('bearItems','Bear Points (one per line)',p.bearItems,4)
+    );break;
+
+    case'calendar_day': html=H('Calendar Day',
+      `<div class="pr2">${I('date','Date label',p.date)}${I('title','Day title',p.title)}</div>`+
+      `<div><div class="pl">Events (flag|impact|name|detail — one per line)</div>
+       <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);margin-bottom:5px">Impact: high, medium, low</div>
+       <textarea class="pta" rows="6" oninput="upd('${w.id}','${cId}','${rId}','events',this.value)">${(p.events||'').replace(/</g,'&lt;')}</textarea>
+       <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);margin-top:4px">Example: 🇺🇸|high|US CPI|Prev: 3.2% YoY</div>
+      </div>`
+    );break;
+
+    case'toc': html=H('Table of Contents',
+      `<div><div class="pl">Section headings (one per line — links auto-generated)</div>
+       <textarea class="pta" rows="7" oninput="upd('${w.id}','${cId}','${rId}','items',this.value)">${(p.items||'').replace(/</g,'&lt;')}</textarea>
+      </div>`
+    );break;
   }
   html+=`<button onclick="rmW('${w.id}','${cId}','${rId}')" style="width:100%;padding:6px;background:transparent;border:1px solid rgba(224,92,92,0.2);color:var(--bear);font-family:'Syne',sans-serif;font-size:11px;cursor:pointer;border-radius:3px;transition:all 0.2s;margin-top:4px" onmouseover="this.style.background='var(--bear-bg)'" onmouseout="this.style.background='transparent'">🗑 Remove</button>`;
   el.innerHTML=html;
@@ -525,7 +818,19 @@ function wHTML(w){
     case'quote':   return`<blockquote style="border-left:3px solid var(--gold);padding:11px 16px;background:rgba(200,169,110,0.06);margin:0 0 14px;font-style:italic;color:#a09880;border-radius:0 3px 3px 0"><p style="margin:0 0 5px;font-size:15px;line-height:1.7">${p.text||''}</p>${p.author?`<cite style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);font-style:normal">— ${p.author}</cite>`:''}</blockquote>`;
     case'callout': const ct={note:'var(--gold)',bull:'var(--bull)',bear:'var(--bear)',info:'#6ba3ff'}[p.type||'note'];const cb={note:'rgba(200,169,110,0.07)',bull:'rgba(76,175,125,0.07)',bear:'rgba(224,92,92,0.07)',info:'rgba(74,158,255,0.07)'}[p.type||'note'];return`<div style="border-left:3px solid ${ct};background:${cb};padding:11px 15px;border-radius:0 3px 3px 0;font-size:14px;color:#dedad4;line-height:1.7;margin:0 0 14px">${p.text||''}</div>`;
     case'code':    return`<pre style="background:#0a0b0e;border:1px solid var(--border2);border-radius:3px;padding:12px;font-family:'DM Mono',monospace;font-size:12px;color:#a8d8a8;overflow-x:auto;margin:0 0 14px;line-height:1.7"><code>${(p.code||'').replace(/</g,'&lt;')}</code></pre>`;
-    case'table':{const hs=(p.headers||'Col 1,Col 2').split(',');const tr=(p.rows||'').split('\n').filter(Boolean).map(r=>`<tr>${r.split(',').map(c=>`<td style="padding:8px 11px;border:1px solid var(--border2);color:#dedad4">${c.trim()}</td>`).join('')}</tr>`).join('');return`<div style="overflow-x:auto;margin:0 0 14px"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr>${hs.map(h=>`<th style="padding:8px 11px;background:var(--bg3);border:1px solid var(--border2);color:var(--white);font-weight:600;text-align:left">${h.trim()}</th>`).join('')}</tr></thead><tbody>${tr}</tbody></table></div>`;}
+    case'table':{
+      const hs=(p.headers||'Col 1,Col 2').split(',');
+      const aligns=(p.align_cols||'').split(',');
+      const st=p.style||'full';
+      const thStyle=`padding:11px 14px;background:rgba(200,169,110,0.08);color:#fff;font-weight:700;font-size:13px;text-align:left;border-bottom:2px solid rgba(200,169,110,0.3);${st==='minimal'?'border:none':'border:1px solid rgba(255,255,255,0.08)'}`;
+      const tdBorder=st==='full'?'1px solid rgba(255,255,255,0.07)':st==='clean'?'none':'none';
+      const trStyle=(i)=>i%2===0?'background:rgba(255,255,255,0.02)':'';
+      const trs=(p.rows||'').split('\n').filter(Boolean).map((r,i)=>{
+        const cells=r.split(',');
+        return`<tr style="${trStyle(i)}">${hs.map((_,ci)=>`<td style="padding:10px 14px;font-size:13px;color:#dedad4;border-bottom:${tdBorder};text-align:${aligns[ci]||'left'};vertical-align:top">${(cells[ci]||'').trim()}</td>`).join('')}</tr>`;
+      }).join('');
+      return`<div style="overflow-x:auto;margin:0 0 20px;border-radius:4px;border:1px solid rgba(255,255,255,0.08);overflow:hidden"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr>${hs.map((h,i)=>`<th style="${thStyle};text-align:${aligns[i]||'left'}">${h.trim()}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div>`;
+    }
     case'video':{if(!p.url)return'';let em='';if(p.type==='youtube'){const v=p.url.match(/(?:v=|youtu\.be\/)([^&\s]+)/)?.[1]||p.url;em=`<iframe src="https://www.youtube.com/embed/${v}" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none"></iframe>`;}else if(p.type==='vimeo'){const v=p.url.match(/vimeo\.com\/(\d+)/)?.[1]||p.url;em=`<iframe src="https://player.vimeo.com/video/${v}" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none"></iframe>`;}else em=`<video src="${p.url}" controls style="position:absolute;inset:0;width:100%;height:100%"></video>`;return`<div style="position:relative;padding-bottom:56.25%;border-radius:4px;overflow:hidden;margin:0 0 14px">${em}</div>`;}
     case'divider': return`<hr style="border:none;border-top:1px solid ${p.color||'rgba(255,255,255,0.08)'};margin:18px 0">`;
     case'html':    return`<div style="margin:0 0 14px">${p.code||''}</div>`;
