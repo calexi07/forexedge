@@ -716,6 +716,26 @@ footer {
 #ep-save-bar.visible { display: flex; transform: translateY(0); }
 #ep-save-msg { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--white3); flex: 1; }
 
+/* Section overlays */
+.ep-sec-overlay {
+  position: absolute; top: 0; left: 0; right: 0;
+  z-index: 500; pointer-events: none;
+}
+.ep-sec-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(8,9,12,0.92); border-bottom: 2px solid var(--gold);
+  padding: 6px 16px; pointer-events: all;
+  backdrop-filter: blur(8px);
+}
+.ep-sec-name {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  letter-spacing: 0.15em; color: var(--gold); font-weight: 600;
+}
+body.ep-edit-mode [data-ep-section] {
+  outline: 2px dashed rgba(200,169,110,0.2);
+  outline-offset: -2px;
+}
+
 /* Editable element highlight */
 body.ep-edit-mode [data-ep] {
   outline: 1px dashed rgba(200,169,110,0.3);
@@ -774,7 +794,7 @@ body.ep-edit-mode [data-ep].ep-selected {
 <div id="navMount"></div>
 
 <!-- ═══ HERO ═══ -->
-<section class="hero" id="hero">
+<section class="hero" id="hero" data-ep-section="hero">
   <!-- Video background — lazy loaded after page paint -->
   <div class="hero-video-wrap" id="heroVideoBg">
     <div class="hero-video-overlay"></div>
@@ -795,7 +815,7 @@ body.ep-edit-mode [data-ep].ep-selected {
 
   <!-- Scroll CTA -->
   <button class="hero-scroll-btn" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})" aria-label="Discover more">
-    <span class="hero-scroll-label">Discover your edge</span>
+    <span class="hero-scroll-label" data-ep="hero_scroll_label" data-ep-type="text">Discover your edge</span>
     <div class="scroll-chevrons">
       <div class="scroll-chevron"></div>
       <div class="scroll-chevron"></div>
@@ -805,12 +825,12 @@ body.ep-edit-mode [data-ep].ep-selected {
 </section>
 
 <!-- ═══ FEATURES GRID (Section 2) ═══ -->
-<section id="features" style="padding:100px 48px">
+<section id="features" data-ep-section="features" style="padding:100px 48px">
   <div class="roadmap-section">
     <div class="roadmap-header fade-in">
       <span class="section-eyebrow">// The Platform</span>
-      <h2 class="section-title">Everything you need<br><em>to trade smarter.</em></h2>
-      <p class="section-sub" style="margin-top:8px">One platform. Multiple tools. Built for serious traders.</p>
+      <h2 class="section-title" data-ep="features_title" data-ep-type="text">Everything you need<br><em>to trade smarter.</em></h2>
+      <p class="section-sub" style="margin-top:8px" data-ep="features_sub" data-ep-type="text">One platform. Multiple tools. Built for serious traders.</p>
     </div>
 
     <!-- Top row: 2 big cards -->
@@ -821,8 +841,8 @@ body.ep-edit-mode [data-ep].ep-selected {
         <div class="rm-card rm-card-featured fade-in" style="height:100%;cursor:pointer;transition:all 0.2s;border-color:rgba(200,169,110,0.25)" onmouseover="this.style.borderColor='rgba(200,169,110,0.5)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='rgba(200,169,110,0.25)';this.style.transform=''">
           <span class="rm-status live">● Live Now</span>
           <span class="rm-icon" style="font-size:36px">📒</span>
-          <div class="rm-title" style="font-size:20px">Trading Journal</div>
-          <div class="rm-desc" style="font-size:14px;line-height:1.7">Multi-account journal with PnL calendar, equity curve, deep performance statistics, strategy tracking and payout management. Built for prop traders.</div>
+          <div class="rm-title" style="font-size:20px" data-ep="card_journal_title" data-ep-type="text">Trading Journal</div>
+          <div class="rm-desc" style="font-size:14px;line-height:1.7" data-ep="card_journal_desc" data-ep-type="text">Multi-account journal with PnL calendar, equity curve, deep performance statistics, strategy tracking and payout management. Built for prop traders.</div>
           <div class="rm-tags">
             <span class="rm-tag">Multi-Account</span>
             <span class="rm-tag">Prop Firms</span>
@@ -838,8 +858,8 @@ body.ep-edit-mode [data-ep].ep-selected {
         <div class="rm-card fade-in fade-in-delay-1" style="height:100%;cursor:pointer;transition:all 0.2s;border-color:rgba(74,158,255,0.2)" onmouseover="this.style.borderColor='rgba(74,158,255,0.4)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='rgba(74,158,255,0.2)';this.style.transform=''">
           <span class="rm-status live" style="background:rgba(74,158,255,0.1);border-color:rgba(74,158,255,0.3);color:#6ba3ff">● Live Now</span>
           <span class="rm-icon" style="font-size:36px">📰</span>
-          <div class="rm-title" style="font-size:20px">Market Updates</div>
-          <div class="rm-desc" style="font-size:14px;line-height:1.7">Technical and fundamental analysis written by experienced traders. Weekly deep-dives on major pairs, macro events, and market structure shifts.</div>
+          <div class="rm-title" style="font-size:20px" data-ep="card_mu_title" data-ep-type="text">Market Updates</div>
+          <div class="rm-desc" style="font-size:14px;line-height:1.7" data-ep="card_mu_desc" data-ep-type="text">Technical and fundamental analysis written by experienced traders. Weekly deep-dives on major pairs, macro events, and market structure shifts.</div>
           <div class="rm-tags">
             <span class="rm-tag">Weekly Analysis</span>
             <span class="rm-tag">Macro</span>
@@ -900,14 +920,14 @@ body.ep-edit-mode [data-ep].ep-selected {
 </section>
 
 <!-- ═══ MARKET UPDATES SECTION ═══ -->
-<section style="padding:80px 48px;background:rgba(200,169,110,0.02);border-top:1px solid rgba(200,169,110,0.08);border-bottom:1px solid rgba(200,169,110,0.08)" id="market-updates-section">
+<section style="padding:80px 48px;background:rgba(200,169,110,0.02);border-top:1px solid rgba(200,169,110,0.08);border-bottom:1px solid rgba(200,169,110,0.08)" id="market-updates-section" data-ep-section="market-updates-section">
   <div style="max-width:1300px;margin:0 auto">
 
     <!-- Header row -->
     <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px">
       <div>
         <span class="section-eyebrow" style="margin-bottom:8px;display:block">// Market Updates</span>
-        <h2 class="section-title" style="margin:0;font-size:clamp(28px,3.5vw,42px)">Latest <em>Analysis</em></h2>
+        <h2 class="section-title" style="margin:0;font-size:clamp(28px,3.5vw,42px)" data-ep="mu_title" data-ep-type="text">Latest <em>Analysis</em></h2>
       </div>
       <a href="market-updates.html" style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);text-decoration:none;display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid rgba(200,169,110,0.3);transition:all 0.2s" onmouseover="this.style.gap='12px'" onmouseout="this.style.gap='6px'">See all articles →</a>
     </div>
@@ -970,7 +990,7 @@ body.ep-edit-mode [data-ep].ep-selected {
 </section>
 
 <!-- ═══ JOURNAL SECTION ═══ -->
-<section class="journal-section" id="journal">
+<section class="journal-section" id="journal" data-ep-section="journal">
   <div class="journal-inner">
     <div class="journal-text fade-in">
       <span class="section-eyebrow" id="journalEyebrow" data-ep="journal_eyebrow" data-ep-type="text">// Trading Journal</span>
@@ -1158,43 +1178,103 @@ async function loadMarketUpdates(){
 /* ══ INLINE PAGE EDITOR ══════════════════════════════════════════════════ */
 const EP_URL = 'https://vaimxhgqcdhjhdiaampa.supabase.co';
 const EP_KEY = 'sb_publishable_CebHZhFOubWHVcC-DaGV8w_LsMUCVNH';
-let epEditMode = false;
-let epSelected = null;
-let epChanges = {}; // key → new value
-let epOriginals = {}; // key → original value
+let epEditMode = false, epSelected = null, epChanges = {}, epOriginals = {}, epHiddenSections = {};
 
-// Show FAB if admin
+// ── Init: show FAB for admins ──────────────────────────────────────────
 function epInitAdmin(user) {
   if (!user?.user_metadata?.is_admin) return;
-  const fab = document.getElementById('ep-edit-fab');
-  if (fab) fab.style.display = 'flex';
+  document.getElementById('ep-edit-fab').style.display = 'flex';
 }
 
+// ── Toggle edit mode ───────────────────────────────────────────────────
 function epToggleEdit() {
   epEditMode = !epEditMode;
   document.body.classList.toggle('ep-edit-mode', epEditMode);
   const fab = document.getElementById('ep-edit-fab');
   const bar = document.getElementById('ep-save-bar');
-  if (fab) { fab.textContent = epEditMode ? '✕' : '✏️'; fab.classList.toggle('active', epEditMode); }
-  if (bar) { bar.classList.toggle('visible', epEditMode); }
-  if (!epEditMode) epDeselectAll();
+  fab.innerHTML = epEditMode ? '✕' : '✏️';
+  fab.classList.toggle('active', epEditMode);
+  bar.classList.toggle('visible', epEditMode);
 
-  // Attach/detach click listeners
   if (epEditMode) {
-    document.querySelectorAll('[data-ep]').forEach(el => {
-      el.addEventListener('click', epHandleClick);
-    });
+    // Add section overlays
+    epAddSectionOverlays();
+    // Attach text click handlers
+    document.querySelectorAll('[data-ep]').forEach(el => el.addEventListener('click', epHandleClick, true));
   } else {
-    document.querySelectorAll('[data-ep]').forEach(el => {
-      el.removeEventListener('click', epHandleClick);
-    });
+    epRemoveSectionOverlays();
+    document.querySelectorAll('[data-ep]').forEach(el => el.removeEventListener('click', epHandleClick, true));
+    epDeselectAll();
   }
 }
 
+// ── Section overlays ───────────────────────────────────────────────────
+function epAddSectionOverlays() {
+  document.querySelectorAll('[data-ep-section]').forEach(sec => {
+    if (sec.querySelector('.ep-sec-overlay')) return;
+    const id = sec.dataset.epSection;
+    const hidden = epHiddenSections[id];
+
+    const ov = document.createElement('div');
+    ov.className = 'ep-sec-overlay';
+    ov.dataset.secId = id;
+    ov.innerHTML = `
+      <div class="ep-sec-bar">
+        <span class="ep-sec-name">${id.replace(/-/g,' ').toUpperCase()}</span>
+        <div style="display:flex;gap:4px">
+          <button class="ep-tb-btn" onclick="epToggleSection('${id}')" title="${hidden?'Show':'Hide'} section">
+            ${hidden ? '👁 Show' : '🙈 Hide'}
+          </button>
+          <button class="ep-tb-btn" onclick="epMoveSection('${id}',-1)" title="Move up">↑</button>
+          <button class="ep-tb-btn" onclick="epMoveSection('${id}',1)" title="Move down">↓</button>
+        </div>
+      </div>`;
+    sec.style.position = 'relative';
+    sec.insertBefore(ov, sec.firstChild);
+
+    if (hidden) { sec.style.opacity = '0.3'; sec.style.filter = 'grayscale(1)'; }
+  });
+}
+
+function epRemoveSectionOverlays() {
+  document.querySelectorAll('.ep-sec-overlay').forEach(el => el.remove());
+  document.querySelectorAll('[data-ep-section]').forEach(sec => {
+    sec.style.opacity = ''; sec.style.filter = '';
+  });
+}
+
+function epToggleSection(id) {
+  const sec = document.querySelector(`[data-ep-section="${id}"]`);
+  if (!sec) return;
+  const hidden = epHiddenSections[id] = !epHiddenSections[id];
+  sec.style.opacity = hidden ? '0.3' : '';
+  sec.style.filter = hidden ? 'grayscale(1)' : '';
+  epChanges[`section_hidden_${id}`] = hidden ? '1' : '0';
+  // Update button text
+  const btn = sec.querySelector('.ep-sec-overlay button');
+  if (btn) btn.innerHTML = hidden ? '👁 Show' : '🙈 Hide';
+  epUpdateSaveMsg();
+}
+
+function epMoveSection(id, dir) {
+  const sec = document.querySelector(`[data-ep-section="${id}"]`);
+  if (!sec) return;
+  const parent = sec.parentNode;
+  const sections = [...parent.querySelectorAll(':scope > [data-ep-section]')];
+  const idx = sections.indexOf(sec);
+  const target = sections[idx + dir];
+  if (!target) return;
+  if (dir === -1) parent.insertBefore(sec, target);
+  else parent.insertBefore(target, sec);
+  epChanges[`section_order`] = [...parent.querySelectorAll(':scope > [data-ep-section]')].map(s=>s.dataset.epSection).join(',');
+  epUpdateSaveMsg();
+}
+
+// ── Text editing ───────────────────────────────────────────────────────
 function epHandleClick(e) {
   if (!epEditMode) return;
   e.preventDefault(); e.stopPropagation();
-  epSelectElement(this);
+  epSelectElement(this || e.currentTarget);
 }
 
 function epSelectElement(el) {
@@ -1202,22 +1282,21 @@ function epSelectElement(el) {
   el.classList.add('ep-selected');
   epSelected = el;
 
-  const type = el.dataset.epType || 'text';
-  const label = el.dataset.ep.replace(/_/g, ' ');
+  const key = el.dataset.ep;
+  const label = key.replace(/_/g,' ');
+  document.getElementById('ep-tb-label').textContent = label;
 
-  // Position toolbar near element
+  // Show toolbar near element
   const toolbar = document.getElementById('ep-toolbar');
   const rect = el.getBoundingClientRect();
-  document.getElementById('ep-tb-label').textContent = label;
-  document.getElementById('ep-tb-img-btn').style.display = type === 'image' ? '' : 'none';
-
-  const top = Math.max(8, rect.top + window.scrollY - 48);
+  const top = Math.max(8, rect.top - 52 + window.scrollY);
+  const left = Math.min(Math.max(8, rect.left), window.innerWidth - 340);
+  toolbar.style.position = 'absolute';
   toolbar.style.top = top + 'px';
-  toolbar.style.left = Math.min(rect.left, window.innerWidth - 320) + 'px';
+  toolbar.style.left = left + 'px';
   toolbar.classList.add('visible');
 
-  // Auto-open text editor
-  if (type === 'text') epEditText();
+  epEditText();
 }
 
 function epDeselectAll() {
@@ -1229,89 +1308,71 @@ function epDeselectAll() {
 function epEditText() {
   if (!epSelected) return;
   const key = epSelected.dataset.ep;
-  const current = epChanges[key] !== undefined ? epChanges[key] : (epSelected.textContent || '');
-  if (!epOriginals[key]) epOriginals[key] = epSelected.textContent;
-
-  document.getElementById('epTextModalTitle').textContent = 'Edit: ' + key.replace(/_/g, ' ');
-  const input = document.getElementById('epTextInput');
-  input.value = current;
+  // Get current display text (strip HTML tags for clean editing)
+  const current = epChanges[key] !== undefined ? epChanges[key] : epSelected.innerText.trim();
+  if (!epOriginals[key]) epOriginals[key] = epSelected.innerText.trim();
+  document.getElementById('epTextModalTitle').textContent = 'Edit: ' + key.replace(/_/g,' ');
+  const inp = document.getElementById('epTextInput');
+  inp.value = current;
   document.getElementById('epTextModal').style.display = 'flex';
-  setTimeout(() => { input.focus(); input.select(); input.style.height = 'auto'; input.style.height = input.scrollHeight + 'px'; }, 50);
+  setTimeout(() => { inp.focus(); inp.setSelectionRange(0, inp.value.length); inp.style.height='auto'; inp.style.height=inp.scrollHeight+'px'; }, 60);
 }
 
-function epCloseTextModal() {
-  document.getElementById('epTextModal').style.display = 'none';
-}
+function epCloseTextModal() { document.getElementById('epTextModal').style.display='none'; }
 
 function epApplyText() {
   if (!epSelected) return;
   const key = epSelected.dataset.ep;
-  const val = document.getElementById('epTextInput').value.trim();
+  const val = document.getElementById('epTextInput').value;
   epChanges[key] = val;
-  epSelected.textContent = val;
+  // Apply to element — preserve any child elements by only changing text nodes
+  epSelected.innerText = val;
   epCloseTextModal();
+  epDeselectAll();
   epUpdateSaveMsg();
 }
 
-function epChangeImage() {
-  if (!epSelected) return;
-  // Open media picker
-  if (typeof openMediaPicker === 'function') {
-    openMediaPicker(url => {
-      const key = epSelected.dataset.ep;
-      epChanges[key] = url;
-      if (epSelected.tagName === 'IMG') epSelected.src = url;
-      else epSelected.style.backgroundImage = `url(${url})`;
-      epUpdateSaveMsg();
-    });
-  } else {
-    const url = prompt('Image URL:');
-    if (url) {
-      const key = epSelected.dataset.ep;
-      epChanges[key] = url;
-      if (epSelected.tagName === 'IMG') epSelected.src = url;
-      epUpdateSaveMsg();
-    }
-  }
-}
-
+// ── Save / Discard ─────────────────────────────────────────────────────
 function epUpdateSaveMsg() {
-  const count = Object.keys(epChanges).length;
-  const msg = document.getElementById('ep-save-msg');
-  if (msg) msg.textContent = count > 0 ? `${count} change${count>1?'s':''} pending — click Save to publish` : 'Click any highlighted element to edit it';
+  const n = Object.keys(epChanges).length;
+  const el = document.getElementById('ep-save-msg');
+  if (el) el.textContent = n ? `${n} change${n>1?'s':''} pending — click Save to publish` : 'Click any highlighted element to edit it';
 }
 
 async function epSaveAll() {
   if (!Object.keys(epChanges).length) { epToggleEdit(); return; }
   const btn = document.querySelector('#ep-save-bar .primary');
   if (btn) btn.textContent = '⏳ Saving...';
-
   try {
     const _sb = getNavSB() || window.supabase.createClient(EP_URL, EP_KEY);
     for (const [key, value] of Object.entries(epChanges)) {
-      await _sb.from('site_settings').upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+      await _sb.from('site_settings').upsert({ key, value: String(value), updated_at: new Date().toISOString() }, { onConflict: 'key' });
     }
-    const msg = document.getElementById('ep-save-msg');
-    if (msg) msg.textContent = '✓ Saved! Refreshing...';
+    document.getElementById('ep-save-msg').textContent = '✓ Saved!';
     epChanges = {};
-    setTimeout(() => window.location.reload(), 800);
-  } catch(e) {
-    alert('Save failed: ' + e.message);
+    setTimeout(() => window.location.reload(), 700);
+  } catch(err) {
+    alert('Save error: ' + err.message);
     if (btn) btn.textContent = '💾 Save Changes';
   }
 }
 
 function epDiscardAll() {
-  // Restore originals
   Object.entries(epOriginals).forEach(([key, val]) => {
     const el = document.querySelector(`[data-ep="${key}"]`);
-    if (el) el.textContent = val;
+    if (el) el.innerText = val;
   });
-  epChanges = {}; epOriginals = {};
+  // Restore hidden sections
+  Object.entries(epHiddenSections).forEach(([id, hidden]) => {
+    const sec = document.querySelector(`[data-ep-section="${id}"]`);
+    if (sec) { sec.style.opacity=''; sec.style.filter=''; }
+  });
+  epChanges={}; epOriginals={}; epHiddenSections={};
   epUpdateSaveMsg();
   epToggleEdit();
 }
 
+/* ── Load settings from Supabase ── */
 /* ── Load settings from Supabase ── */
 async function loadSiteSettings() {
   try {
@@ -1366,6 +1427,24 @@ function applySettings(s) {
   if (s.cta_subtitle)     set('ctaSub', s.cta_subtitle);
   if (s.cta_button)       { const btn = document.querySelector('#ctaForm .hero-submit'); if(btn) btn.textContent = s.cta_button; }
   if (s.footer_copy)      set('footerCopy', s.footer_copy);
+
+  // Apply section visibility from settings
+  ['hero','features','market-updates-section','journal'].forEach(id => {
+    const key = 'section_hidden_' + id;
+    if (s[key] === '1') {
+      const sec = document.getElementById(id);
+      if (sec) sec.style.display = 'none';
+    }
+  });
+  // Apply section order
+  if (s.section_order) {
+    const body = document.body;
+    const order = s.section_order.split(',');
+    order.forEach(id => {
+      const sec = document.getElementById(id);
+      if (sec) body.appendChild(sec);
+    });
+  }
 }
 
 function applyNav(items) {
