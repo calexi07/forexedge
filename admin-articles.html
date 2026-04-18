@@ -223,15 +223,9 @@ const TEMPLATES = {
         { type:'heading', props:{ text:'Two scenarios driving everything', level:'h3', size:'20', align:'left' } },
         { type:'scenarios', props:{
           bullTitle:'🟢 Bull Scenario — [Condition]',
-          bullItems:'[Asset] stays at [range]
-[Currency] continues lower
-[Currency] and [Currency] hold gains
-Risk appetite stays elevated',
+          bullItems:'[Asset] stays at [range]\n[Currency] continues lower\n[Currency] and [Currency] hold gains\nRisk appetite stays elevated',
           bearTitle:'🔴 Bear Scenario — [Condition]',
-          bearItems:'[Asset] spikes back to [level]
-[Currency] rebounds toward [level]
-[Safe haven] catches bids
-Equities reverse from highs',
+          bearItems:'[Asset] spikes back to [level]\n[Currency] rebounds toward [level]\n[Safe haven] catches bids\nEquities reverse from highs',
         }}
       ]},
       // Divider
@@ -242,16 +236,11 @@ Equities reverse from highs',
         { type:'text', props:{ content:'[X] days, [X] key events, [X] that actually matter. Here is what to watch and when.' } },
       ]},
       // Calendar days
-      { cols: [1], widgets: [{ type:'calendar_day', props:{ date:'MON · APR 00', title:'[First trading day — main theme]', events:'🇨🇳|high|[Event Name]|[Expected + impact]
-🇺🇸|medium|[Event Name]|[Context]' } }] },
-      { cols: [1], widgets: [{ type:'calendar_day', props:{ date:'TUE · APR 00', title:'⚡ [KEY EVENT DAY]', events:'🌐|high|[Main binary event]|[Extension = X · Collapse = Y]
-🇬🇧|high|[Data release]|[What to watch]' } }] },
-      { cols: [1], widgets: [{ type:'calendar_day', props:{ date:'WED · APR 00', title:'[Mid-week theme]', events:'🇬🇧|high|[CPI or data]|[Hot vs soft outcome]
-🇪🇺|medium|[PMI or data]|[Context]' } }] },
-      { cols: [1], widgets: [{ type:'calendar_day', props:{ date:'THU · APR 00', title:'[Flash PMI day or key data]', events:'🇺🇸|high|[Event]|[Impact]
-🇬🇧|medium|[Event]|[Context]' } }] },
-      { cols: [1], widgets: [{ type:'calendar_day', props:{ date:'FRI · APR 00', title:'[Quiet close or key release]', events:'🇬🇧|medium|[Event]|[Context]
-🌐|low|Weekend positioning|ECB / Fed / BoE pre-meeting positioning' } }] },
+      { cols: [1], widgets: [{ type:'calendar_day', props:{ date:'MON · APR 00', title:'[First trading day — main theme]', events:'🇨🇳|high|[Event Name]|[Expected + impact]\n🇺🇸|medium|[Event Name]|[Context]' } }] },
+      { cols: [1], widgets: [{ type:'calendar_day', props:{ date:'TUE · APR 00', title:'⚡ [KEY EVENT DAY]', events:'🌐|high|[Main binary event]|[Extension = X · Collapse = Y]\n🇬🇧|high|[Data release]|[What to watch]' } }] },
+      { cols: [1], widgets: [{ type:'calendar_day', props:{ date:'WED · APR 00', title:'[Mid-week theme]', events:'🇬🇧|high|[CPI or data]|[Hot vs soft outcome]\n🇪🇺|medium|[PMI or data]|[Context]' } }] },
+      { cols: [1], widgets: [{ type:'calendar_day', props:{ date:'THU · APR 00', title:'[Flash PMI day or key data]', events:'🇺🇸|high|[Event]|[Impact]\n🇬🇧|medium|[Event]|[Context]' } }] },
+      { cols: [1], widgets: [{ type:'calendar_day', props:{ date:'FRI · APR 00', title:'[Quiet close or key release]', events:'🇬🇧|medium|[Event]|[Context]\n🌐|low|Weekend positioning|ECB / Fed / BoE pre-meeting positioning' } }] },
       // Divider
       { cols: [1], widgets: [{ type:'divider', props:{ color:'rgba(255,255,255,0.07)' } }] },
       // Currency section
@@ -283,7 +272,7 @@ Equities reverse from highs',
       ]},
     ]
   },
-  quick_update: {  quick_update: {
+  quick_update: {
     label: '⚡ Quick Market Update',
     category: 'Market Update',
     tags: 'Update, Breaking',
@@ -295,12 +284,8 @@ Equities reverse from highs',
         { type:'text', props:{ content:'[Context paragraph — what led to this, how big is the move, what asset classes are affected]' } }
       ]},
       { cols: [1,1], widgets: [
-        { type:'callout', props:{ text:'📈 What's moving UP
-
-[List assets, currencies or pairs that are gaining]', type:'bull' } },
-        { type:'callout', props:{ text:'📉 What's moving DOWN
-
-[List assets, currencies or pairs that are falling]', type:'bear' } }
+        { type:'callout', props:{ text:'Markets moving UP: [list assets gaining]', type:'bull' } },
+        { type:'callout', props:{ text:'Markets moving DOWN: [list assets falling]', type:'bear' } }
       ]},
       { cols: [1], widgets: [
         { type:'heading', props:{ text:'What to Watch Next', level:'h2', size:'28', align:'left' } },
@@ -308,7 +293,7 @@ Equities reverse from highs',
       ]}
     ]
   },
-  technical_analysis: {
+    technical_analysis: {
     label: '📈 Technical Analysis',
     category: 'Technical Analysis',
     tags: 'Technical, Chart, Setup',
@@ -316,15 +301,11 @@ Equities reverse from highs',
     rows: [
       { cols: [1], widgets: [
         { type:'heading', props:{ text:'[PAIR] — [Timeframe] Analysis', level:'h1', size:'40', align:'left' } },
-        { type:'text', props:{ content:'Brief intro — what is the current market structure and what is this analysis focused on.' } }
+        { type:'text', props:{ content:'Brief intro — what is the current market structure and what this analysis is focused on.' } }
       ]},
       { cols: [1,1], widgets: [
-        { type:'callout', props:{ text:'📊 Bias: BULLISH / BEARISH / NEUTRAL
-
-One line reason for the bias.', type:'bull' } },
-        { type:'table', props:{ headers:'Level,Type,Notes', rows:'1.0820,Support,Previous structure
-1.0950,Resistance,Weekly high
-1.0780,Stop Zone,Below structure' } }
+        { type:'callout', props:{ text:'📊 Bias: BULLISH / BEARISH / NEUTRAL\n\nOne line reason for the bias.', type:'bull' } },
+        { type:'table', props:{ headers:'Level,Type,Notes', rows:'1.0820,Support,Previous structure\n1.0950,Resistance,Weekly high\n1.0780,Stop Zone,Below structure' } }
       ]},
       { cols: [1], widgets: [
         { type:'image', props:{ src:'', alt:'Chart', caption:'[PAIR] [Timeframe] — TradingView', width:'100%' } },
@@ -333,10 +314,7 @@ One line reason for the bias.', type:'bull' } },
       ]},
       { cols: [1], widgets: [
         { type:'heading', props:{ text:'The Setup', level:'h2', size:'28', align:'left' } },
-        { type:'callout', props:{ text:'Entry: [level]
-Stop Loss: [level]
-Target: [level]
-R:R: [ratio]', type:'note' } },
+        { type:'callout', props:{ text:'Entry: [level]\nStop Loss: [level]\nTarget: [level]\nR:R: [ratio]', type:'note' } },
         { type:'text', props:{ content:'[Explain the entry logic — what needs to happen for the setup to be valid, what invalidates it]' } }
       ]},
       { cols: [1], widgets: [
