@@ -3,162 +3,381 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ForexEdge — Forex Academy</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>EaglePips Academy — Forex Education</title>
+<meta name="description" content="Learn forex trading — glossary of 100+ terms, fundamentals, technical analysis, COT data and more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <style>
-.feature-hero{padding:80px 48px 60px;text-align:center;position:relative;overflow:hidden}
-.feature-hero::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(201,168,76,0.06) 0%,transparent 70%);pointer-events:none}
-.mock-wrap{max-width:960px;margin:0 auto;padding:0 48px 60px}
-.mock-layout{display:grid;grid-template-columns:260px 1fr;gap:16px;background:var(--bg2);border:1px solid var(--border2);border-radius:2px;overflow:hidden}
-.mock-sidebar-nav{border-right:1px solid var(--border2)}
-.msn-header{padding:14px 16px;border-bottom:1px solid var(--border2);background:var(--bg3)}
-.msn-title{font-size:12px;font-weight:500;color:var(--text)}
-.msn-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-top:2px}
-.module{border-bottom:1px solid var(--border2)}
-.module-header{padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
-.module-header.active{background:var(--gold-dim)}
-.module-name{font-size:11px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:6px}
-.module-num{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);background:var(--bg3);padding:1px 5px}
-.module-progress{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3)}
-.lesson-item{padding:7px 16px 7px 32px;font-size:11px;color:var(--text3);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:6px}
-.lesson-item.done{color:var(--bull)}
-.lesson-item.active{color:var(--gold)}
-.lesson-item.locked{color:var(--text3)}
-.lesson-content{padding:24px}
-.lc-breadcrumb{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
-.lc-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--text);margin-bottom:6px}
-.lc-meta{display:flex;gap:14px;margin-bottom:20px}
-.lc-meta span{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3)}
-.lc-body h2{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);margin:0 0 10px}
-.lc-body p{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:14px}
-.callout{background:var(--gold-dim);border:1px solid var(--border);border-left:3px solid var(--gold);padding:12px 14px;border-radius:2px;margin:14px 0}
-.callout-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:5px}
-.callout p{font-size:12px;color:var(--text2);line-height:1.6;margin:0}
-.key-terms{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
-.kt{background:var(--bg3);border:1px solid var(--border2);padding:12px}
-.kt-name{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;color:var(--gold);margin-bottom:3px;letter-spacing:0.05em}
-.kt-def{font-size:11px;color:var(--text2);line-height:1.5}
-.modules-overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:20px}
-.mo-card{background:var(--bg2);border:1px solid var(--border2);padding:18px}
-.mo-num{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:0.1em;margin-bottom:8px}
-.mo-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px}
-.mo-lessons{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3)}
-.mo-card.locked{opacity:0.5}
-.cta-bar{background:var(--bg2);border-top:1px solid var(--border2);padding:40px 48px;text-align:center}
-@media(max-width:768px){.feature-hero,.mock-wrap{padding-left:20px;padding-right:20px}.mock-layout{grid-template-columns:1fr}.mock-sidebar-nav{border-right:none;border-bottom:1px solid var(--border2)}.cta-bar{padding:40px 20px}}
+.ac-subnav{border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(8,9,12,0.97);backdrop-filter:blur(10px);position:sticky;top:70px;z-index:100}
+.ac-subnav-inner{max-width:1100px;margin:0 auto;padding:0 48px;display:flex;gap:0;align-items:center;overflow-x:auto;scrollbar-width:none}
+.ac-subnav-inner::-webkit-scrollbar{display:none}
+.ac-tab{padding:14px 20px;font-family:"DM Mono",monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;border-bottom:2px solid transparent;border-top:none;border-left:none;border-right:none;transition:all 0.2s;white-space:nowrap;display:flex;align-items:center;gap:7px;cursor:pointer;background:none}
+.ac-tab:hover{color:rgba(255,255,255,0.7)}
+.ac-tab.active{color:#c8a96e;border-bottom-color:#c8a96e}
+.ac-badge{font-size:8px;padding:1px 5px;border-radius:100px;background:rgba(200,169,110,0.15);color:#c8a96e;border:1px solid rgba(200,169,110,0.2)}
+.ac-soon{font-size:8px;padding:1px 5px;border-radius:100px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.08)}
+.ac-panel{display:none}
+.ac-panel.active{display:block}
+.gl-hero{max-width:1100px;margin:0 auto;padding:56px 48px 36px}
+.gl-search-wrap{position:relative;max-width:540px;margin-top:20px}
+.gl-search{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:13px 46px 13px 18px;color:#fff;font-family:"Syne",sans-serif;font-size:15px;outline:none;transition:border-color 0.2s}
+.gl-search::placeholder{color:rgba(255,255,255,0.25)}
+.gl-search:focus{border-color:rgba(200,169,110,0.4);background:rgba(200,169,110,0.04)}
+.gl-search-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.25);font-size:16px;pointer-events:none}
+.gl-filter-bar{max-width:1100px;margin:0 auto;padding:0 48px 24px;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.gl-letter-btn{width:32px;height:32px;background:transparent;border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.4);font-family:"DM Mono",monospace;font-size:11px;border-radius:4px;cursor:pointer;transition:all 0.15s;font-weight:600}
+.gl-letter-btn:hover{border-color:rgba(200,169,110,0.3);color:#c8a96e}
+.gl-letter-btn.active{background:rgba(200,169,110,0.12);border-color:rgba(200,169,110,0.4);color:#c8a96e}
+.gl-letter-btn:disabled{opacity:0.2;cursor:default}
+.gl-clear-btn{padding:6px 12px;background:transparent;border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.3);font-family:"DM Mono",monospace;font-size:10px;border-radius:4px;cursor:pointer;transition:all 0.15s;margin-left:4px}
+.gl-clear-btn:hover{color:#fff;border-color:rgba(255,255,255,0.2)}
+.gl-body{max-width:1100px;margin:0 auto;padding:0 48px 80px}
+.gl-section{margin-bottom:40px}
+.gl-letter-heading{font-family:"DM Mono",monospace;font-size:11px;letter-spacing:0.2em;color:#c8a96e;text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(200,169,110,0.15)}
+.gl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px}
+.gl-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:14px 16px;transition:all 0.15s}
+.gl-card:hover{background:rgba(200,169,110,0.04);border-color:rgba(200,169,110,0.2)}
+.gl-term{font-family:"Syne",sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.gl-cat{font-family:"DM Mono",monospace;font-size:8px;padding:1px 6px;border-radius:100px;letter-spacing:0.06em;font-weight:500;flex-shrink:0}
+.gl-def{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6}
+.gl-no-results{text-align:center;padding:60px 20px;color:rgba(255,255,255,0.25);font-size:14px}
+.cat-basic{background:rgba(76,175,125,0.12);color:#4caf7d;border:1px solid rgba(76,175,125,0.2)}
+.cat-fx{background:rgba(200,169,110,0.12);color:#c8a96e;border:1px solid rgba(200,169,110,0.2)}
+.cat-macro{background:rgba(74,158,255,0.12);color:#6ba3ff;border:1px solid rgba(74,158,255,0.2)}
+.cat-risk{background:rgba(224,92,92,0.12);color:#e05c5c;border:1px solid rgba(224,92,92,0.2)}
+.cat-tech{background:rgba(167,139,250,0.12);color:#a78bfa;border:1px solid rgba(167,139,250,0.2)}
+.cat-cot{background:rgba(249,168,37,0.12);color:#f9a825;border:1px solid rgba(249,168,37,0.2)}
+.ac-modules{max-width:1100px;margin:0 auto;padding:56px 48px 80px}
+.ac-coming-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:32px}
+.ac-module-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:24px;opacity:0.7;transition:all 0.2s}
+.ac-module-card:hover{opacity:0.9;border-color:rgba(255,255,255,0.12)}
+.ac-module-icon{font-size:28px;margin-bottom:12px}
+.ac-module-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}
+.ac-module-desc{font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6}
+.ac-module-badge{display:inline-block;margin-top:12px;font-family:"DM Mono",monospace;font-size:9px;padding:2px 8px;border-radius:100px;letter-spacing:0.08em;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.08)}
+footer{border-top:1px solid rgba(255,255,255,0.06);background:#060709}
+.footer-main{max-width:1300px;margin:0 auto;padding:60px 48px 40px;display:grid;grid-template-columns:280px 1fr;gap:60px}
+.footer-logo-img{height:48px;width:auto;object-fit:contain;margin-bottom:18px;display:block}
+.footer-disclaimer{font-size:12px;color:rgba(255,255,255,0.3);line-height:1.7;max-width:240px}
+.footer-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+.footer-col-title{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.5);font-weight:600;margin-bottom:16px;display:block}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-col ul a{font-size:13px;color:rgba(255,255,255,0.3);text-decoration:none;transition:color 0.2s;display:flex;align-items:center;gap:6px}
+.footer-col ul a:hover{color:#fff}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.05);max-width:1300px;margin:0 auto;padding:20px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-copy{font-family:"DM Mono",monospace;font-size:11px;color:rgba(255,255,255,0.25)}
+.footer-social{display:flex;gap:8px}
+.footer-social a{width:34px;height:34px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:15px;transition:all 0.2s}
+.footer-social a:hover{background:rgba(200,169,110,0.1);border-color:rgba(200,169,110,0.3)}
+@media(max-width:640px){.gl-hero,.gl-filter-bar,.gl-body,.ac-modules{padding-left:20px;padding-right:20px}.ac-subnav-inner{padding:0 16px}.gl-grid{grid-template-columns:1fr}.footer-main{grid-template-columns:1fr;padding:40px 20px 30px}.footer-cols{grid-template-columns:1fr 1fr}.footer-bottom{padding:16px 20px}}
 </style>
 </head>
 <body>
 <div id="navMount"></div>
 
-<div class="feature-hero">
-  <div class="page-label">// Feature</div>
-  <h1 class="page-title" style="margin-bottom:12px">Forex <strong>Academy</strong></h1>
-  <p style="font-size:16px;color:var(--text2);max-width:520px;margin:0 auto 28px;line-height:1.7">Structured learning from zero to advanced. Master fundamental analysis, central bank policy, and macro trading — the way institutional traders do it.</p>
-  <a href="auth.html?tab=register" class="btn-gold-lg">Start Learning Free →</a>
+<nav class="ac-subnav">
+  <div class="ac-subnav-inner">
+    <button class="ac-tab active" onclick="showPanel('glossary',this)">📖 Glossary <span class="ac-badge">100+ terms</span></button>
+    <button class="ac-tab" onclick="showPanel('fundamentals',this)">🏦 Fundamentals <span class="ac-soon">Coming soon</span></button>
+    <button class="ac-tab" onclick="showPanel('technical',this)">📈 Technical Analysis <span class="ac-soon">Coming soon</span></button>
+    <button class="ac-tab" onclick="showPanel('cot',this)">📊 COT Data <span class="ac-soon">Coming soon</span></button>
+    <button class="ac-tab" onclick="showPanel('central-banks',this)">🏛 Central Banks <span class="ac-soon">Coming soon</span></button>
+    <button class="ac-tab" onclick="showPanel('risk',this)">🛡 Risk Management <span class="ac-soon">Coming soon</span></button>
+  </div>
+</nav>
+
+<!-- GLOSSARY -->
+<div class="ac-panel active" id="panel-glossary">
+  <div class="gl-hero">
+    <span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#c8a96e">// Academy &middot; Glossary</span>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(32px,4vw,52px);font-weight:900;color:#fff;margin:12px 0 8px;line-height:1.1">Forex <em style="color:#c8a96e">Dictionary</em></h1>
+    <p style="font-size:15px;color:rgba(255,255,255,0.45);max-width:520px;line-height:1.7">Every term you'll encounter in forex markets — clearly explained. Search or browse alphabetically.</p>
+    <div class="gl-search-wrap">
+      <input type="text" class="gl-search" id="glSearch" placeholder="Search terms... e.g. pip, carry trade, COT" oninput="filterGlossary(this.value)">
+      <span class="gl-search-icon">&#128269;</span>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,0.2);margin-top:10px" id="glCount"></div>
+  </div>
+  <div class="gl-filter-bar" id="glAlphabet"></div>
+  <div class="gl-body" id="glBody"></div>
 </div>
 
-<div class="mock-wrap">
-  <div class="mock-layout">
-    <!-- Sidebar nav -->
-    <div class="mock-sidebar-nav">
-      <div class="msn-header">
-        <div class="msn-title">Course Curriculum</div>
-        <div class="msn-sub">7 modules · 8% complete</div>
-      </div>
-      <div class="module">
-        <div class="module-header active">
-          <span class="module-name"><span class="module-num">01</span>Forex Fundamentals</span>
-          <span class="module-progress">2/5</span>
-        </div>
-        <div class="lesson-item done">✓ What is Forex?</div>
-        <div class="lesson-item done">✓ Market Participants</div>
-        <div class="lesson-item active">▶ Currency Pairs Explained</div>
-        <div class="lesson-item">○ Pips, Lots & Leverage</div>
-        <div class="lesson-item">○ Trading Sessions</div>
-      </div>
-      <div class="module">
-        <div class="module-header">
-          <span class="module-name"><span class="module-num">02</span>Macroeconomics 101</span>
-          <span class="module-progress">0/6</span>
-        </div>
-      </div>
-      <div class="module">
-        <div class="module-header">
-          <span class="module-name"><span class="module-num">03</span>Central Banks</span>
-          <span class="module-progress">0/7</span>
-        </div>
-      </div>
-      <div class="module">
-        <div class="module-header">
-          <span class="module-name"><span class="module-num">04</span>Reading the Calendar</span>
-          <span class="module-progress">0/5</span>
-        </div>
-      </div>
-      <div class="module">
-        <div class="module-header">
-          <span class="module-name"><span class="module-num">05</span>Currency Correlations</span>
-          <span class="module-progress">0/4</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Lesson content -->
-    <div class="lesson-content">
-      <div class="lc-breadcrumb">Module 01 — Forex Fundamentals</div>
-      <h2 class="lc-title">Currency Pairs Explained</h2>
-      <div class="lc-meta">
-        <span>⏱ 8 min read</span>
-        <span>📊 Beginner</span>
-        <span>✓ Lesson 3 of 5</span>
-      </div>
-      <div class="lc-body">
-        <h2>What is a Currency Pair?</h2>
-        <p>In forex trading, currencies are always quoted in pairs. When you trade EUR/USD, you're simultaneously buying the Euro and selling the US Dollar. The price tells you how much of the quote currency you need to buy one unit of the base currency.</p>
-        <p>For example, if EUR/USD = 1.1532, it means 1 Euro buys 1.1532 US Dollars.</p>
-        <div class="callout">
-          <div class="callout-label">💡 Key Insight</div>
-          <p>Every forex trade involves two currencies — which is why understanding the <strong>relative strength</strong> between two economies is the foundation of fundamental analysis.</p>
-        </div>
-        <div class="key-terms">
-          <div class="kt"><div class="kt-name">Base Currency</div><div class="kt-def">The first currency in a pair. In EUR/USD, EUR is the base.</div></div>
-          <div class="kt"><div class="kt-name">Quote Currency</div><div class="kt-def">The second currency. In EUR/USD, USD is the quote.</div></div>
-          <div class="kt"><div class="kt-name">Pip</div><div class="kt-def">Smallest standard price move. For most pairs = 0.0001.</div></div>
-          <div class="kt"><div class="kt-name">Spread</div><div class="kt-def">Difference between bid and ask. The broker's fee.</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modules overview -->
-  <div style="margin-top:32px">
-    <div class="section-label">// Full Curriculum</div>
-    <div class="modules-overview">
-      <div class="mo-card"><div class="mo-num">Module 01</div><div class="mo-title">Forex Fundamentals</div><div class="mo-lessons">5 lessons · Beginner</div></div>
-      <div class="mo-card"><div class="mo-num">Module 02</div><div class="mo-title">Macroeconomics 101</div><div class="mo-lessons">6 lessons · Beginner</div></div>
-      <div class="mo-card"><div class="mo-num">Module 03</div><div class="mo-title">Central Banks</div><div class="mo-lessons">7 lessons · Intermediate</div></div>
-      <div class="mo-card"><div class="mo-num">Module 04</div><div class="mo-title">Reading the Calendar</div><div class="mo-lessons">5 lessons · Intermediate</div></div>
-      <div class="mo-card locked"><div class="mo-num">Module 05</div><div class="mo-title">Currency Correlations</div><div class="mo-lessons">4 lessons · 🔒 Basic+</div></div>
-      <div class="mo-card locked"><div class="mo-num">Module 06</div><div class="mo-title">COT & Positioning</div><div class="mo-lessons">4 lessons · 🔒 Basic+</div></div>
-      <div class="mo-card locked"><div class="mo-num">Module 07</div><div class="mo-title">Risk Management</div><div class="mo-lessons">5 lessons · 🔒 Basic+</div></div>
+<!-- FUNDAMENTALS -->
+<div class="ac-panel" id="panel-fundamentals">
+  <div class="ac-modules">
+    <span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#c8a96e">// Academy &middot; Fundamentals</span>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,3.5vw,48px);font-weight:900;color:#fff;margin:12px 0 8px">Fundamental <em style="color:#c8a96e">Analysis</em></h1>
+    <p style="font-size:15px;color:rgba(255,255,255,0.45);max-width:560px;line-height:1.7">How macro events, central bank decisions and economic data move currencies. Coming soon.</p>
+    <div class="ac-coming-grid">
+      <div class="ac-module-card"><div class="ac-module-icon">🏦</div><div class="ac-module-title">Central Bank Policy</div><div class="ac-module-desc">How interest rate decisions, forward guidance and QE programs impact currency valuations.</div><span class="ac-module-badge">Module 1</span></div>
+      <div class="ac-module-card"><div class="ac-module-icon">📉</div><div class="ac-module-title">Inflation &amp; CPI</div><div class="ac-module-desc">Understanding inflation data, why it moves markets and how to position around CPI releases.</div><span class="ac-module-badge">Module 2</span></div>
+      <div class="ac-module-card"><div class="ac-module-icon">💼</div><div class="ac-module-title">Employment Data</div><div class="ac-module-desc">NFP, unemployment rate, wage growth — how to read labour market reports like a macro trader.</div><span class="ac-module-badge">Module 3</span></div>
+      <div class="ac-module-card"><div class="ac-module-icon">🛢</div><div class="ac-module-title">Commodities &amp; FX</div><div class="ac-module-desc">How oil, gold and commodity prices correlate with currencies like NOK, CAD, AUD and CHF.</div><span class="ac-module-badge">Module 4</span></div>
+      <div class="ac-module-card"><div class="ac-module-icon">🌍</div><div class="ac-module-title">Geopolitical Risk</div><div class="ac-module-desc">Conflict, sanctions, trade wars — how to identify geopolitical risk premiums in FX markets.</div><span class="ac-module-badge">Module 5</span></div>
+      <div class="ac-module-card"><div class="ac-module-icon">📅</div><div class="ac-module-title">Economic Calendar</div><div class="ac-module-desc">How to read and trade around the economic calendar — what matters and what doesn't.</div><span class="ac-module-badge">Module 6</span></div>
     </div>
   </div>
 </div>
 
-<div class="cta-bar">
-  <h2 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--text);margin-bottom:8px">Learn to trade <strong>fundamentals.</strong></h2>
-  <p style="font-size:14px;color:var(--text2);margin-bottom:20px">First 2 lessons free. Full access from $19/month.</p>
-  <a href="auth.html?tab=register" class="btn-gold-lg">Start Learning →</a>
+<!-- TECHNICAL -->
+<div class="ac-panel" id="panel-technical">
+  <div class="ac-modules">
+    <span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#a78bfa">// Academy &middot; Technical</span>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,3.5vw,48px);font-weight:900;color:#fff;margin:12px 0 8px">Technical <em style="color:#a78bfa">Analysis</em></h1>
+    <p style="font-size:15px;color:rgba(255,255,255,0.45);max-width:560px;line-height:1.7">Price action, market structure, key levels and chart patterns for forex traders. Coming soon.</p>
+    <div class="ac-coming-grid">
+      <div class="ac-module-card"><div class="ac-module-icon">📊</div><div class="ac-module-title">Market Structure</div><div class="ac-module-desc">Higher highs, lower lows, break of structure — reading the market's footprint on any timeframe.</div><span class="ac-module-badge">Module 1</span></div>
+      <div class="ac-module-card"><div class="ac-module-icon">🕯</div><div class="ac-module-title">Candlestick Patterns</div><div class="ac-module-desc">The most important reversal and continuation patterns and how to trade them in forex.</div><span class="ac-module-badge">Module 2</span></div>
+      <div class="ac-module-card"><div class="ac-module-icon">📏</div><div class="ac-module-title">Support &amp; Resistance</div><div class="ac-module-desc">How to identify, draw and trade key levels — structure, round numbers, weekly highs and lows.</div><span class="ac-module-badge">Module 3</span></div>
+      <div class="ac-module-card"><div class="ac-module-icon">📐</div><div class="ac-module-title">Fibonacci</div><div class="ac-module-desc">Retracements, extensions and how institutional traders use Fibonacci levels in practice.</div><span class="ac-module-badge">Module 4</span></div>
+    </div>
+  </div>
 </div>
 
-<footer>
-  <div class="footer-logo">Forex<span>Edge</span></div>
-  <ul class="footer-links"><li><a href="index.html">Home</a></li><li><a href="news.html">News</a></li><li><a href="journal.html">Journal</a></li><li><a href="tools.html">Tools</a></li></ul>
-  <div class="footer-copy">© 2026 ForexEdge. All rights reserved.</div>
+<!-- COT -->
+<div class="ac-panel" id="panel-cot">
+  <div class="ac-modules">
+    <span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#f9a825">// Academy &middot; COT Data</span>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,3.5vw,48px);font-weight:900;color:#fff;margin:12px 0 8px">COT <em style="color:#f9a825">Data</em></h1>
+    <p style="font-size:15px;color:rgba(255,255,255,0.45);max-width:560px;line-height:1.7">Commitment of Traders — how to read institutional positioning and use it in your analysis. Coming soon.</p>
+    <div class="ac-coming-grid">
+      <div class="ac-module-card"><div class="ac-module-icon">📋</div><div class="ac-module-title">What is COT?</div><div class="ac-module-desc">The CFTC report explained — what it measures, when it's released and why it matters for FX.</div><span class="ac-module-badge">Module 1</span></div>
+      <div class="ac-module-card"><div class="ac-module-icon">🏦</div><div class="ac-module-title">Commercial vs Non-Commercial</div><div class="ac-module-desc">The difference between hedgers and speculators — and whose positions matter most for direction.</div><span class="ac-module-badge">Module 2</span></div>
+      <div class="ac-module-card"><div class="ac-module-icon">📈</div><div class="ac-module-title">Reading Extremes</div><div class="ac-module-desc">How to identify crowded positioning and use COT extremes as a contrarian signal.</div><span class="ac-module-badge">Module 3</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- CENTRAL BANKS -->
+<div class="ac-panel" id="panel-central-banks">
+  <div class="ac-modules">
+    <span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#6ba3ff">// Academy &middot; Central Banks</span>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,3.5vw,48px);font-weight:900;color:#fff;margin:12px 0 8px">Central <em style="color:#6ba3ff">Banks</em></h1>
+    <p style="font-size:15px;color:rgba(255,255,255,0.45);max-width:560px;line-height:1.7">Fed, ECB, BoE, BoJ, RBA — how each bank operates and what drives their policy decisions. Coming soon.</p>
+    <div class="ac-coming-grid">
+      <div class="ac-module-card"><div class="ac-module-icon">🇺🇸</div><div class="ac-module-title">Federal Reserve (Fed)</div><div class="ac-module-desc">Dual mandate, FOMC meetings, dot plot, forward guidance and how USD reacts to Fed decisions.</div><span class="ac-module-badge">Module 1</span></div>
+      <div class="ac-module-card"><div class="ac-module-icon">🇪🇺</div><div class="ac-module-title">European Central Bank (ECB)</div><div class="ac-module-desc">ECB mandate, governing council, TPI and the mechanics of EUR monetary policy.</div><span class="ac-module-badge">Module 2</span></div>
+      <div class="ac-module-card"><div class="ac-module-icon">🇬🇧</div><div class="ac-module-title">Bank of England (BoE)</div><div class="ac-module-desc">MPC votes, inflation targeting, GBP sensitivity to BoE communications and UK data.</div><span class="ac-module-badge">Module 3</span></div>
+      <div class="ac-module-card"><div class="ac-module-icon">🇯🇵</div><div class="ac-module-title">Bank of Japan (BoJ)</div><div class="ac-module-desc">YCC, negative rates, intervention history and why JPY is the world's most unusual currency.</div><span class="ac-module-badge">Module 4</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- RISK -->
+<div class="ac-panel" id="panel-risk">
+  <div class="ac-modules">
+    <span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#e05c5c">// Academy &middot; Risk Management</span>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,3.5vw,48px);font-weight:900;color:#fff;margin:12px 0 8px">Risk <em style="color:#e05c5c">Management</em></h1>
+    <p style="font-size:15px;color:rgba(255,255,255,0.45);max-width:560px;line-height:1.7">Position sizing, drawdown management and the mental frameworks that keep you in the game. Coming soon.</p>
+    <div class="ac-coming-grid">
+      <div class="ac-module-card"><div class="ac-module-icon">⚖️</div><div class="ac-module-title">Position Sizing</div><div class="ac-module-desc">How to calculate lot sizes based on account balance, risk % and stop loss distance.</div><span class="ac-module-badge">Module 1</span></div>
+      <div class="ac-module-card"><div class="ac-module-icon">📉</div><div class="ac-module-title">Drawdown &amp; Recovery</div><div class="ac-module-desc">The mathematics of drawdown — why a 50% loss requires a 100% gain to recover.</div><span class="ac-module-badge">Module 2</span></div>
+      <div class="ac-module-card"><div class="ac-module-icon">🧠</div><div class="ac-module-title">Trading Psychology</div><div class="ac-module-desc">FOMO, revenge trading, overconfidence — the biases that destroy accounts.</div><span class="ac-module-badge">Module 3</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer id="site-footer">
+  <div class="footer-main">
+    <div class="footer-brand-col">
+      <a href="index.html"><img src="https://vaimxhgqcdhjhdiaampa.supabase.co/storage/v1/object/public/EaglePips/design-f-r--titlu-1776494279309.png" class="footer-logo-img" alt="EaglePips"></a>
+      <p class="footer-disclaimer" id="footerDisclaimer">Trading involves substantial risk and is not appropriate for everyone. Only risk capital should be used. Past performance is not indicative of future results.</p>
+    </div>
+    <div class="footer-cols" id="footerCols">
+      <div class="footer-col"><span class="footer-col-title">Platform</span><ul><li><a href="journal.html">Trading Journal</a></li><li><a href="market-updates.html">Market Updates</a></li><li><a href="academy.html">Academy</a></li><li><a href="changelog.html">Changelog</a></li></ul></div>
+      <div class="footer-col"><span class="footer-col-title">Legal</span><ul><li><a href="privacy.html">Privacy Policy</a></li><li><a href="terms.html">Terms of Service</a></li><li><a href="risk.html">Risk Disclaimer</a></li></ul></div>
+      <div class="footer-col"><span class="footer-col-title">Community</span><ul><li><a href="#">💬 Discord</a></li><li><a href="#">𝕏 Twitter / X</a></li><li><a href="#">📷 Instagram</a></li></ul></div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy" id="footerCopy">© 2026 EaglePips. All rights reserved.</span>
+    <div class="footer-social" id="footerSocial"><a href="#" title="Discord">💬</a><a href="#" title="Twitter">𝕏</a><a href="#" title="Instagram">📷</a></div>
+  </div>
 </footer>
 
-<script src='nav.js'></script>
-<script src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2' onload="renderNav('academy')"></script>
+<script>
+function showPanel(id,btn){
+  document.querySelectorAll('.ac-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ac-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+const GLOSSARY=[
+  {term:'Ask',def:'The price at which the market is willing to sell a currency pair. Also called the offer price. You buy at the Ask.',cat:'basic'},
+  {term:'At the Money (ATM)',def:'An option whose strike price is equal to the current market price of the underlying asset.',cat:'basic'},
+  {term:'Australian Dollar (AUD)',def:'The official currency of Australia. A commodity currency closely correlated with iron ore and coal exports.',cat:'fx'},
+  {term:'Average True Range (ATR)',def:'A technical indicator measuring market volatility — the average range between high and low over N periods.',cat:'tech'},
+  {term:'Base Currency',def:'The first currency in a currency pair. In EUR/USD, the Euro is the base currency. You are always buying or selling the base.',cat:'basic'},
+  {term:'Basis Points (bps)',def:'One hundredth of one percent (0.01%). Used to describe changes in interest rates and yield spreads.',cat:'macro'},
+  {term:'Bear Market',def:'A market in a sustained downtrend, typically defined as a decline of 20% or more from recent highs.',cat:'basic'},
+  {term:'Bid',def:'The price at which the market is willing to buy a currency pair. You sell at the Bid.',cat:'basic'},
+  {term:'Bid-Ask Spread',def:'The difference between the Bid and Ask price. The spread is the primary cost of trading forex.',cat:'basic'},
+  {term:'BOJ (Bank of Japan)',def:"Japan's central bank. Controls JPY monetary policy. Known for ultra-loose policy, YCC, and occasional FX intervention.",cat:'macro'},
+  {term:'BOE (Bank of England)',def:"The UK's central bank. Sets GBP interest rates via MPC votes. Known for close CPI targeting.",cat:'macro'},
+  {term:'Breakout',def:'When price moves decisively above resistance or below support, often accompanied by increased volume.',cat:'tech'},
+  {term:'Bull Market',def:'A market in a sustained uptrend, characterized by rising prices and positive sentiment.',cat:'basic'},
+  {term:'Cable',def:'Trader slang for GBP/USD. The name comes from the transatlantic telegraph cable used for price quotes in the 19th century.',cat:'fx'},
+  {term:'Canadian Dollar (CAD)',def:'Official currency of Canada. A commodity currency closely correlated with crude oil prices.',cat:'fx'},
+  {term:'Carry Trade',def:'Borrowing a low-interest-rate currency to buy a high-interest-rate currency, profiting from the interest rate differential.',cat:'macro'},
+  {term:'Central Bank',def:"A national or supranational institution that manages a country's currency, money supply and interest rates.",cat:'macro'},
+  {term:'CHF (Swiss Franc)',def:"Official currency of Switzerland. Considered the world's safest haven currency due to Swiss political neutrality and financial stability.",cat:'fx'},
+  {term:'Commodity Currency',def:'A currency from a country whose economy is heavily dependent on commodity exports. AUD, CAD and NOK are the main examples.',cat:'fx'},
+  {term:'Consumer Price Index (CPI)',def:'A measure of inflation tracking the average price change of a basket of consumer goods and services over time.',cat:'macro'},
+  {term:'Correlation',def:'A statistical measure of how two assets move in relation to each other. Ranges from -1 (perfect inverse) to +1 (perfect positive).',cat:'tech'},
+  {term:'COT Report',def:'Commitment of Traders report published weekly by the CFTC. Shows positioning of commercial and non-commercial traders in futures markets.',cat:'cot'},
+  {term:'Counter Currency',def:'The second currency in a pair. In EUR/USD, the US Dollar is the counter (quote) currency.',cat:'basic'},
+  {term:'Cross Currency Pair',def:'A currency pair that does not include the US Dollar. Examples: EUR/GBP, AUD/JPY, GBP/CHF.',cat:'fx'},
+  {term:'Day Trading',def:'A trading style where all positions are opened and closed within the same trading day.',cat:'basic'},
+  {term:'Dead Cat Bounce',def:'A temporary recovery in a declining asset before the downtrend resumes. Often mistaken for a reversal.',cat:'tech'},
+  {term:'Deflation',def:'A sustained decrease in the general price level. Associated with weak demand and can be damaging to economic growth.',cat:'macro'},
+  {term:'Divergence',def:'When price makes a new high/low but an indicator (e.g. RSI) does not. Often signals weakening momentum.',cat:'tech'},
+  {term:'Dovish',def:'A central bank policy stance favouring lower interest rates and accommodative monetary policy. Typically negative for a currency.',cat:'macro'},
+  {term:'Drawdown',def:"The peak-to-trough decline in an account's equity. A measure of downside risk and strategy performance.",cat:'risk'},
+  {term:'DXY (Dollar Index)',def:"A measure of the US Dollar's value against a basket of six major currencies: EUR, JPY, GBP, CAD, SEK and CHF.",cat:'fx'},
+  {term:'ECB (European Central Bank)',def:'The central bank of the Eurozone. Sets monetary policy for the 20 countries using the Euro.',cat:'macro'},
+  {term:'Economic Calendar',def:'A schedule of upcoming data releases, central bank meetings and other events that can move financial markets.',cat:'macro'},
+  {term:'Equity',def:'The current value of a trading account, including open positions. Balance + unrealised P&L.',cat:'risk'},
+  {term:'EUR/USD',def:'The most traded currency pair in the world. Represents the Euro versus the US Dollar. Also called "the Fiber" in trader slang.',cat:'fx'},
+  {term:'Exotic Currency Pair',def:'A currency pair involving one major currency and one from an emerging or smaller economy. E.g. USD/TRY, EUR/ZAR.',cat:'fx'},
+  {term:'Fakeout',def:'A false breakout where price briefly moves beyond a key level before reversing. Designed to trap breakout traders.',cat:'tech'},
+  {term:'Fibonacci Retracement',def:'Horizontal levels based on Fibonacci ratios (23.6%, 38.2%, 50%, 61.8%, 78.6%) used to identify potential support and resistance.',cat:'tech'},
+  {term:'Flat (Square)',def:'Having no open positions. A trader who has closed all positions is said to be flat or square.',cat:'basic'},
+  {term:'FOMC',def:'Federal Open Market Committee. The body within the Federal Reserve that sets US interest rate policy. Meets 8 times per year.',cat:'macro'},
+  {term:'Forex (FX)',def:'Foreign Exchange. The global decentralised market for trading currencies. The largest financial market in the world by daily volume (~$7.5 trillion).',cat:'basic'},
+  {term:'Forward Contract',def:'An agreement to buy or sell a currency at a specified price on a future date. Used primarily for hedging.',cat:'basic'},
+  {term:'Fundamental Analysis',def:'Evaluating currencies based on economic data, central bank policy, geopolitical events and macroeconomic factors.',cat:'macro'},
+  {term:'G10 Currencies',def:'The 10 most traded currencies: USD, EUR, GBP, JPY, CHF, CAD, AUD, NZD, NOK and SEK.',cat:'fx'},
+  {term:'Gap',def:'A price discontinuity where the open of one period is significantly different from the close of the previous period.',cat:'tech'},
+  {term:'GDP (Gross Domestic Product)',def:'The total monetary value of all goods and services produced in a country. A primary measure of economic health.',cat:'macro'},
+  {term:'Going Long',def:'Buying a currency pair with the expectation that it will rise in value.',cat:'basic'},
+  {term:'Going Short',def:'Selling a currency pair with the expectation that it will fall in value.',cat:'basic'},
+  {term:'Hawkish',def:'A central bank policy stance favouring higher interest rates to combat inflation. Typically positive for a currency.',cat:'macro'},
+  {term:'Hedge',def:'A position taken to offset the risk of an existing trade. Used to reduce exposure to adverse price movements.',cat:'risk'},
+  {term:'Higher High / Lower Low',def:'Market structure concepts. Higher highs and higher lows define an uptrend; lower highs and lower lows define a downtrend.',cat:'tech'},
+  {term:'Inflation',def:'A sustained increase in the general price level of goods and services. Central banks target inflation, typically at 2%.',cat:'macro'},
+  {term:'Interest Rate Differential',def:'The difference between interest rates in two countries. A key driver of currency pairs — capital flows toward higher yields.',cat:'macro'},
+  {term:'Intervention',def:'When a central bank directly buys or sells its own currency in the forex market to influence its value.',cat:'macro'},
+  {term:'JPY (Japanese Yen)',def:"The official currency of Japan. A traditional safe-haven currency. Known for its role in carry trades due to Japan's ultra-low rates.",cat:'fx'},
+  {term:'Kiwi',def:'Trader slang for the New Zealand Dollar (NZD/USD).',cat:'fx'},
+  {term:'Leverage',def:'Using borrowed capital to control a larger position than your account equity would allow. Amplifies both gains and losses.',cat:'risk'},
+  {term:'Liquidity',def:"The ease with which an asset can be bought or sold without significantly affecting its price. Forex is the world's most liquid market.",cat:'basic'},
+  {term:'Lot',def:'A standardised unit of currency in forex. Standard lot = 100,000 units. Mini lot = 10,000. Micro lot = 1,000.',cat:'basic'},
+  {term:'Margin',def:'The deposit required to open and maintain a leveraged trading position. Expressed as a percentage of the full position value.',cat:'risk'},
+  {term:'Margin Call',def:"A broker demand to deposit more funds when a position's losses reduce equity below the required margin level.",cat:'risk'},
+  {term:'Market Order',def:'An instruction to buy or sell immediately at the current best available price.',cat:'basic'},
+  {term:'Major Currency Pair',def:'Currency pairs that include the US Dollar on one side and a major world currency on the other: EUR/USD, GBP/USD, USD/JPY, etc.',cat:'fx'},
+  {term:'MPC (Monetary Policy Committee)',def:"The Bank of England's rate-setting body. Votes on interest rate decisions; the vote split (e.g. 6-3) is closely watched by GBP traders.",cat:'macro'},
+  {term:'Net Positions (COT)',def:'The difference between long and short positions held by a trader category in the COT report. Indicates overall directional bias.',cat:'cot'},
+  {term:'NFP (Non-Farm Payrolls)',def:'Monthly US jobs report released on the first Friday of each month. One of the most market-moving data releases in forex.',cat:'macro'},
+  {term:'NOK (Norwegian Krone)',def:'Official currency of Norway. Highly correlated with oil prices. Pays one of the highest rates in G10.',cat:'fx'},
+  {term:'NZD (New Zealand Dollar)',def:'Official currency of New Zealand. Known as the "Kiwi." Influenced by dairy prices, RBNZ policy and risk sentiment.',cat:'fx'},
+  {term:'Open Interest',def:'The total number of outstanding futures contracts that have not been settled. Rising open interest confirms a trend.',cat:'cot'},
+  {term:'Order Block',def:'A price area where large institutional orders were previously filled, often acting as future support or resistance.',cat:'tech'},
+  {term:'Overbought',def:'A market condition where prices have risen too far too fast and may be due for a pullback. Often identified with RSI > 70.',cat:'tech'},
+  {term:'Oversold',def:'A market condition where prices have fallen too far too fast and may be due for a bounce. Often identified with RSI < 30.',cat:'tech'},
+  {term:'Pip',def:'Percentage In Point. The smallest standard price move in a currency pair. For most pairs, 1 pip = 0.0001. For JPY pairs, 1 pip = 0.01.',cat:'basic'},
+  {term:'Pipette',def:'A fractional pip, one tenth of a pip (0.00001). Used by brokers offering 5-decimal pricing.',cat:'basic'},
+  {term:'PMI (Purchasing Managers Index)',def:'A survey-based economic indicator measuring business activity. Above 50 = expansion; below 50 = contraction.',cat:'macro'},
+  {term:'Position Sizing',def:'Calculating how many lots to trade based on account size, risk percentage and stop loss distance.',cat:'risk'},
+  {term:'Price Action',def:'Trading methodology based on reading raw price movement — candlestick patterns, structure and momentum — without indicators.',cat:'tech'},
+  {term:'Pullback',def:'A temporary reversal against the prevailing trend before it resumes. Also called a retracement or correction.',cat:'tech'},
+  {term:'Quantitative Easing (QE)',def:'A monetary policy tool where a central bank buys securities to inject money into the economy and lower long-term interest rates.',cat:'macro'},
+  {term:'Quantitative Tightening (QT)',def:'The reverse of QE — a central bank reduces its balance sheet by selling or not reinvesting maturing securities.',cat:'macro'},
+  {term:'Quote Currency',def:'The second currency in a pair. Tells you how much of it is needed to buy one unit of the base currency.',cat:'basic'},
+  {term:'Rate Differential',def:"The gap between two countries' interest rates. Determines carry trade attractiveness and capital flow direction.",cat:'macro'},
+  {term:'Resistance',def:'A price level where selling pressure has historically been strong enough to halt or reverse upward price movement.',cat:'tech'},
+  {term:'Risk-Off',def:'A market environment where investors move capital away from risky assets into safe havens like JPY, CHF, USD and gold.',cat:'macro'},
+  {term:'Risk-On',def:'A market environment where investors move into higher-risk, higher-yield assets. Positive for AUD, NZD, NOK and equities.',cat:'macro'},
+  {term:'Risk/Reward Ratio',def:'The ratio of potential profit to potential loss on a trade. A 1:2 R:R means risking 1 to make 2.',cat:'risk'},
+  {term:'RSI (Relative Strength Index)',def:'A momentum oscillator ranging from 0-100. Readings above 70 suggest overbought; below 30 suggest oversold.',cat:'tech'},
+  {term:'Safe Haven',def:'An asset that retains or increases value during market turmoil. In forex: JPY, CHF and USD are the primary safe havens.',cat:'macro'},
+  {term:'Scalping',def:'A high-frequency trading strategy aiming to profit from very small price moves, typically holding positions for seconds to minutes.',cat:'basic'},
+  {term:'SEK (Swedish Krona)',def:'Official currency of Sweden. Set by the Riksbank. One of the lower-yielding G10 currencies.',cat:'fx'},
+  {term:'Sentiment',def:'The overall attitude of traders toward a market or currency. Can be bullish, bearish or neutral.',cat:'basic'},
+  {term:'Slippage',def:'The difference between the expected price of a trade and the actual execution price. Common during high volatility or low liquidity.',cat:'risk'},
+  {term:'SNB (Swiss National Bank)',def:"Switzerland's central bank. Known for periodic currency interventions to prevent excessive CHF strength.",cat:'macro'},
+  {term:'Speculative Positioning',def:'Non-commercial positions in the COT report — hedge funds and large speculators betting on directional moves.',cat:'cot'},
+  {term:'Spread',def:"The difference between the bid and ask price. Represents the cost of trading and the broker's profit.",cat:'basic'},
+  {term:'Stop Loss',def:'An order to automatically close a position at a specified price to limit losses if the trade moves against you.',cat:'risk'},
+  {term:'Support',def:'A price level where buying pressure has historically been strong enough to halt or reverse downward price movement.',cat:'tech'},
+  {term:'Swap (Overnight Financing)',def:'The interest paid or earned for holding a forex position overnight. Positive swap = earn interest. Negative swap = pay interest.',cat:'basic'},
+  {term:'Swing High / Swing Low',def:'A swing high is a candle with lower highs on both sides. A swing low has higher lows on both sides. Used to define market structure.',cat:'tech'},
+  {term:'Swing Trading',def:'A medium-term trading style holding positions from several hours to several weeks to capture larger price moves.',cat:'basic'},
+  {term:'Take Profit',def:'An order to automatically close a position at a specified price to lock in profits when the trade reaches your target.',cat:'risk'},
+  {term:'Technical Analysis',def:'Analysing past price data — charts, patterns, indicators — to forecast future price movements.',cat:'tech'},
+  {term:'Trend',def:'The general direction of price movement over a period of time. Upward (bullish), downward (bearish) or sideways.',cat:'tech'},
+  {term:'USD (US Dollar)',def:'The world's primary reserve currency. Involved in ~88% of all forex transactions. The DXY measures its relative strength.',cat:'fx'},
+  {term:'Volatility',def:'The degree of price variation over time. High volatility means larger price swings; low volatility means smaller moves.',cat:'basic'},
+  {term:'War Premium',def:'The additional risk premium priced into safe-haven assets and oil during geopolitical conflicts or war.',cat:'macro'},
+  {term:'Yield Curve',def:'A graph showing interest rates across different maturities. An inverted yield curve often signals recession.',cat:'macro'},
+  {term:'YCC (Yield Curve Control)',def:'A Bank of Japan policy capping Japanese government bond yields at a target level by buying unlimited bonds.',cat:'macro'},
+];
+
+const CAT_LABELS={basic:'Basics',fx:'FX',macro:'Macro',risk:'Risk',tech:'Technical',cot:'COT'};
+const CAT_CLASS={basic:'cat-basic',fx:'cat-fx',macro:'cat-macro',risk:'cat-risk',tech:'cat-tech',cot:'cat-cot'};
+let activeFilter=null;
+
+function buildAlphabet(){
+  const letters=[...new Set(GLOSSARY.map(t=>t.term[0].toUpperCase()))].sort();
+  const all='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  document.getElementById('glAlphabet').innerHTML=all.map(l=>`<button class="gl-letter-btn" onclick="filterLetter('${l}')" id="lbtn-${l}" ${!letters.includes(l)?'disabled':''}>${l}</button>`).join('')+`<button class="gl-clear-btn" onclick="clearFilters()">&#x2715; Clear</button>`;
+}
+
+function filterLetter(l){
+  activeFilter=activeFilter===l?null:l;
+  document.querySelectorAll('.gl-letter-btn').forEach(b=>b.classList.remove('active'));
+  if(activeFilter)document.getElementById('lbtn-'+l)?.classList.add('active');
+  document.getElementById('glSearch').value='';
+  renderGlossary(null,activeFilter);
+}
+
+function clearFilters(){
+  activeFilter=null;
+  document.querySelectorAll('.gl-letter-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('glSearch').value='';
+  renderGlossary('');
+}
+
+function filterGlossary(q){
+  activeFilter=null;
+  document.querySelectorAll('.gl-letter-btn').forEach(b=>b.classList.remove('active'));
+  renderGlossary(q.trim().toLowerCase());
+}
+
+function renderGlossary(query,letter){
+  let items=[...GLOSSARY].sort((a,b)=>a.term.localeCompare(b.term));
+  if(letter) items=items.filter(t=>t.term[0].toUpperCase()===letter);
+  else if(query) items=items.filter(t=>t.term.toLowerCase().includes(query)||t.def.toLowerCase().includes(query)||(CAT_LABELS[t.cat]||'').toLowerCase().includes(query));
+  const total=document.getElementById('glCount');
+  if(total)total.textContent=items.length+' of '+GLOSSARY.length+' terms';
+  const body=document.getElementById('glBody');
+  if(!items.length){body.innerHTML='<div class="gl-no-results"><div style="font-size:36px;margin-bottom:12px;opacity:0.3">&#128269;</div>No terms found.</div>';return;}
+  const grouped={};
+  items.forEach(t=>{const l=t.term[0].toUpperCase();if(!grouped[l])grouped[l]=[];grouped[l].push(t);});
+  body.innerHTML=Object.keys(grouped).sort().map(l=>`<div class="gl-section"><div class="gl-letter-heading">${l}</div><div class="gl-grid">${grouped[l].map(t=>`<div class="gl-card"><div class="gl-term">${t.term}<span class="gl-cat ${CAT_CLASS[t.cat]||'cat-basic'}">${CAT_LABELS[t.cat]||t.cat}</span></div><div class="gl-def">${t.def}</div></div>`).join('')}</div></div>`).join('');
+}
+
+buildAlphabet();
+renderGlossary('');
+</script>
+
+<script src="nav.js"></script>
+<script>
+async function renderFooterFromDB(){
+  try{
+    const _sb=getNavSB();if(!_sb)return;
+    const{data}=await _sb.from('site_settings').select('key,value').in('key',['footer_data','footer_copy','footer_disclaimer']);
+    if(!data?.length)return;
+    const s={};data.forEach(r=>s[r.key]=r.value);
+    if(s.footer_disclaimer){const el=document.getElementById('footerDisclaimer');if(el)el.textContent=s.footer_disclaimer;}
+    if(s.footer_copy){const el=document.getElementById('footerCopy');if(el)el.textContent=s.footer_copy;}
+    if(s.footer_data){try{const d=JSON.parse(s.footer_data);if(d.columns?.length){const w=document.getElementById('footerCols');if(w)w.innerHTML=d.columns.map(col=>`<div class="footer-col"><span class="footer-col-title">${col.title}</span><ul>${(col.links||[]).map(l=>`<li><a href="${l.url||'#'}">${l.icon?`<span class="fi">${l.icon}</span> `:''}${l.label}</a></li>`).join('')} </ul></div>`).join('');}if(d.social?.length){const w=document.getElementById('footerSocial');if(w)w.innerHTML=d.social.map(s=>`<a href="${s.url||'#'}" title="${s.title||''}">${s.icon||'🔗'}</a>`).join('');}if(d.copyright){const el=document.getElementById('footerCopy');if(el)el.textContent=d.copyright;}}catch(e){}}
+  }catch(e){}
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="renderNav('academy');renderFooterFromDB()"></script>
 </body>
 </html>

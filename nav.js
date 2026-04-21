@@ -49,6 +49,7 @@ async function renderNav(activePage) {
   const defaults = [
     { id: 'home', label: 'Home', url: 'index.html' },
     { id: 'updates', label: 'Market Updates', url: 'market-updates.html' },
+    { id: 'academy', label: 'Academy', url: 'academy.html' },
   ];
   const roots = navItems.filter(n => !n.parent_id);
   const items = roots.length ? roots : defaults;
