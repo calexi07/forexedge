@@ -344,13 +344,30 @@ function clearFilters(){
 function filterGlossary(q){
   activeFilter=null;
   document.querySelectorAll('.gl-letter-btn').forEach(b=>b.classList.remove('active'));
-  renderGlossary(q.trim().toLowerCase());
+  renderGlossary(q.trim());
 }
 
 function renderGlossary(query,letter){
   let items=[...GLOSSARY].sort((a,b)=>a.term.localeCompare(b.term));
   if(letter) items=items.filter(t=>t.term[0].toUpperCase()===letter);
-  else if(query) items=items.filter(t=>t.term.toLowerCase().includes(query)||t.def.toLowerCase().includes(query)||(CAT_LABELS[t.cat]||'').toLowerCase().includes(query));
+  else if(query){
+    const q=query.toLowerCase();
+    const qUpper=query.toUpperCase();
+    items=items.filter(t=>{
+      const term=t.term.toLowerCase();
+      const def=t.def.toLowerCase();
+      const cat=(CAT_LABELS[t.cat]||'').toLowerCase();
+      const catKey=(t.cat||'').toLowerCase();
+      // Extract abbreviation from term (text in parentheses like "COT" from "COT Report")
+      const abbr=t.term.match(/\b[A-Z]{2,}\b/g)||[];
+      return term.includes(q)
+        || def.includes(q)
+        || cat.includes(q)
+        || catKey.includes(q)
+        || abbr.some(a=>a.includes(qUpper))
+        || t.term.includes(query); // case-sensitive fallback for exact match
+    });
+  }
   const total=document.getElementById('glCount');
   if(total)total.textContent=items.length+' of '+GLOSSARY.length+' terms';
   const body=document.getElementById('glBody');
