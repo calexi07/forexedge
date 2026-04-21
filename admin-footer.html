@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EaglePips — Footer Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="hub.css">
+<style>
+.col-card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px}
+.col-hdr{padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.col-body{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.link-row{display:flex;gap:8px;align-items:center;padding:8px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px}
+.link-row:hover{border-color:var(--gold-border)}
+.li{flex:1;min-width:0;background:var(--bg);border:1px solid var(--border2);color:var(--white);font-family:'Syne',sans-serif;font-size:12px;padding:6px 10px;border-radius:3px;outline:none;transition:border-color 0.2s}
+.li:focus{border-color:var(--gold-border)}
+.drag-handle{cursor:grab;color:var(--white3);font-size:14px;flex-shrink:0;padding:0 4px}
+.drag-handle:active{cursor:grabbing}
+.del-btn{background:none;border:1px solid var(--border2);color:var(--white3);width:28px;height:28px;border-radius:3px;cursor:pointer;font-size:12px;flex-shrink:0;transition:all 0.15s;display:flex;align-items:center;justify-content:center}
+.del-btn:hover{border-color:var(--bear);color:var(--bear);background:var(--bear-bg)}
+.add-link-btn{width:100%;padding:7px;background:transparent;border:1px dashed rgba(200,169,110,0.2);color:rgba(200,169,110,0.5);font-family:'Syne',sans-serif;font-size:12px;cursor:pointer;border-radius:3px;transition:all 0.15s;margin-top:4px}
+.add-link-btn:hover{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
+.social-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.social-card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.social-top{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.preview-footer{background:#060709;border:1px solid var(--border);border-radius:6px;padding:32px;margin-top:20px}
+.pf-grid{display:grid;grid-template-columns:240px 1fr;gap:40px;margin-bottom:24px}
+.pf-logo{height:36px;width:auto;object-fit:contain;display:block;margin-bottom:12px}
+.pf-disc{font-size:11px;color:rgba(255,255,255,0.3);line-height:1.6;max-width:200px}
+.pf-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.pf-col-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(200,169,110,0.7);margin-bottom:10px;display:block}
+.pf-link{font-size:12px;color:rgba(255,255,255,0.4);display:block;margin-bottom:6px;text-decoration:none}
+.pf-bottom{border-top:1px solid rgba(255,255,255,0.05);padding-top:16px;display:flex;align-items:center;justify-content:space-between}
+.pf-copy{font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,0.25)}
+.pf-social{display:flex;gap:6px}
+.pf-si{width:28px;height:28px;border-radius:5px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;font-size:13px}
+</style>
+</head>
+<body class="et-loading">
+<div id="et-loader">
+  <div class="et-loader-logo">
+    <img src="https://vaimxhgqcdhjhdiaampa.supabase.co/storage/v1/object/public/EaglePips/design-f-r--titlu-1776494279309.png" style="width:40px;height:40px;object-fit:contain;animation:etLoaderPulse 1.5s ease-in-out infinite" alt="EaglePips">
+    <div class="et-loader-name">Eagle<span>Pips</span></div>
+  </div>
+  <div class="et-loader-bar"><div class="et-loader-bar-fill"></div></div>
+  <div class="et-loader-text">Loading footer manager...</div>
+</div>
+<div id="etSidebarMount"></div>
+<div class="hub-main">
+  <div class="hub-topbar">
+    <a href="admin.html" style="background:none;border:1px solid var(--border2);color:var(--white3);padding:5px 10px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px;text-decoration:none;transition:all 0.2s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">← Admin</a>
+    <div class="hub-topbar-title" style="flex:1;margin-left:12px">🦶 <strong>Footer Manager</strong></div>
+    <span id="saveStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)"></span>
+    <button class="et-btn-gold" onclick="saveAll()" style="padding:7px 18px;font-size:11px">💾 Save All</button>
+  </div>
+
+  <div class="hub-content et-fade">
+    <div style="display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start">
+
+      <!-- Left: columns editor -->
+      <div>
+        <!-- Disclaimer -->
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:14px">
+          <label class="et-form-label" style="margin-bottom:8px;display:block">Risk Disclaimer Text</label>
+          <textarea id="disclaimerText" class="et-form-input" rows="3" style="resize:none;font-size:13px" placeholder="Trading involves substantial risk..."></textarea>
+        </div>
+
+        <!-- Copyright -->
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:14px">
+          <label class="et-form-label" style="margin-bottom:8px;display:block">Copyright Text</label>
+          <input type="text" id="copyrightText" class="et-form-input" placeholder="© 2026 EaglePips. All rights reserved.">
+        </div>
+
+        <!-- Footer columns -->
+        <div id="columnsWrap"></div>
+        <button onclick="addColumn()" style="width:100%;padding:10px;background:transparent;border:1px dashed rgba(200,169,110,0.2);color:rgba(200,169,110,0.5);font-family:'Syne',sans-serif;font-size:12px;cursor:pointer;border-radius:4px;transition:all 0.15s;margin-bottom:20px" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='rgba(200,169,110,0.2)';this.style.color='rgba(200,169,110,0.5)'">+ Add Column</button>
+
+        <!-- Social links -->
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <label class="et-form-label" style="margin:0">Social Media Links</label>
+            <button onclick="addSocial()" class="et-btn-ghost" style="padding:5px 12px;font-size:11px">+ Add</button>
+          </div>
+          <div id="socialWrap" class="social-grid"></div>
+        </div>
+      </div>
+
+      <!-- Right: live preview -->
+      <div style="position:sticky;top:74px">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--white3);margin-bottom:10px">Live Preview</div>
+        <div class="preview-footer">
+          <div class="pf-grid">
+            <div>
+              <img src="https://vaimxhgqcdhjhdiaampa.supabase.co/storage/v1/object/public/EaglePips/design-f-r--titlu-1776494279309.png" class="pf-logo" alt="EaglePips">
+              <div class="pf-disc" id="prevDisclaimer">Trading involves substantial risk...</div>
+            </div>
+            <div class="pf-cols" id="prevCols"></div>
+          </div>
+          <div class="pf-bottom">
+            <div class="pf-copy" id="prevCopy">© 2026 EaglePips.</div>
+            <div class="pf-social" id="prevSocial"></div>
+          </div>
+        </div>
+        <div style="margin-top:12px;font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);text-align:center">Changes apply to all public pages after save</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let _user, _sb, footerData = {
+  disclaimer: 'Trading involves substantial risk and is not appropriate for everyone. Only risk capital should be used. Past performance is not indicative of future results.',
+  copyright: '© 2026 EaglePips. All rights reserved.',
+  columns: [
+    { title: 'Platform', links: [
+      { label: 'Trading Journal', url: 'journal.html', icon: '' },
+      { label: 'Market Updates', url: 'market-updates.html', icon: '' },
+      { label: 'Changelog', url: 'changelog.html', icon: '' },
+      { label: 'Sign In', url: 'auth.html', icon: '' },
+      { label: 'Get Access', url: 'auth.html?tab=register', icon: '' },
+    ]},
+    { title: 'Legal', links: [
+      { label: 'Privacy Policy', url: 'privacy.html', icon: '' },
+      { label: 'Terms of Service', url: 'terms.html', icon: '' },
+      { label: 'Risk Disclaimer', url: 'risk.html', icon: '' },
+    ]},
+    { title: 'Community', links: [
+      { label: 'Discord', url: '#', icon: '💬' },
+      { label: 'Twitter / X', url: '#', icon: '𝕏' },
+      { label: 'Instagram', url: '#', icon: '📷' },
+      { label: 'About', url: 'market-updates.html', icon: '📰' },
+    ]},
+  ],
+  social: [
+    { icon: '💬', label: 'Discord', url: '#', title: 'Discord' },
+    { icon: '𝕏', label: 'Twitter / X', url: '#', title: 'Twitter' },
+    { icon: '📷', label: 'Instagram', url: '#', title: 'Instagram' },
+  ]
+};
+
+async function main() {
+  const res = await initEtSidebar('admin');
+  if (!res) return;
+  _user = res.user; _sb = res.sb;
+  if (!_user.user_metadata?.is_admin) { document.querySelector('.hub-main').innerHTML = '<div style="text-align:center;padding:60px;color:var(--white3)">Access denied.</div>'; return; }
+  await loadFooterData();
+  renderAll();
+}
+
+async function loadFooterData() {
+  const { data } = await _sb.from('site_settings').select('key,value').in('key', ['footer_data', 'footer_copy', 'footer_disclaimer']);
+  if (!data) return;
+  const s = {};
+  data.forEach(r => s[r.key] = r.value);
+  if (s.footer_data) {
+    try { const parsed = JSON.parse(s.footer_data); Object.assign(footerData, parsed); } catch(e) {}
+  }
+  if (s.footer_copy) footerData.copyright = s.footer_copy;
+  if (s.footer_disclaimer) footerData.disclaimer = s.footer_disclaimer;
+}
+
+function renderAll() {
+  document.getElementById('disclaimerText').value = footerData.disclaimer || '';
+  document.getElementById('copyrightText').value = footerData.copyright || '';
+  document.getElementById('disclaimerText').oninput = () => { footerData.disclaimer = document.getElementById('disclaimerText').value; updatePreview(); };
+  document.getElementById('copyrightText').oninput = () => { footerData.copyright = document.getElementById('copyrightText').value; updatePreview(); };
+  renderColumns();
+  renderSocial();
+  updatePreview();
+}
+
+// ── Columns ───────────────────────────────────────────────────────────────
+function renderColumns() {
+  const wrap = document.getElementById('columnsWrap');
+  wrap.innerHTML = '';
+  footerData.columns.forEach((col, ci) => {
+    const card = document.createElement('div');
+    card.className = 'col-card';
+    card.innerHTML = `
+      <div class="col-hdr">
+        <span style="cursor:grab;color:var(--white3);font-size:14px">⠿</span>
+        <input type="text" class="li" value="${col.title.replace(/"/g,'&quot;')}" placeholder="Column title" oninput="footerData.columns[${ci}].title=this.value;updatePreview()" style="max-width:160px">
+        <div style="margin-left:auto;display:flex;gap:6px">
+          ${ci > 0 ? `<button class="del-btn" onclick="moveCol(${ci},-1)" title="Move left">←</button>` : ''}
+          ${ci < footerData.columns.length - 1 ? `<button class="del-btn" onclick="moveCol(${ci},1)" title="Move right">→</button>` : ''}
+          <button class="del-btn" onclick="delCol(${ci})" title="Delete column">✕</button>
+        </div>
+      </div>
+      <div class="col-body" id="col-links-${ci}">
+        ${col.links.map((link, li) => `
+          <div class="link-row">
+            <input type="text" class="li" value="${(link.icon||'').replace(/"/g,'&quot;')}" placeholder="Icon" style="max-width:48px" oninput="footerData.columns[${ci}].links[${li}].icon=this.value;updatePreview()">
+            <input type="text" class="li" value="${(link.label||'').replace(/"/g,'&quot;')}" placeholder="Label" oninput="footerData.columns[${ci}].links[${li}].label=this.value;updatePreview()">
+            <input type="text" class="li" value="${(link.url||'').replace(/"/g,'&quot;')}" placeholder="URL" oninput="footerData.columns[${ci}].links[${li}].url=this.value">
+            <button class="del-btn" onclick="delLink(${ci},${li})">✕</button>
+          </div>`).join('')}
+        <button class="add-link-btn" onclick="addLink(${ci})">+ Add Link</button>
+      </div>`;
+    wrap.appendChild(card);
+  });
+}
+
+function addColumn() {
+  footerData.columns.push({ title: 'New Column', links: [{ label: 'Link', url: '#', icon: '' }] });
+  renderColumns(); updatePreview();
+}
+function delCol(ci) {
+  if (!confirm('Delete this column?')) return;
+  footerData.columns.splice(ci, 1);
+  renderColumns(); updatePreview();
+}
+function moveCol(ci, dir) {
+  const cols = footerData.columns;
+  const ni = ci + dir;
+  if (ni < 0 || ni >= cols.length) return;
+  [cols[ci], cols[ni]] = [cols[ni], cols[ci]];
+  renderColumns(); updatePreview();
+}
+function addLink(ci) {
+  footerData.columns[ci].links.push({ label: 'New Link', url: '#', icon: '' });
+  renderColumns(); updatePreview();
+}
+function delLink(ci, li) {
+  footerData.columns[ci].links.splice(li, 1);
+  renderColumns(); updatePreview();
+}
+
+// ── Social ────────────────────────────────────────────────────────────────
+function renderSocial() {
+  const wrap = document.getElementById('socialWrap');
+  wrap.innerHTML = footerData.social.map((s, i) => `
+    <div class="social-card">
+      <div class="social-top">
+        <input type="text" class="li" value="${(s.icon||'').replace(/"/g,'&quot;')}" placeholder="Icon/Emoji" style="max-width:60px;font-size:18px;text-align:center" oninput="footerData.social[${i}].icon=this.value;updatePreview()">
+        <input type="text" class="li" value="${(s.label||'').replace(/"/g,'&quot;')}" placeholder="Label" oninput="footerData.social[${i}].label=this.value">
+        <button class="del-btn" onclick="delSocial(${i})" style="margin-left:auto">✕</button>
+      </div>
+      <input type="url" class="li" value="${(s.url||'').replace(/"/g,'&quot;')}" placeholder="https://..." oninput="footerData.social[${i}].url=this.value;updatePreview()">
+      <input type="text" class="li" value="${(s.title||'').replace(/"/g,'&quot;')}" placeholder="Tooltip (e.g. Discord)" oninput="footerData.social[${i}].title=this.value">
+    </div>`).join('');
+}
+function addSocial() {
+  footerData.social.push({ icon: '🔗', label: 'New', url: '#', title: '' });
+  renderSocial(); updatePreview();
+}
+function delSocial(i) {
+  footerData.social.splice(i, 1);
+  renderSocial(); updatePreview();
+}
+
+// ── Preview ───────────────────────────────────────────────────────────────
+function updatePreview() {
+  document.getElementById('prevDisclaimer').textContent = footerData.disclaimer || '';
+  document.getElementById('prevCopy').textContent = footerData.copyright || '';
+  document.getElementById('prevCols').innerHTML = footerData.columns.map(col => `
+    <div>
+      <span class="pf-col-title">${col.title}</span>
+      ${col.links.map(l => `<a class="pf-link" href="${l.url||'#'}">${l.icon ? l.icon + ' ' : ''}${l.label}</a>`).join('')}
+    </div>`).join('');
+  document.getElementById('prevSocial').innerHTML = footerData.social.map(s =>
+    `<a class="pf-si" href="${s.url||'#'}" title="${s.title||''}">${s.icon||'🔗'}</a>`).join('');
+}
+
+// ── Save ──────────────────────────────────────────────────────────────────
+async function saveAll() {
+  const btn = document.querySelector('.et-btn-gold');
+  btn.textContent = '⏳ Saving...';
+  try {
+    const payload = [
+      { key: 'footer_data', value: JSON.stringify(footerData), updated_at: new Date().toISOString() },
+      { key: 'footer_copy', value: footerData.copyright, updated_at: new Date().toISOString() },
+      { key: 'footer_disclaimer', value: footerData.disclaimer, updated_at: new Date().toISOString() },
+    ];
+    for (const p of payload) {
+      await _sb.from('site_settings').upsert(p, { onConflict: 'key' });
+    }
+    document.getElementById('saveStatus').textContent = '✓ Saved';
+    btn.textContent = '💾 Save All';
+    setTimeout(() => document.getElementById('saveStatus').textContent = '', 3000);
+  } catch(err) {
+    alert('Save error: ' + err.message);
+    btn.textContent = '💾 Save All';
+  }
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="hub-sidebar.js" onload="main()"></script>
+</body>
+</html>

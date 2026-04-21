@@ -637,32 +637,64 @@ section { padding: 100px 48px; }
 /* ═══════════════════════════════════════
    FOOTER
 ═══════════════════════════════════════ */
+/* ── FOOTER ─────────────────────────────────────────────────────────── */
 footer {
-  padding: 32px 48px;
-  border-top: 1px solid var(--border2);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  background: #060709;
+}
+.footer-main {
+  max-width: 1300px; margin: 0 auto;
+  padding: 60px 48px 40px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 60px;
+}
+.footer-brand-col {}
+.footer-logo-img { height: 48px; width: auto; object-fit: contain; margin-bottom: 18px; display: block; }
+.footer-disclaimer {
+  font-size: 12px; color: var(--white3); line-height: 1.7;
+  max-width: 240px;
+}
+.footer-cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+.footer-col-title {
+  font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--white2); font-weight: 600;
+  margin-bottom: 16px; display: block;
+}
+.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.footer-col ul a {
+  font-size: 13px; color: var(--white3); text-decoration: none;
+  transition: color 0.2s; display: flex; align-items: center; gap: 6px;
+}
+.footer-col ul a:hover { color: var(--white); }
+.footer-col ul a .fi { font-size: 14px; }
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.05);
+  max-width: 1300px; margin: 0 auto;
+  padding: 20px 48px;
   display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 16px;
+  flex-wrap: wrap; gap: 12px;
 }
-.footer-brand {
-  font-family: var(--font-display);
-  font-size: 18px; font-weight: 700;
-  color: var(--white);
+.footer-copy { font-family: var(--font-mono); font-size: 11px; color: var(--white3); }
+.footer-social { display: flex; gap: 8px; }
+.footer-social a {
+  width: 34px; height: 34px; border-radius: 6px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none; font-size: 15px; transition: all 0.2s;
+  color: var(--white3);
 }
-.footer-brand span { color: var(--gold); font-style: italic; }
-.footer-copy {
-  font-family: var(--font-mono);
-  font-size: 12px; color: var(--white2);
-  letter-spacing: 0.05em;
+.footer-social a:hover { background: var(--gold-dim); border-color: var(--gold-border); color: var(--gold); }
+@media(max-width:860px){
+  .footer-main { grid-template-columns: 1fr; gap: 40px; padding: 40px 20px 30px; }
+  .footer-cols { grid-template-columns: 1fr 1fr; }
+  .footer-bottom { padding: 16px 20px; }
 }
-.footer-links {
-  display: flex; gap: 24px; list-style: none;
-}
-.footer-links a {
-  font-size: 13px; color: var(--white2);
-  text-decoration: none; letter-spacing: 0.05em;
-  transition: color 0.2s;
-}
-.footer-links a:hover { color: var(--gold); }
 
 /* ═══════════════════════════════════════
    ANIMATIONS
@@ -1184,12 +1216,61 @@ body.ep-edit-mode [data-ep].ep-selected {
 </section>
 
 <!-- FOOTER -->
-<footer>
-  <ul class="footer-links">
-    <li><a href="market-updates.html">Market Updates</a></li>
-    <li><a href="journal.html">Journal</a></li>
-  </ul>
-  <div class="footer-copy" id="footerCopy">© 2026 EaglePips. All rights reserved.</div>
+<footer id="site-footer">
+  <div class="footer-main">
+    <!-- Brand col -->
+    <div class="footer-brand-col">
+      <a href="index.html">
+        <img src="https://vaimxhgqcdhjhdiaampa.supabase.co/storage/v1/object/public/EaglePips/design-f-r--titlu-1776494279309.png" class="footer-logo-img" alt="EaglePips">
+      </a>
+      <p class="footer-disclaimer" id="footerDisclaimer">Trading involves substantial risk and is not appropriate for everyone. Only risk capital should be used. Past performance is not indicative of future results.</p>
+    </div>
+
+    <!-- Link columns -->
+    <div class="footer-cols" id="footerCols">
+      <!-- Platform -->
+      <div class="footer-col">
+        <span class="footer-col-title">Platform</span>
+        <ul>
+          <li><a href="journal.html">Trading Journal</a></li>
+          <li><a href="market-updates.html">Market Updates</a></li>
+          <li><a href="changelog.html">Changelog</a></li>
+          <li><a href="auth.html">Sign In</a></li>
+          <li><a href="auth.html?tab=register">Get Access</a></li>
+        </ul>
+      </div>
+      <!-- Legal -->
+      <div class="footer-col">
+        <span class="footer-col-title">Legal</span>
+        <ul>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Service</a></li>
+          <li><a href="risk.html">Risk Disclaimer</a></li>
+        </ul>
+      </div>
+      <!-- Community -->
+      <div class="footer-col">
+        <span class="footer-col-title">Community</span>
+        <ul>
+          <li><a href="#"><span class="fi">💬</span> Discord</a></li>
+          <li><a href="#"><span class="fi">🐦</span> Twitter / X</a></li>
+          <li><a href="#"><span class="fi">📷</span> Instagram</a></li>
+          <li><a href="market-updates.html"><span class="fi">📰</span> About</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="footer-bottom">
+    <span class="footer-copy" id="footerCopy">© 2026 EaglePips. All rights reserved.</span>
+    <div class="footer-social" id="footerSocial">
+      <!-- Social icons — edit from admin -->
+      <a href="#" title="Discord">💬</a>
+      <a href="#" title="Twitter / X">𝕏</a>
+      <a href="#" title="Instagram">📷</a>
+    </div>
+  </div>
 </footer>
 
 <script>
@@ -1229,6 +1310,63 @@ body.ep-edit-mode [data-ep].ep-selected {
     setTimeout(loadHeroVideo, 500);
   }
 })();
+
+/* ── Render footer from DB settings ── */
+async function renderFooterFromDB() {
+  try {
+    const _sb = getNavSB();
+    if (!_sb) return;
+    const { data } = await _sb.from('site_settings').select('key,value').in('key',['footer_data','footer_copy','footer_disclaimer']);
+    if (!data?.length) return;
+    const s = {};
+    data.forEach(r => s[r.key] = r.value);
+
+    // Disclaimer + copyright
+    if (s.footer_disclaimer) {
+      const el = document.getElementById('footerDisclaimer');
+      if (el) el.textContent = s.footer_disclaimer;
+    }
+    if (s.footer_copy) {
+      const el = document.getElementById('footerCopy');
+      if (el) el.textContent = s.footer_copy;
+    }
+
+    // Full footer_data (columns + social)
+    if (s.footer_data) {
+      try {
+        const d = JSON.parse(s.footer_data);
+
+        // Columns
+        if (d.columns?.length) {
+          const wrap = document.getElementById('footerCols');
+          if (wrap) {
+            wrap.innerHTML = d.columns.map(col => `
+              <div class="footer-col">
+                <span class="footer-col-title">${col.title||''}</span>
+                <ul>
+                  ${(col.links||[]).map(l => `<li><a href="${l.url||'#'}">${l.icon ? `<span class="fi">${l.icon}</span> ` : ''}${l.label||''}</a></li>`).join('')}
+                </ul>
+              </div>`).join('');
+          }
+        }
+
+        // Social icons
+        if (d.social?.length) {
+          const wrap = document.getElementById('footerSocial');
+          if (wrap) {
+            wrap.innerHTML = d.social.map(s => `<a href="${s.url||'#'}" title="${s.title||s.label||''}">${s.icon||'🔗'}</a>`).join('');
+          }
+        }
+
+        // Copyright (also in footer_data)
+        if (d.copyright) {
+          const el = document.getElementById('footerCopy');
+          if (el) el.textContent = d.copyright;
+        }
+      } catch(e) { console.warn('Footer parse error:', e); }
+    }
+  } catch(e) { console.warn('Footer load error:', e); }
+}
 
 /* ── Load Market Updates on homepage ── */
 async function loadMarketUpdates(){
@@ -1593,22 +1731,25 @@ async function fetchCategory(category, keywords) {
 async function loadNews(forceRefresh) {
   if (newsLoaded && !forceRefresh) return;
 
-  // Fetch forex search + world/geopolitical in parallel (2 API calls)
-  const [forexNews, geoNews] = await Promise.all([
-    fetchCategory(null, 'forex dollar euro pound central bank interest rate inflation oil'),
-    fetchCategory(null, 'iran war sanctions ceasefire geopolitical nato trade tariff')
-  ]);
-
-  const combined = [...forexNews, ...geoNews];
-
-  // Filter for relevance
-  const relevant = combined.filter(isRelevant);
-
-  // Deduplicate
-  allNewsItems = deduplicate(relevant)
-    .sort((a, b) => new Date(b.date) - new Date(a.date));
-
-  newsLoaded = true;
+  // Fetch via Vercel proxy (no CORS/whitelist issues)
+  try {
+    const res = await fetch('/api/news');
+    if (!res.ok) throw new Error('Proxy ' + res.status);
+    const data = await res.json();
+    allNewsItems = (data.news || []).map(item => ({
+      title: item.title || '',
+      description: item.description || '',
+      url: item.url || '#',
+      image: item.image || '',
+      source: item.author || 'News',
+      date: item.published || new Date().toISOString(),
+    }));
+    console.log('[News]', allNewsItems.length, 'stories loaded');
+  } catch(e) {
+    console.warn('[News] failed:', e.message);
+    allNewsItems = [];
+  }
+    newsLoaded = true;
   renderNews();
 
 
@@ -1621,7 +1762,17 @@ function renderNews() {
   if (!allNewsItems.length) {
     const featured = document.getElementById('newsFeatured');
     const grid = document.getElementById('newsGrid');
-    if (featured) featured.innerHTML = '<div style="padding:20px;color:var(--white3);font-size:13px">Loading forex news...</div>';
+    if (featured) featured.innerHTML = `
+      <div style="padding:40px 0;color:var(--white3);font-size:13px;display:flex;flex-direction:column;gap:16px">
+        ${[1,2,3,4,5].map(i => `<div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <div style="width:100px;height:72px;background:rgba(255,255,255,0.04);border-radius:4px;flex-shrink:0"></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:7px;justify-content:center">
+            <div style="height:8px;background:rgba(255,255,255,0.04);border-radius:3px;width:15%"></div>
+            <div style="height:14px;background:rgba(255,255,255,0.04);border-radius:3px;width:${70+i*5}%"></div>
+            <div style="height:10px;background:rgba(255,255,255,0.04);border-radius:3px;width:${50+i*8}%"></div>
+          </div>
+        </div>`).join('')}
+      </div>`;
     if (grid) grid.innerHTML = '';
     return;
   }
@@ -1897,7 +2048,7 @@ async function signOutIndex() {
 </div>
 
 <script src="nav.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="renderNav('');loadSiteSettings();loadMarketUpdates();checkIndexAuth();loadNews()"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="renderNav('');loadSiteSettings();loadMarketUpdates();checkIndexAuth();loadNews();renderFooterFromDB()"></script>
 <script>
 
 /* ── Email capture ── */
