@@ -1920,18 +1920,28 @@ function applySettings(s) {
       if (sec) sec.style.display = 'none';
     }
   });
-  // Apply section order — skip if not set, prevents sections jumping to top
+  // Apply section order — validate first, clear if stale
   if (s.section_order) {
     try {
+      const KNOWN = ['hero','features','market-updates-section','news-feed','journal'];
       const order = s.section_order.split(',').filter(Boolean);
-      if (order.length > 1) {
-        const firstSec = document.getElementById(order[0]);
-        const parent = firstSec?.parentNode;
-        if (parent) {
-          order.forEach(id => {
-            const sec = document.getElementById(id);
-            if (sec && sec.parentNode === parent) parent.appendChild(sec);
-          });
+      // If saved order is missing current sections, clear it from DB
+      const hasMissing = KNOWN.some(id => !order.includes(id));
+      if (hasMissing) {
+        // Stale order — delete from DB silently
+        const _sb2 = getNavSB();
+        if (_sb2) _sb2.from('site_settings').delete().eq('key','section_order').then(()=>{});
+      } else {
+        const allExist = order.every(id => !!document.getElementById(id));
+        if (allExist) {
+          const footer = document.querySelector('footer');
+          const parent = footer?.parentNode;
+          if (parent) {
+            order.forEach(id => {
+              const sec = document.getElementById(id);
+              if (sec) parent.insertBefore(sec, footer);
+            });
+          }
         }
       }
     } catch(e) { console.warn('Section order error:', e); }
