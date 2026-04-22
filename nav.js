@@ -49,7 +49,10 @@ async function renderNav(activePage) {
   const defaults = [
     { id: 'home', label: 'Home', url: 'index.html' },
     { id: 'updates', label: 'Market Updates', url: 'market-updates.html' },
-    { id: 'academy', label: 'Academy', url: 'academy.html' },
+    { id: 'academy', label: 'Academy', url: 'academy.html', children: [
+      { id: 'glossary', label: '📖 Glossary', url: 'academy.html' },
+      { id: 'eagle-academy', label: '🦅 Eagle Academy', url: 'eagle-academy.html' },
+    ]},
   ];
   const roots = navItems.filter(n => !n.parent_id);
   const items = roots.length ? roots : defaults;
@@ -61,7 +64,8 @@ async function renderNav(activePage) {
 
   function buildLinks(items) {
     return items.map(item => {
-      const children = navItems.filter(n => n.parent_id === item.id);
+      const dbChildren = navItems.filter(n => n.parent_id === item.id);
+      const children = dbChildren.length ? dbChildren : (item.children || []);
       const active = isActive(item);
       if (!children.length) {
         return `<li><a href="${item.url}" class="nav-link${active?' active':''}"${item.open_new_tab?' target="_blank"':''}>${item.label}</a></li>`;
@@ -78,8 +82,14 @@ async function renderNav(activePage) {
 
   function buildMobile(items) {
     return items.map(item => {
+      const dbChildren = navItems.filter(n => n.parent_id === item.id);
+      const children = dbChildren.length ? dbChildren : (item.children || []);
       const active = isActive(item);
-      return `<a href="${item.url}"${active?' class="active"':''}${item.open_new_tab?' target="_blank"':''}>${item.label}</a>`;
+      let html = `<a href="${item.url}"${active?' class="active"':''}${item.open_new_tab?' target="_blank"':''}>${item.label}</a>`;
+      if (children.length) {
+        html += children.map(c => `<a href="${c.url}" style="padding-left:24px;font-size:11px;opacity:0.7">${c.label}</a>`).join('');
+      }
+      return html;
     }).join('');
   }
 
