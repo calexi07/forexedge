@@ -60,11 +60,18 @@ async function renderNav(activePage) {
     ]},
   ];
   const roots = navItems.filter(n => !n.parent_id);
-  // Merge default children into DB items (DB may not have children configured)
-  const items = roots.length ? roots.map(item => {
-    const defaultItem = defaults.find(d => d.url === item.url || d.id === item.id);
-    return defaultItem?.children ? { ...item, children: defaultItem.children } : item;
-  }) : defaults;
+  // Always start from defaults to ensure all items are present
+  // Then override with DB versions if they exist (for label/url edits)
+  const items = defaults.map(def => {
+    const dbItem = roots.find(r => r.id === def.id || r.url === def.url);
+    return dbItem ? { ...def, ...dbItem, children: def.children } : def;
+  });
+  // Append any DB items not in defaults
+  roots.forEach(r => {
+    if (!items.find(i => i.id === r.id || i.url === r.url)) {
+      items.push(r);
+    }
+  });
 
   function isActive(item) {
     if (!activePage) return false;
