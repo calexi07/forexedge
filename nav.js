@@ -55,7 +55,11 @@ async function renderNav(activePage) {
     ]},
   ];
   const roots = navItems.filter(n => !n.parent_id);
-  const items = roots.length ? roots : defaults;
+  // Merge default children into DB items (DB may not have children configured)
+  const items = roots.length ? roots.map(item => {
+    const defaultItem = defaults.find(d => d.url === item.url || d.id === item.id);
+    return defaultItem?.children ? { ...item, children: defaultItem.children } : item;
+  }) : defaults;
 
   function isActive(item) {
     if (!activePage) return false;
@@ -70,10 +74,13 @@ async function renderNav(activePage) {
       if (!children.length) {
         return `<li><a href="${item.url}" class="nav-link${active?' active':''}"${item.open_new_tab?' target="_blank"':''}>${item.label}</a></li>`;
       }
-      const ddStyle = `position:absolute;top:calc(100% + 4px);left:0;background:#0c0e13;border:1px solid rgba(200,169,110,0.15);border-radius:4px;min-width:180px;padding:4px 0;display:none;z-index:200;box-shadow:0 16px 40px rgba(0,0,0,0.5)`;
+      const ddStyle = `position:absolute;top:100%;left:0;background:#0c0e13;border:1px solid rgba(200,169,110,0.15);border-radius:4px;min-width:200px;padding:6px 0;display:none;z-index:200;box-shadow:0 16px 40px rgba(0,0,0,0.5);padding-top:8px`;
       const subStyle = `display:block;padding:9px 14px;font-family:'Syne',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.05em;color:#a09880;text-decoration:none;transition:all 0.15s`;
       const subs = children.map(c => `<a href="${c.url}" style="${subStyle}" onmouseover="this.style.background='rgba(200,169,110,0.08)';this.style.color='#c8c4bc'" onmouseout="this.style.background='';this.style.color='#a09880'"${c.open_new_tab?' target="_blank"':''}>${c.label}</a>`).join('');
-      return `<li style="position:relative" onmouseover="this.querySelector('.nav-dd').style.display='block'" onmouseout="this.querySelector('.nav-dd').style.display='none'">
+      const liId = 'navdd-' + item.id;
+      return `<li style="position:relative" id="${liId}"
+        onmouseenter="document.getElementById('${liId}').querySelector('.nav-dd').style.display='block'"
+        onmouseleave="document.getElementById('${liId}').querySelector('.nav-dd').style.display='none'">
         <a href="${item.url}" class="nav-link${active?' active':''}">${item.label} <span style="font-size:9px;opacity:0.5">▾</span></a>
         <div class="nav-dd" style="${ddStyle}">${subs}</div>
       </li>`;
