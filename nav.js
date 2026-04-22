@@ -53,6 +53,11 @@ async function renderNav(activePage) {
       { id: 'glossary', label: '📖 Glossary', url: 'academy.html' },
       { id: 'eagle-academy', label: '🦅 Eagle Academy', url: 'eagle-academy.html' },
     ]},
+    { id: 'community', label: 'Community', url: 'community.html', children: [
+      { id: 'contest', label: '🏆 Contest', url: 'community.html#contest' },
+      { id: 'leaderboard', label: '📊 Leaderboard', url: 'community.html#leaderboard' },
+      { id: 'achievements', label: '🎖 Achievements', url: 'community.html#achievements' },
+    ]},
   ];
   const roots = navItems.filter(n => !n.parent_id);
   // Merge default children into DB items (DB may not have children configured)

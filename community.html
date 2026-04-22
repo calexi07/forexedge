@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community — EaglePips</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+/* ── SUBNAV ────────────────────────────────────────────── */
+.cm-subnav{border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(8,9,12,0.97);backdrop-filter:blur(10px);position:sticky;top:70px;z-index:100}
+.cm-subnav-inner{max-width:1100px;margin:0 auto;padding:0 48px;display:flex;align-items:center;overflow-x:auto;scrollbar-width:none}
+.cm-subnav-inner::-webkit-scrollbar{display:none}
+.cm-tab{padding:14px 22px;font-family:"DM Mono",monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);border-bottom:2px solid transparent;border-top:none;border-left:none;border-right:none;background:none;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:8px;transition:all 0.2s;text-decoration:none}
+.cm-tab:hover{color:rgba(255,255,255,0.7)}
+.cm-tab.active{color:#c8a96e;border-bottom-color:#c8a96e}
+.cm-tab .soon{font-size:8px;padding:1px 5px;border-radius:100px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.08)}
+.cm-panel{display:none}
+.cm-panel.active{display:block}
+
+/* ── ACHIEVEMENTS ──────────────────────────────────────── */
+.ach-hero{max-width:1100px;margin:0 auto;padding:56px 48px 32px}
+.ach-grid{max-width:1100px;margin:0 auto;padding:0 48px 80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+
+/* Diploma card */
+.diploma{border-radius:12px;overflow:hidden;position:relative;transition:all 0.25s;cursor:default}
+.diploma.earned{cursor:pointer}
+.diploma.earned:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(0,0,0,0.5)}
+.diploma.locked{opacity:0.45;filter:grayscale(0.6)}
+.diploma-inner{padding:28px 24px 22px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:12px;position:relative;overflow:hidden}
+.diploma.earned .diploma-inner{background:linear-gradient(135deg,rgba(200,169,110,0.06),rgba(200,169,110,0.02));border-color:rgba(200,169,110,0.25)}
+.diploma-shine{position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(200,169,110,0.12),transparent 70%);pointer-events:none}
+.diploma-icon{font-size:44px;margin-bottom:14px;display:block}
+.diploma-name{font-family:"Playfair Display",serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.2}
+.diploma-desc{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.6;margin-bottom:14px}
+.diploma-earned-label{font-family:"DM Mono",monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.diploma-progress{height:3px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;margin-top:14px}
+.diploma-progress-fill{height:100%;border-radius:3px;transition:width 0.8s cubic-bezier(0.4,0,0.2,1)}
+.diploma-lock-icon{position:absolute;top:16px;right:16px;font-size:16px;opacity:0.3}
+
+/* Diploma modal */
+.diploma-modal-overlay{position:fixed;inset:0;background:rgba(4,5,8,0.95);backdrop-filter:blur(12px);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s}
+.diploma-modal-overlay.open{opacity:1;pointer-events:all}
+.diploma-modal{background:#0c0e14;border:1px solid rgba(200,169,110,0.2);border-radius:16px;width:90%;max-width:480px;padding:40px;text-align:center;position:relative}
+.dm-close{position:absolute;top:14px;right:14px;background:none;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;transition:all 0.15s;display:flex;align-items:center;justify-content:center}
+.dm-close:hover{border-color:rgba(255,255,255,0.3);color:#fff}
+
+/* ── COMING SOON PANELS ────────────────────────────────── */
+.cs-hero{max-width:1100px;margin:0 auto;padding:80px 48px 40px;text-align:center}
+.cs-features{max-width:1100px;margin:0 auto;padding:0 48px 80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.cs-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:22px;opacity:0.65}
+.cs-card-icon{font-size:26px;margin-bottom:10px}
+.cs-card-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:5px}
+.cs-card-desc{font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6}
+
+/* Footer */
+footer{border-top:1px solid rgba(255,255,255,0.06);background:#060709}
+.footer-main{max-width:1300px;margin:0 auto;padding:60px 48px 40px;display:grid;grid-template-columns:280px 1fr;gap:60px}
+.footer-logo-img{height:48px;width:auto;object-fit:contain;margin-bottom:18px;display:block}
+.footer-disclaimer{font-size:12px;color:rgba(255,255,255,0.3);line-height:1.7;max-width:240px}
+.footer-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+.footer-col-title{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.5);font-weight:600;margin-bottom:16px;display:block}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-col ul a{font-size:13px;color:rgba(255,255,255,0.3);text-decoration:none;transition:color 0.2s}
+.footer-col ul a:hover{color:#fff}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.05);max-width:1300px;margin:0 auto;padding:20px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-copy{font-family:"DM Mono",monospace;font-size:11px;color:rgba(255,255,255,0.25)}
+.footer-social{display:flex;gap:8px}
+.footer-social a{width:34px;height:34px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:15px;transition:all 0.2s}
+.footer-social a:hover{background:rgba(200,169,110,0.1);border-color:rgba(200,169,110,0.3)}
+@media(max-width:768px){.ach-hero,.ach-grid,.cs-hero,.cs-features{padding-left:20px;padding-right:20px}.cm-subnav-inner{padding:0 16px}.footer-main{grid-template-columns:1fr;padding:40px 20px 30px}.footer-cols{grid-template-columns:1fr 1fr}.footer-bottom{padding:16px 20px}}
+</style>
+</head>
+<body>
+<div id="navMount"></div>
+
+<!-- Diploma Modal -->
+<div class="diploma-modal-overlay" id="diplomaModal">
+  <div class="diploma-modal">
+    <button class="dm-close" onclick="closeDiplomaModal()">✕</button>
+    <div style="font-size:64px;margin-bottom:16px" id="dmIcon"></div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#c8a96e;margin-bottom:8px">Achievement Unlocked</div>
+    <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:#fff;margin-bottom:10px" id="dmName"></div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:20px" id="dmDesc"></div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,0.25)" id="dmDate"></div>
+    <div style="margin-top:24px;padding:16px;background:rgba(200,169,110,0.06);border:1px solid rgba(200,169,110,0.15);border-radius:8px">
+      <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:4px">Your diploma is waiting</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.25)">PDF download & shareable certificate coming soon</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SUBNAV ════════════════════════════════════════════ -->
+<nav class="cm-subnav">
+  <div class="cm-subnav-inner">
+    <button class="cm-tab active" onclick="showPanel('achievements',this)" id="tab-achievements">🎖 Achievements</button>
+    <button class="cm-tab" onclick="showPanel('leaderboard',this)" id="tab-leaderboard">📊 Leaderboard <span class="soon">Coming soon</span></button>
+    <button class="cm-tab" onclick="showPanel('contest',this)" id="tab-contest">🏆 Contest <span class="soon">Coming soon</span></button>
+  </div>
+</nav>
+
+<!-- ══ ACHIEVEMENTS PANEL ════════════════════════════════ -->
+<div class="cm-panel active" id="panel-achievements">
+  <div class="ach-hero">
+    <span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#c8a96e">// Community · Achievements</span>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(32px,4vw,52px);font-weight:900;color:#fff;margin:12px 0 8px;line-height:1.1">Your <em style="color:#c8a96e">Diplomas</em></h1>
+    <p style="font-size:15px;color:rgba(255,255,255,0.45);max-width:520px;line-height:1.7">Complete courses, read articles and engage with the platform to earn achievements. Each one comes with a diploma you can keep.</p>
+    <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap" id="achStats"></div>
+  </div>
+
+  <div class="ach-grid" id="achGrid">
+    <!-- Rendered by JS -->
+  </div>
+</div>
+
+<!-- ══ LEADERBOARD PANEL ═════════════════════════════════ -->
+<div class="cm-panel" id="panel-leaderboard">
+  <div class="cs-hero">
+    <span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#c8a96e">// Community · Leaderboard</span>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,3.5vw,48px);font-weight:900;color:#fff;margin:12px 0 8px">Trader <em style="color:#c8a96e">Leaderboard</em></h1>
+    <p style="font-size:15px;color:rgba(255,255,255,0.45);max-width:560px;margin:0 auto 32px;line-height:1.7">See who's earning the most XP on the platform. Points awarded for completed courses, articles read and community activity.</p>
+    <div style="display:inline-flex;align-items:center;gap:10px;padding:14px 24px;background:rgba(200,169,110,0.08);border:1px solid rgba(200,169,110,0.2);border-radius:6px">
+      <span style="font-size:24px">🏗</span>
+      <div style="text-align:left">
+        <div style="font-size:14px;font-weight:600;color:#fff">Leaderboard launching soon</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px">XP system, rankings and weekly prizes in development</div>
+      </div>
+    </div>
+  </div>
+  <div class="cs-features">
+    <div class="cs-card"><div class="cs-card-icon">⭐</div><div class="cs-card-title">XP Points System</div><div class="cs-card-desc">Earn points for every action — completing lessons, reading articles, logging trades in the journal.</div></div>
+    <div class="cs-card"><div class="cs-card-icon">🥇</div><div class="cs-card-title">Weekly Rankings</div><div class="cs-card-desc">Top 10 traders on the leaderboard each week. Rankings reset every Monday.</div></div>
+    <div class="cs-card"><div class="cs-card-icon">🎁</div><div class="cs-card-title">Prizes & Recognition</div><div class="cs-card-desc">Top performers get featured on the platform and receive community recognition.</div></div>
+    <div class="cs-card"><div class="cs-card-icon">🔥</div><div class="cs-card-title">Streaks</div><div class="cs-card-desc">Maintain daily activity streaks to boost your XP multiplier and climb the rankings faster.</div></div>
+  </div>
+</div>
+
+<!-- ══ CONTEST PANEL ═════════════════════════════════════ -->
+<div class="cm-panel" id="panel-contest">
+  <div class="cs-hero">
+    <span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#c8a96e">// Community · Contest</span>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,3.5vw,48px);font-weight:900;color:#fff;margin:12px 0 8px">Trading <em style="color:#c8a96e">Contests</em></h1>
+    <p style="font-size:15px;color:rgba(255,255,255,0.45);max-width:560px;margin:0 auto 32px;line-height:1.7">Compete against other EaglePips traders in structured demo contests. Prove your edge in a risk-free environment.</p>
+    <div style="display:inline-flex;align-items:center;gap:10px;padding:14px 24px;background:rgba(200,169,110,0.08);border:1px solid rgba(200,169,110,0.2);border-radius:6px">
+      <span style="font-size:24px">🏗</span>
+      <div style="text-align:left">
+        <div style="font-size:14px;font-weight:600;color:#fff">First contest launching Q3 2026</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px">Join the Discord to be notified when it goes live</div>
+      </div>
+    </div>
+  </div>
+  <div class="cs-features">
+    <div class="cs-card"><div class="cs-card-icon">📈</div><div class="cs-card-title">Demo Contests</div><div class="cs-card-desc">Trade in a risk-free environment with a virtual $100,000 account against other platform traders.</div></div>
+    <div class="cs-card"><div class="cs-card-icon">⏱</div><div class="cs-card-title">Monthly Format</div><div class="cs-card-desc">Each contest runs for 30 days. Profit % determines ranking — not absolute P&L.</div></div>
+    <div class="cs-card"><div class="cs-card-icon">🎯</div><div class="cs-card-title">Category Brackets</div><div class="cs-card-desc">Separate contests for BabyEagle, HuntingEagle and AlphaEagle — compete at your level.</div></div>
+    <div class="cs-card"><div class="cs-card-icon">🏆</div><div class="cs-card-title">Prizes</div><div class="cs-card-desc">Winners receive platform recognition, exclusive badges and community spotlight features.</div></div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ════════════════════════════════════════════ -->
+<footer id="site-footer">
+  <div class="footer-main">
+    <div><a href="index.html"><img src="https://vaimxhgqcdhjhdiaampa.supabase.co/storage/v1/object/public/EaglePips/design-f-r--titlu-1776494279309.png" class="footer-logo-img" alt="EaglePips"></a><p class="footer-disclaimer" id="footerDisclaimer">Trading involves substantial risk and is not appropriate for everyone. Only risk capital should be used. Past performance is not indicative of future results.</p></div>
+    <div class="footer-cols" id="footerCols">
+      <div class="footer-col"><span class="footer-col-title">Platform</span><ul><li><a href="journal.html">Trading Journal</a></li><li><a href="market-updates.html">Market Updates</a></li><li><a href="eagle-academy.html">Eagle Academy</a></li><li><a href="community.html">Community</a></li></ul></div>
+      <div class="footer-col"><span class="footer-col-title">Legal</span><ul><li><a href="privacy.html">Privacy Policy</a></li><li><a href="terms.html">Terms of Service</a></li><li><a href="risk.html">Risk Disclaimer</a></li></ul></div>
+      <div class="footer-col"><span class="footer-col-title">Community</span><ul><li><a href="#">💬 Discord</a></li><li><a href="community.html#achievements">🎖 Achievements</a></li><li><a href="community.html#leaderboard">📊 Leaderboard</a></li><li><a href="community.html#contest">🏆 Contest</a></li></ul></div>
+    </div>
+  </div>
+  <div class="footer-bottom"><span class="footer-copy" id="footerCopy">© 2026 EaglePips. All rights reserved.</span><div class="footer-social" id="footerSocial"><a href="#" title="Discord">💬</a><a href="#" title="Twitter">𝕏</a><a href="#" title="Instagram">📷</a></div></div>
+</footer>
+
+<script>
+// ── All achievements definition ──────────────────────────────────────────
+const ALL_ACHIEVEMENTS = [
+  // Academy
+  { id:'baby_complete',   icon:'🐣', name:'BabyEagle Graduate',      category:'academy',   color:'#4caf7d', desc:'Completed the Forex Foundations course — BabyEagle level. You understand the basics of how forex markets work.',       requirement:'Complete all 8 lessons in BabyEagle course' },
+  { id:'hunting_complete',icon:'🦅', name:'HuntingEagle Graduate',    category:'academy',   color:'#c8a96e', desc:'Completed The Macro Edge course — HuntingEagle level. You can now build a weekly macro narrative with confidence.',  requirement:'Complete all 10 lessons in HuntingEagle course' },
+  { id:'alpha_complete',  icon:'⚡', name:'AlphaEagle Graduate',      category:'academy',   color:'#a78bfa', desc:'Completed the Institutional Thinking course — AlphaEagle level. You think like a professional prop trader.',           requirement:'Complete all 12 lessons in AlphaEagle course' },
+  { id:'glossary_reader', icon:'📖', name:'Dictionary Mind',          category:'academy',   color:'#6ba3ff', desc:'Searched the Forex Glossary 10+ times. You make sure you understand every term before trading.',                     requirement:'Use the Glossary search 10 times' },
+  // Journal
+  { id:'first_trade',     icon:'✍️', name:'First Trade Logged',       category:'journal',   color:'#4caf7d', desc:'Logged your first trade in the EaglePips Trading Journal. Every great trader starts with trade #1.',                  requirement:'Log 1 trade in the journal' },
+  { id:'streak_7',        icon:'🔥', name:'7-Day Streak',             category:'journal',   color:'#e05c5c', desc:'Logged trades for 7 consecutive days. Consistency is the most underrated edge in trading.',                          requirement:'Log a trade every day for 7 days' },
+  { id:'trades_100',      icon:'💯', name:'Century Trader',           category:'journal',   color:'#c8a96e', desc:'Logged 100 trades in the journal. You have a real sample size to work with. Now study what the data tells you.',      requirement:'Log 100 trades in the journal' },
+  { id:'journal_notes',   icon:'🧠', name:'Reflective Trader',        category:'journal',   color:'#a78bfa', desc:'Added trade notes and emotional tags on 30+ trades. Self-awareness is what separates great traders from gamblers.',    requirement:'Add notes to 30 trades' },
+  // Reading
+  { id:'first_article',   icon:'📰', name:'First Read',               category:'content',   color:'#6ba3ff', desc:'Read your first Market Update article on EaglePips. Stay informed — the market rewards prepared traders.',           requirement:'Read 1 Market Update article' },
+  { id:'articles_10',     icon:'📚', name:'Knowledge Seeker',         category:'content',   color:'#4caf7d', desc:'Read 10 Market Update articles. You make a habit of studying the market before you trade.',                         requirement:'Read 10 articles' },
+  { id:'articles_50',     icon:'🎓', name:'Research Veteran',         category:'content',   color:'#c8a96e', desc:'Read 50 Market Update articles. You approach markets with the rigour of a professional analyst.',                    requirement:'Read 50 articles' },
+  // Community
+  { id:'discord_joined',  icon:'💬', name:'Eagle Joined the Nest',    category:'community', color:'#5865f2', desc:'Joined the EaglePips Discord server. Welcome to the community — this is where the real conversations happen.',        requirement:'Join the EaglePips Discord' },
+  { id:'early_adopter',   icon:'🌟', name:'Early Adopter',            category:'community', color:'#f9a825', desc:'Joined EaglePips in the first year of the platform. You were here before it was big.',                              requirement:'Account created before Dec 31, 2026' },
+  // Special
+  { id:'all_courses',     icon:'👑', name:'Grand Master Eagle',       category:'special',   color:'#c8a96e', desc:'Completed all three Eagle Academy courses: BabyEagle, HuntingEagle and AlphaEagle. You are among the elite.',        requirement:'Complete all 3 academy courses' },
+  { id:'quiz_taken',      icon:'🎯', name:'Know Thyself',             category:'special',   color:'#4caf7d', desc:'Completed the Eagle Academy level quiz. The first step to improvement is knowing where you stand.',                  requirement:'Complete the trading level quiz' },
+];
+
+const CAT_COLORS = { academy:'#c8a96e', journal:'#4caf7d', content:'#6ba3ff', community:'#5865f2', special:'#a78bfa' };
+const CAT_LABELS = { academy:'Academy', journal:'Journal', content:'Reading', community:'Community', special:'Special' };
+
+// User earned achievements — loaded from Supabase
+let earnedIds = new Set();
+let _sb = null;
+
+// ── Panel navigation ─────────────────────────────────────────────────────
+function showPanel(id, btn) {
+  document.querySelectorAll(".cm-panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".cm-tab").forEach(t => t.classList.remove("active"));
+  document.getElementById("panel-" + id).classList.add("active");
+  btn.classList.add("active");
+  // Update URL hash
+  history.pushState(null, null, "#" + id);
+}
+
+// ── Diploma modal ────────────────────────────────────────────────────────
+function openDiplomaModal(id) {
+  const ach = ALL_ACHIEVEMENTS.find(a => a.id === id);
+  if (!ach || !earnedIds.has(id)) return;
+  document.getElementById("dmIcon").textContent = ach.icon;
+  document.getElementById("dmName").textContent = ach.name;
+  document.getElementById("dmDesc").textContent = ach.desc;
+  document.getElementById("dmDate").textContent = "Earned · " + new Date().toLocaleDateString("en-US", {month:"long", day:"numeric", year:"numeric"});
+  document.getElementById("diplomaModal").classList.add("open");
+}
+function closeDiplomaModal() {
+  document.getElementById("diplomaModal").classList.remove("open");
+}
+document.getElementById("diplomaModal").addEventListener("click", e => {
+  if (e.target === document.getElementById("diplomaModal")) closeDiplomaModal();
+});
+
+// ── Render achievements ──────────────────────────────────────────────────
+function renderAchievements() {
+  const earned = ALL_ACHIEVEMENTS.filter(a => earnedIds.has(a.id));
+  const locked = ALL_ACHIEVEMENTS.filter(a => !earnedIds.has(a.id));
+  const total = ALL_ACHIEVEMENTS.length;
+
+  // Stats bar
+  document.getElementById("achStats").innerHTML = [
+    { label:"Earned", value: earned.length, color:"#c8a96e" },
+    { label:"Locked", value: locked.length, color:"rgba(255,255,255,0.25)" },
+    { label:"Total", value: total, color:"rgba(255,255,255,0.25)" },
+  ].map(s => `<div style="padding:8px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:4px;font-family:'DM Mono',monospace">
+    <div style="font-size:18px;font-weight:600;color:${s.color}">${s.value}</div>
+    <div style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px">${s.label}</div>
+  </div>`).join("");
+
+  // Grid — earned first, then locked
+  const sorted = [...earned, ...locked];
+  document.getElementById("achGrid").innerHTML = sorted.map(ach => {
+    const isEarned = earnedIds.has(ach.id);
+    const catColor = CAT_COLORS[ach.category] || "#c8a96e";
+    const catLabel = CAT_LABELS[ach.category] || ach.category;
+    return `<div class="diploma ${isEarned?"earned":"locked"}" onclick="${isEarned?`openDiplomaModal('${ach.id}')`:""}">
+      <div class="diploma-inner">
+        ${isEarned ? '<div class="diploma-shine"></div>' : ""}
+        ${!isEarned ? '<div class="diploma-lock-icon">🔒</div>' : ""}
+        <span class="diploma-icon">${ach.icon}</span>
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px">
+          <span style="font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;border-radius:100px;background:${catColor}18;color:${catColor};border:1px solid ${catColor}30;letter-spacing:0.06em">${catLabel}</span>
+          ${isEarned ? `<span style="font-family:'DM Mono',monospace;font-size:8px;color:#4caf7d;display:flex;align-items:center;gap:3px">✓ Earned</span>` : ""}
+        </div>
+        <div class="diploma-name">${ach.name}</div>
+        <div class="diploma-desc">${isEarned ? ach.desc : ach.requirement}</div>
+        ${isEarned ? `
+          <div class="diploma-progress"><div class="diploma-progress-fill" style="width:100%;background:${catColor}"></div></div>
+          <div class="diploma-earned-label" style="color:${catColor};margin-top:8px">✓ <span>Diploma earned — click to view</span></div>
+        ` : `
+          <div class="diploma-progress"><div class="diploma-progress-fill" style="width:0%;background:${catColor}"></div></div>
+          <div class="diploma-earned-label" style="color:rgba(255,255,255,0.2);margin-top:8px">🔒 <span>Not yet earned</span></div>
+        `}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ── Load user achievements from Supabase ─────────────────────────────────
+async function loadAchievements() {
+  renderAchievements(); // render locked state first
+
+  // Check localStorage quiz achievement
+  const level = localStorage.getItem("ep_level");
+  if (level) earnedIds.add("quiz_taken");
+
+  try {
+    _sb = getNavSB();
+    if (!_sb) { renderAchievements(); return; }
+    const { data: { session } } = await _sb.auth.getSession();
+    if (!session) { renderAchievements(); return; }
+
+    // Load from user_achievements table (to be created)
+    const { data } = await _sb.from("user_achievements").select("achievement_id").eq("user_id", session.user.id);
+    if (data?.length) {
+      data.forEach(r => earnedIds.add(r.achievement_id));
+    }
+
+    // Check early adopter (account created in 2026)
+    const created = session.user.created_at;
+    if (created && new Date(created) < new Date("2027-01-01")) {
+      earnedIds.add("early_adopter");
+    }
+  } catch(e) {
+    console.warn("Achievements load error:", e.message);
+  }
+
+  renderAchievements();
+}
+
+// ── Handle hash routing ──────────────────────────────────────────────────
+function handleHash() {
+  const hash = window.location.hash.replace("#","");
+  const validPanels = ["achievements","leaderboard","contest"];
+  if (validPanels.includes(hash)) {
+    const tab = document.getElementById("tab-" + hash);
+    if (tab) showPanel(hash, tab);
+  }
+}
+
+handleHash();
+window.addEventListener("hashchange", handleHash);
+loadAchievements();
+</script>
+
+<script src="nav.js"></script>
+<script>
+async function renderFooterFromDB() {
+  try {
+    const _sb2 = getNavSB(); if (!_sb2) return;
+    const {data} = await _sb2.from("site_settings").select("key,value").in("key",["footer_data","footer_copy","footer_disclaimer"]);
+    if (!data?.length) return;
+    const s={}; data.forEach(r=>s[r.key]=r.value);
+    if(s.footer_disclaimer){const el=document.getElementById("footerDisclaimer");if(el)el.textContent=s.footer_disclaimer;}
+    if(s.footer_copy){const el=document.getElementById("footerCopy");if(el)el.textContent=s.footer_copy;}
+    if(s.footer_data){try{const d=JSON.parse(s.footer_data);if(d.columns?.length){const w=document.getElementById("footerCols");if(w)w.innerHTML=d.columns.map(c=>`<div class="footer-col"><span class="footer-col-title">${c.title}</span><ul>${(c.links||[]).map(l=>`<li><a href="${l.url||"#"}">${l.icon?l.icon+" ":""}${l.label}</a></li>`).join("")}</ul></div>`).join("");}if(d.social?.length){const w=document.getElementById("footerSocial");if(w)w.innerHTML=d.social.map(s=>`<a href="${s.url||"#"}" title="${s.title||""}">${s.icon||"🔗"}</a>`).join("");}if(d.copyright){const el=document.getElementById("footerCopy");if(el)el.textContent=d.copyright;}}catch(e){}}
+  } catch(e) {}
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="renderNav('community');renderFooterFromDB()"></script>
+</body>
+</html>
