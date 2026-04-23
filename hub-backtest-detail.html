@@ -61,10 +61,14 @@
 .col-builder-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .col-builder-title{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold)}
 .col-list{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
-.col-row{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;transition:border-color 0.15s}
+.col-row{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;transition:all 0.15s;user-select:none}
 .col-row:hover{border-color:var(--gold-border)}
 .col-row.fixed-col{border-color:rgba(200,169,110,0.15);background:rgba(200,169,110,0.04)}
-.col-drag{cursor:grab;color:var(--white3);font-size:14px;flex-shrink:0}
+.col-row.dragging{opacity:0.4;border-color:var(--gold-border);background:var(--gold-dim)}
+.col-row.drag-over{border-color:var(--gold);background:rgba(200,169,110,0.08);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+.col-drag{cursor:grab;color:var(--white3);font-size:16px;flex-shrink:0;padding:0 2px;transition:color 0.15s}
+.col-drag:hover{color:var(--gold)}
+.col-drag:active{cursor:grabbing}
 .col-name{flex:1;background:none;border:none;color:var(--white);font-family:"Syne",sans-serif;font-size:12px;outline:none}
 .col-name::placeholder{color:var(--white3)}
 .col-name[disabled]{color:var(--gold);cursor:default}
@@ -308,8 +312,14 @@ function renderColumnBuilder() {
     return;
   }
   list.innerHTML = cols.map((col, i) => `
-    <div class="col-row" data-idx="${i}">
-      <span class="col-drag">⠿</span>
+    <div class="col-row" data-idx="${i}"
+      draggable="true"
+      ondragstart="colDragStart(event,${i})"
+      ondragover="colDragOver(event,${i})"
+      ondragleave="colDragLeave(event)"
+      ondrop="colDrop(event,${i})"
+      ondragend="colDragEnd(event)">
+      <span class="col-drag" title="Drag to reorder">⠿</span>
       <input type="text" class="col-name" value="${col.name||''}" placeholder="Column name (e.g. Session, Setup, Pair)" oninput="bt.columns[${i}].name=this.value">
       <select class="col-type" onchange="updateColType(${i},this.value)">
         ${COL_TYPES.map(t=>`<option value="${t.val}" ${col.type===t.val?'selected':''}>${t.label}</option>`).join('')}
@@ -689,6 +699,53 @@ function renderBreakdowns() {
     }).join('');
     return `<div class="an-card"><div class="an-card-title">By ${col.name}</div>${rows||'<div style="color:var(--white3);font-size:12px">No data</div>'}</div>`;
   }).join('');
+}
+
+// ── COLUMN DRAG & DROP ───────────────────────────────────────────────────
+let _dragIdx = null;
+
+function colDragStart(e, idx) {
+  _dragIdx = idx;
+  e.dataTransfer.effectAllowed = 'move';
+  // Small delay so the element doesn't disappear instantly
+  setTimeout(() => {
+    const el = document.querySelector(`.col-row[data-idx="${idx}"]`);
+    if (el) el.classList.add('dragging');
+  }, 0);
+}
+
+function colDragOver(e, idx) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  if (idx === _dragIdx) return;
+  document.querySelectorAll('.col-row').forEach(el => el.classList.remove('drag-over'));
+  const el = document.querySelector(`.col-row[data-idx="${idx}"]`);
+  if (el) el.classList.add('drag-over');
+}
+
+function colDragLeave(e) {
+  if (!e.currentTarget.contains(e.relatedTarget)) {
+    e.currentTarget.classList.remove('drag-over');
+  }
+}
+
+function colDrop(e, toIdx) {
+  e.preventDefault();
+  if (_dragIdx === null || _dragIdx === toIdx) return;
+  // Reorder bt.columns array
+  const cols = bt.columns;
+  const moved = cols.splice(_dragIdx, 1)[0];
+  cols.splice(toIdx, 0, moved);
+  bt.columns = cols;
+  _dragIdx = null;
+  renderColumnBuilder();
+}
+
+function colDragEnd(e) {
+  document.querySelectorAll('.col-row').forEach(el => {
+    el.classList.remove('dragging', 'drag-over');
+  });
+  _dragIdx = null;
 }
 
 async function confirmDelete() {
