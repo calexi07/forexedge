@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EaglePips — My Backtests</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="hub.css">
+<style>
+.bt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.bt-card{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;overflow:hidden;cursor:pointer;transition:all 0.2s;text-decoration:none;display:block}
+.bt-card:hover{border-color:var(--gold-border);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+.bt-card-top{height:3px}
+.bt-card-body{padding:16px}
+.bt-card-name{font-family:"Playfair Display",serif;font-size:17px;font-weight:700;color:var(--white);margin-bottom:4px}
+.bt-card-desc{font-size:12px;color:var(--white3);line-height:1.5;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bt-card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.bt-tag{font-family:"DM Mono",monospace;font-size:8px;padding:2px 7px;background:var(--bg3);border:1px solid var(--border2);color:var(--white3);border-radius:100px}
+.bt-card-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--border2);background:var(--bg3)}
+.bt-stat{padding:10px;text-align:center;border-right:1px solid var(--border2)}
+.bt-stat:last-child{border-right:none}
+.bt-stat-val{font-family:"DM Mono",monospace;font-size:14px;font-weight:500;margin-bottom:2px}
+.bt-stat-lbl{font-family:"DM Mono",monospace;font-size:7px;color:var(--white3);text-transform:uppercase;letter-spacing:0.1em}
+.bt-empty{text-align:center;padding:80px 20px;color:var(--white3)}
+.bt-cols-preview{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.bt-col-pill{font-family:"DM Mono",monospace;font-size:8px;padding:1px 6px;background:rgba(200,169,110,0.08);border:1px solid rgba(200,169,110,0.15);color:var(--gold);border-radius:3px}
+</style>
+</head>
+<body class="et-loading">
+<div id="et-loader">
+  <div class="et-loader-logo"><img src="https://vaimxhgqcdhjhdiaampa.supabase.co/storage/v1/object/public/EaglePips/design-f-r--titlu-1776494279309.png" style="width:40px;height:40px;object-fit:contain;animation:etLoaderPulse 1.5s ease-in-out infinite" alt="EaglePips"><div class="et-loader-name">Eagle<span>Pips</span></div></div>
+  <div class="et-loader-bar"><div class="et-loader-bar-fill"></div></div>
+  <div class="et-loader-text">Loading backtests...</div>
+</div>
+<div id="etSidebarMount"></div>
+
+<!-- ── NEW BACKTEST MODAL ─────────────────────────────────────────────── -->
+<div class="et-modal-overlay" id="newBtModal">
+  <div class="et-modal" style="max-width:560px">
+    <button class="et-modal-close" onclick="etCloseModal('newBtModal')">✕</button>
+    <div class="et-modal-title">New Backtest</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label class="et-form-label">Backtest Name *</label>
+        <input type="text" id="btName" class="et-form-input" placeholder="e.g. EURUSD London Sessions — Q1 2026">
+      </div>
+      <div>
+        <label class="et-form-label">Description</label>
+        <textarea id="btDesc" class="et-form-input" rows="2" placeholder="What strategy or idea are you testing?" style="resize:none"></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label class="et-form-label">Symbol / Pair</label>
+          <input type="text" id="btSymbol" class="et-form-input" placeholder="EURUSD, GBPUSD...">
+        </div>
+        <div>
+          <label class="et-form-label">Period</label>
+          <input type="text" id="btPeriod" class="et-form-input" placeholder="Jan 2025 – Mar 2025">
+        </div>
+      </div>
+      <div>
+        <label class="et-form-label">Color</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="btColorPicker">
+          <button class="pill-opt on" onclick="selectColor(this,'#c8a96e')" style="width:24px;height:24px;padding:0;background:#c8a96e;border:2px solid #fff;border-radius:50%"></button>
+          <button class="pill-opt" onclick="selectColor(this,'#4caf7d')" style="width:24px;height:24px;padding:0;background:#4caf7d;border:2px solid transparent;border-radius:50%"></button>
+          <button class="pill-opt" onclick="selectColor(this,'#6ba3ff')" style="width:24px;height:24px;padding:0;background:#6ba3ff;border:2px solid transparent;border-radius:50%"></button>
+          <button class="pill-opt" onclick="selectColor(this,'#a78bfa')" style="width:24px;height:24px;padding:0;background:#a78bfa;border:2px solid transparent;border-radius:50%"></button>
+          <button class="pill-opt" onclick="selectColor(this,'#e05c5c')" style="width:24px;height:24px;padding:0;background:#e05c5c;border:2px solid transparent;border-radius:50%"></button>
+          <button class="pill-opt" onclick="selectColor(this,'#f9a825')" style="width:24px;height:24px;padding:0;background:#f9a825;border:2px solid transparent;border-radius:50%"></button>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px">
+      <button class="et-btn-ghost" onclick="etCloseModal('newBtModal')" style="padding:8px 18px;font-size:12px">Cancel</button>
+      <button class="et-btn-gold" onclick="createBacktest()" style="padding:8px 18px;font-size:12px">Create Backtest →</button>
+    </div>
+  </div>
+</div>
+
+<div class="hub-main">
+  <div class="hub-topbar">
+    <div class="hub-topbar-title">🔬 <strong>My Backtests</strong></div>
+    <button class="et-btn-gold" onclick="etOpenModal('newBtModal')" style="padding:7px 16px;font-size:11px">+ New Backtest</button>
+  </div>
+  <div class="hub-content et-fade" id="btContent">
+    <div style="text-align:center;padding:60px"><div class="et-spinner"></div></div>
+  </div>
+</div>
+
+<script src="hub-sidebar.js"></script>
+<script>
+let _user, _sb, backtests = [], selectedColor = '#c8a96e';
+
+async function main() {
+  const res = await initEtSidebar('backtests');
+  if (!res) return;
+  _user = res.user; _sb = res.sb;
+  await loadBacktests();
+}
+
+async function loadBacktests() {
+  const { data } = await _sb.from('backtests').select('*').eq('user_id', _user.id).order('created_at', { ascending: false });
+  backtests = data || [];
+  renderList();
+}
+
+function renderList() {
+  const el = document.getElementById('btContent');
+  if (!backtests.length) {
+    el.innerHTML = `<div class="bt-empty">
+      <div style="font-size:48px;opacity:0.15;margin-bottom:16px">🔬</div>
+      <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--white);margin-bottom:8px">No backtests yet</div>
+      <div style="font-size:14px;color:var(--white3);margin-bottom:24px;max-width:360px;margin-left:auto;margin-right:auto;line-height:1.7">Create your first backtest to start tracking trade results by any criteria you define.</div>
+      <button class="et-btn-gold" onclick="etOpenModal('newBtModal')" style="padding:10px 24px;font-size:12px">+ Create First Backtest</button>
+    </div>`;
+    return;
+  }
+  el.innerHTML = `<div class="bt-grid">${backtests.map(bt => {
+    const cols = bt.columns || [];
+    const stats = bt.stats || {};
+    const wr = stats.trades > 0 ? Math.round((stats.wins/stats.trades)*100) : 0;
+    const pnl = stats.total_rr || 0;
+    return `<a class="bt-card" href="hub-backtest-detail.html?id=${bt.id}">
+      <div class="bt-card-top" style="background:${bt.color||'#c8a96e'}"></div>
+      <div class="bt-card-body">
+        <div class="bt-card-name">${bt.name}</div>
+        ${bt.description ? `<div class="bt-card-desc">${bt.description}</div>` : ''}
+        <div class="bt-card-tags">
+          ${bt.symbol ? `<span class="bt-tag" style="color:${bt.color||'#c8a96e'};border-color:${bt.color||'#c8a96e'}33;background:${bt.color||'#c8a96e'}10">${bt.symbol}</span>` : ''}
+          ${bt.period ? `<span class="bt-tag">${bt.period}</span>` : ''}
+          <span class="bt-tag">${stats.trades||0} trades</span>
+        </div>
+        ${cols.length ? `<div class="bt-cols-preview">${cols.slice(0,5).map(c=>`<span class="bt-col-pill">${c.name}</span>`).join('')}</div>` : ''}
+      </div>
+      <div class="bt-card-stats">
+        <div class="bt-stat"><div class="bt-stat-val" style="color:${wr>=50?'var(--bull)':(wr<40?'var(--bear)':' var(--white)')}">${wr}%</div><div class="bt-stat-lbl">Win Rate</div></div>
+        <div class="bt-stat"><div class="bt-stat-val" style="color:${pnl>0?'var(--bull)':pnl<0?'var(--bear)':' var(--white)'}">${pnl>0?'+':''}${pnl.toFixed(1)}R</div><div class="bt-stat-lbl">Total R</div></div>
+        <div class="bt-stat"><div class="bt-stat-val">${stats.trades||0}</div><div class="bt-stat-lbl">Trades</div></div>
+        <div class="bt-stat"><div class="bt-stat-val" style="color:var(--white2);font-size:11px">${new Date(bt.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</div><div class="bt-stat-lbl">Created</div></div>
+      </div>
+    </a>`;
+  }).join('')}</div>`;
+}
+
+function selectColor(btn, color) {
+  selectedColor = color;
+  document.querySelectorAll('#btColorPicker button').forEach(b => b.style.borderColor = 'transparent');
+  btn.style.borderColor = '#fff';
+}
+
+async function createBacktest() {
+  const name = document.getElementById('btName').value.trim();
+  if (!name) { document.getElementById('btName').style.borderColor = 'var(--bear)'; return; }
+  const payload = {
+    user_id: _user.id,
+    name,
+    description: document.getElementById('btDesc').value.trim(),
+    symbol: document.getElementById('btSymbol').value.trim(),
+    period: document.getElementById('btPeriod').value.trim(),
+    color: selectedColor,
+    columns: [],
+    stats: { trades:0, wins:0, losses:0, breakeven:0, total_rr:0 }
+  };
+  const { data, error } = await _sb.from('backtests').insert(payload).select().single();
+  if (error) { alert('Error: ' + error.message); return; }
+  etCloseModal('newBtModal');
+  window.location.href = 'hub-backtest-detail.html?id=' + data.id + '&setup=1';
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="main()"></script>
+</body>
+</html>
