@@ -233,18 +233,11 @@ tr:hover .del-btn{color:var(--white3)}
         <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)">Define what you track per trade</span>
       </div>
 
-      <!-- Fixed system columns info -->
-      <div style="padding:10px 14px;background:rgba(200,169,110,0.04);border:1px solid rgba(200,169,110,0.12);border-radius:4px;margin-bottom:12px">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);margin-bottom:6px;letter-spacing:0.1em">⚡ SYSTEM COLUMNS — always present, connected to dashboard</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <span style="font-family:'DM Mono',monospace;font-size:9px;padding:3px 9px;background:var(--bg3);border:1px solid var(--gold-border);color:var(--gold);border-radius:3px">Result (W/L/BE)</span>
-          <span style="font-family:'DM Mono',monospace;font-size:9px;padding:3px 9px;background:var(--bg3);border:1px solid var(--gold-border);color:var(--gold);border-radius:3px">R:R</span>
-          <span style="font-family:'DM Mono',monospace;font-size:9px;padding:3px 9px;background:var(--bg3);border:1px solid var(--gold-border);color:var(--gold);border-radius:3px">Notes</span>
-        </div>
+      <!-- All columns — system + custom, all draggable -->
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+        <span>All Columns — drag to reorder</span>
+        <span style="color:rgba(200,169,110,0.5)">⚡ = connected to dashboard</span>
       </div>
-
-      <!-- Custom columns -->
-      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px">Custom Columns</div>
       <div class="col-list" id="colList"></div>
       <button class="add-col-btn" onclick="addColumn()">＋ Add Criteria / Column</button>
       <div style="display:flex;justify-content:flex-end;margin-top:14px">
@@ -360,15 +353,30 @@ function switchTab(tab) {
 }
 
 // ── COLUMN BUILDER ────────────────────────────────────────────────────────
+// System column definitions
+const SYSTEM_COLS = [
+  { id:'__result', name:'Result', type:'result', system:true },
+  { id:'__rr',     name:'R:R',    type:'rr',     system:true },
+  { id:'__notes',  name:'Notes',  type:'notes',  system:true },
+];
+
+function ensureSystemCols() {
+  // Inject system cols at start if not present
+  SYSTEM_COLS.forEach(sc => {
+    if (!bt.columns.find(c => c.id === sc.id)) {
+      bt.columns.unshift({ ...sc });
+    }
+  });
+}
+
 function renderColumnBuilder() {
+  ensureSystemCols();
   const list = document.getElementById('colList');
-  const cols = bt.columns || [];
-  if (!cols.length) {
-    list.innerHTML = `<div style="text-align:center;padding:18px;font-size:12px;color:var(--white3)">No custom columns yet. Add your first criteria below.</div>`;
-    return;
-  }
-  list.innerHTML = cols.map((col, i) => `
-    <div class="col-row" data-idx="${i}"
+  const cols = bt.columns;
+
+  list.innerHTML = cols.map((col, i) => {
+    const isSys = col.system;
+    return `<div class="col-row${isSys?' fixed-col':''}" data-idx="${i}"
       ondragover="colDragOver(event,${i})"
       ondragleave="colDragLeave(event)"
       ondrop="colDrop(event,${i})"
@@ -378,14 +386,21 @@ function renderColumnBuilder() {
         ondragstart="colDragStart(event,${i})"
         onmousedown="this.closest('.col-row').setAttribute('draggable','true')"
         onmouseup="this.closest('.col-row').setAttribute('draggable','false')">⠿</span>
-      <input type="text" class="col-name" value="${col.name||''}" placeholder="Column name (e.g. Session, Setup, Pair)" oninput="bt.columns[${i}].name=this.value">
-      <select class="col-type" onchange="updateColType(${i},this.value)">
-        ${COL_TYPES.map(t=>`<option value="${t.val}" ${col.type===t.val?'selected':''}>${t.label}</option>`).join('')}
-      </select>
-      ${col.type==='select'?`<input type="text" class="col-name" value="${col.options||''}" placeholder="Options: London,NY,Asia" oninput="bt.columns[${i}].options=this.value" style="max-width:200px">`:
-        `<span style="width:160px"></span>`}
-      <button class="col-del" onclick="removeCol(${i})" title="Remove column">✕</button>
-    </div>`).join('');
+      ${isSys
+        ? `<span class="col-name" style="color:var(--gold);font-family:'DM Mono',monospace;font-size:11px">${col.name}</span>
+           <span class="col-fixed-badge">⚡ system</span>
+           <span style="flex:1"></span>`
+        : `<input type="text" class="col-name" value="${col.name||''}" placeholder="Column name" oninput="bt.columns[${i}].name=this.value">
+           <select class="col-type" onchange="updateColType(${i},this.value)">
+             ${COL_TYPES.map(t=>`<option value="${t.val}" ${col.type===t.val?'selected':''}>${t.label}</option>`).join('')}
+           </select>
+           ${col.type==='select'
+             ? `<input type="text" class="col-name" value="${col.options||''}" placeholder="Options: London,NY,Asia" oninput="bt.columns[${i}].options=this.value" style="max-width:180px">`
+             : `<span style="min-width:120px"></span>`}
+           <button class="col-del" onclick="removeCol(${i})" title="Remove column">✕</button>`
+      }
+    </div>`;
+  }).join('');
 }
 
 function addColumn() {
@@ -414,65 +429,66 @@ async function saveColumns() {
 
 // ── TABLE ─────────────────────────────────────────────────────────────────
 function renderTable() {
+  ensureSystemCols();
   const wrap = document.getElementById('btTableWrap');
-  const cols = bt.columns || [];
+  const cols = bt.columns; // now includes system cols in order
 
-  const thead = `<thead><tr>
-    <th class="row-num">#</th>
-    <th>Result</th>
-    <th>R:R</th>
-    ${cols.map(c=>`<th>${c.name||'—'}</th>`).join('')}
-    <th>Notes</th>
-    <th class="del-cell"></th>
-  </tr></thead>`;
-
-  const makeRow = (tr, idx) => {
+  const renderCell = (tr, col) => {
     const d = tr.data || {};
-    const res = d.__result || '';
-    const rr = d.__rr !== undefined ? d.__rr : '';
-    const notes = d.__notes || '';
-    const rrNum = parseFloat(rr);
+    const val = d[col.id] !== undefined ? d[col.id] : '';
 
-    return `<tr data-id="${tr.id}">
-      <td class="row-num">${idx+1}</td>
-      <td>
+    if (col.id === '__result') {
+      const res = val;
+      return `<td>
         <select class="cell-sel" style="width:90px" onchange="updateCell('${tr.id}','__result',this.value)">
           <option value="" ${res===''?'selected':''}>—</option>
           <option value="W" ${res==='W'?'selected':''} style="color:var(--bull)">✓ Win</option>
           <option value="L" ${res==='L'?'selected':''} style="color:var(--bear)">✗ Loss</option>
           <option value="BE" ${res==='BE'?'selected':''}>↔ BE</option>
         </select>
-      </td>
-      <td>
-        <input type="number" step="0.01" class="cell-num" value="${rr}"
-          style="color:${!isNaN(rrNum)&&rr!==''?rrNum>=0?'var(--bull)':'var(--bear)':'var(--white2)'}"
-          onchange="updateCell('${tr.id}','__rr',this.value)">
-      </td>
-      ${cols.map(c => {
-        const val = d[c.id] || '';
-        if (c.type === 'select') {
-          const opts = (c.options||'').split(',').map(o=>o.trim()).filter(Boolean);
-          return `<td><select class="cell-sel" onchange="updateCell('${tr.id}','${c.id}',this.value)">
-            <option value="">—</option>
-            ${opts.map(o=>`<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('')}
-          </select></td>`;
-        }
-        if (c.type === 'number') {
-          return `<td><input type="number" step="any" class="cell-num" value="${val}" onchange="updateCell('${tr.id}','${c.id}',this.value)"></td>`;
-        }
-        if (c.type === 'date') {
-          return `<td><input type="date" value="${val}" class="cell-sel" style="font-size:11px" onchange="updateCell('${tr.id}','${c.id}',this.value)"></td>`;
-        }
-        return `<td><input type="text" class="cell-edit" value="${val.replace(/"/g,'&quot;')}" onchange="updateCell('${tr.id}','${c.id}',this.value)"></td>`;
-      }).join('')}
-      <td><input type="text" class="cell-edit" value="${notes.replace(/"/g,'&quot;')}" placeholder="Notes..." onchange="updateCell('${tr.id}','__notes',this.value)" style="min-width:120px"></td>
-      <td class="del-cell"><button class="del-btn" onclick="deleteTrade('${tr.id}')">✕</button></td>
-    </tr>`;
+      </td>`;
+    }
+    if (col.id === '__rr') {
+      const rrNum = parseFloat(val);
+      return `<td><input type="number" step="0.01" class="cell-num" value="${val}"
+        style="color:${!isNaN(rrNum)&&val!==''?rrNum>=0?'var(--bull)':'var(--bear)':'var(--white2)'}"
+        onchange="updateCell('${tr.id}','__rr',this.value)"></td>`;
+    }
+    if (col.id === '__notes') {
+      return `<td><input type="text" class="cell-edit" value="${String(val).replace(/"/g,'&quot;')}" placeholder="Notes..." onchange="updateCell('${tr.id}','__notes',this.value)" style="min-width:120px"></td>`;
+    }
+    if (col.type === 'select') {
+      const opts = (col.options||'').split(',').map(o=>o.trim()).filter(Boolean);
+      return `<td><select class="cell-sel" onchange="updateCell('${tr.id}','${col.id}',this.value)">
+        <option value="">—</option>
+        ${opts.map(o=>`<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('')}
+      </select></td>`;
+    }
+    if (col.type === 'number') {
+      return `<td><input type="number" step="any" class="cell-num" value="${val}" onchange="updateCell('${tr.id}','${col.id}',this.value)"></td>`;
+    }
+    if (col.type === 'date') {
+      return `<td><input type="date" value="${val}" class="cell-sel" style="font-size:11px" onchange="updateCell('${tr.id}','${col.id}',this.value)"></td>`;
+    }
+    return `<td><input type="text" class="cell-edit" value="${String(val).replace(/"/g,'&quot;')}" onchange="updateCell('${tr.id}','${col.id}',this.value)"></td>`;
   };
 
+  const thead = `<thead><tr>
+    <th class="row-num">#</th>
+    ${cols.map(c=>`<th>${c.name||'—'}</th>`).join('')}
+    <th class="del-cell"></th>
+  </tr></thead>`;
+
+  const makeRow = (tr, idx) => `<tr data-id="${tr.id}">
+    <td class="row-num">${idx+1}</td>
+    ${cols.map(col => renderCell(tr, col)).join('')}
+    <td class="del-cell"><button class="del-btn" onclick="deleteTrade('${tr.id}')">✕</button></td>
+  </tr>`;
+
+  const total = cols.length + 2;
   const tbody = trades.length
     ? `<tbody>${trades.map(makeRow).join('')}</tbody>`
-    : `<tbody><tr><td colspan="${cols.length+5}" style="text-align:center;padding:32px;color:var(--white3);font-size:13px">No trades yet — add your first below</td></tr></tbody>`;
+    : `<tbody><tr><td colspan="${total}" style="text-align:center;padding:32px;color:var(--white3);font-size:13px">No trades yet — add your first below</td></tr></tbody>`;
 
   wrap.innerHTML = `
     <table class="bt-tbl">${thead}${tbody}</table>
