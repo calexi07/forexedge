@@ -122,6 +122,59 @@ tr:hover .del-btn{color:var(--white3)}
 </div>
 <div id="etSidebarMount"></div>
 
+<!-- EDIT BACKTEST MODAL -->
+<div class="et-modal-overlay" id="editBtModal">
+  <div class="et-modal" style="max-width:560px">
+    <button class="et-modal-close" onclick="etCloseModal('editBtModal')">✕</button>
+    <div class="et-modal-title">Edit Backtest</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label class="et-form-label">Name *</label>
+        <input type="text" id="editBtName" class="et-form-input" placeholder="Backtest name">
+      </div>
+      <div>
+        <label class="et-form-label">Description</label>
+        <textarea id="editBtDesc" class="et-form-input" rows="2" style="resize:none" placeholder="What are you testing?"></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label class="et-form-label">Symbol / Pair</label>
+          <input type="text" id="editBtSymbol" class="et-form-input" placeholder="EURUSD, GBPUSD...">
+        </div>
+        <div>
+          <label class="et-form-label">Period</label>
+          <input type="text" id="editBtPeriod" class="et-form-input" placeholder="Jan 2025 – Mar 2025">
+        </div>
+      </div>
+      <div>
+        <label class="et-form-label">Strategy</label>
+        <select id="editBtStrategy" class="et-form-input">
+          <option value="">— No strategy linked —</option>
+        </select>
+      </div>
+      <div>
+        <label class="et-form-label">Strategy Notes / Idea</label>
+        <textarea id="editBtStrategyNotes" class="et-form-input" rows="2" style="resize:none" placeholder="What hypothesis are you testing?"></textarea>
+      </div>
+      <div>
+        <label class="et-form-label">Color</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="editBtColorPicker">
+          <button onclick="selectEditColor(this,'#c8a96e')" style="width:24px;height:24px;padding:0;background:#c8a96e;border:2px solid transparent;border-radius:50%;cursor:pointer"></button>
+          <button onclick="selectEditColor(this,'#4caf7d')" style="width:24px;height:24px;padding:0;background:#4caf7d;border:2px solid transparent;border-radius:50%;cursor:pointer"></button>
+          <button onclick="selectEditColor(this,'#6ba3ff')" style="width:24px;height:24px;padding:0;background:#6ba3ff;border:2px solid transparent;border-radius:50%;cursor:pointer"></button>
+          <button onclick="selectEditColor(this,'#a78bfa')" style="width:24px;height:24px;padding:0;background:#a78bfa;border:2px solid transparent;border-radius:50%;cursor:pointer"></button>
+          <button onclick="selectEditColor(this,'#e05c5c')" style="width:24px;height:24px;padding:0;background:#e05c5c;border:2px solid transparent;border-radius:50%;cursor:pointer"></button>
+          <button onclick="selectEditColor(this,'#f9a825')" style="width:24px;height:24px;padding:0;background:#f9a825;border:2px solid transparent;border-radius:50%;cursor:pointer"></button>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px">
+      <button class="et-btn-ghost" onclick="etCloseModal('editBtModal')" style="padding:8px 18px;font-size:12px">Cancel</button>
+      <button class="et-btn-gold" onclick="saveEditBacktest()" style="padding:8px 18px;font-size:12px">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODE SELECTOR OVERLAY -->
 <div class="mode-overlay" id="modeOverlay" style="display:none">
   <div class="mode-box">
@@ -155,6 +208,7 @@ tr:hover .del-btn{color:var(--white3)}
     <div class="hub-topbar-title" style="flex:1;margin-left:10px">🔬 <strong id="btPageTitle">Backtest</strong></div>
     <span id="saveStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--bull)"></span>
     <button onclick="document.getElementById('modeOverlay').style.display='flex'" class="et-btn-ghost" style="padding:6px 12px;font-size:11px">⊞ Switch Mode</button>
+    <button class="et-btn-ghost" onclick="openEditModal()" style="padding:6px 12px;font-size:11px">✏️ Edit</button>
     <button class="et-btn-ghost" onclick="confirmDelete()" style="padding:6px 12px;font-size:11px;color:var(--bear);border-color:rgba(224,92,92,0.2)">🗑</button>
   </div>
 
@@ -260,8 +314,10 @@ async function loadBt() {
     <div>
       <div class="bt-htitle">${bt.name}</div>
       ${bt.description?`<div class="bt-hdesc">${bt.description}</div>`:''}
+      ${bt.strategy_notes?`<div class="bt-hdesc" style="color:var(--gold);margin-top:2px">📋 ${bt.strategy_notes}</div>`:''}
     </div>
     <div class="bt-htags">
+      ${bt.strategy_name?`<span class="bt-htag" style="color:var(--gold);border-color:var(--gold-border);background:var(--gold-dim)">⚡ ${bt.strategy_name}</span>`:''}
       ${bt.symbol?`<span class="bt-htag" style="color:${bt.color||'#c8a96e'};border-color:${bt.color||'#c8a96e'}44;background:${bt.color||'#c8a96e'}10">${bt.symbol}</span>`:''}
       ${bt.period?`<span class="bt-htag">${bt.period}</span>`:''}
     </div>`;
@@ -747,6 +803,91 @@ function colDragEnd(e) {
     el.setAttribute('draggable', 'false');
   });
   _dragIdx = null;
+}
+
+let editColor = '#c8a96e';
+
+function selectEditColor(btn, color) {
+  editColor = color;
+  document.querySelectorAll('#editBtColorPicker button').forEach(b => b.style.borderColor = 'transparent');
+  btn.style.borderColor = '#fff';
+}
+
+async function openEditModal() {
+  if (!bt) return;
+  // Pre-fill fields
+  document.getElementById('editBtName').value = bt.name || '';
+  document.getElementById('editBtDesc').value = bt.description || '';
+  document.getElementById('editBtSymbol').value = bt.symbol || '';
+  document.getElementById('editBtPeriod').value = bt.period || '';
+  document.getElementById('editBtStrategyNotes').value = bt.strategy_notes || '';
+  editColor = bt.color || '#c8a96e';
+
+  // Set color picker
+  document.querySelectorAll('#editBtColorPicker button').forEach(b => {
+    b.style.borderColor = b.style.background === editColor ? '#fff' : 'transparent';
+  });
+
+  // Load strategies
+  const sel = document.getElementById('editBtStrategy');
+  const { data: strats } = await _sb.from('strategies').select('id,name').eq('user_id', _user.id).order('name');
+  sel.innerHTML = '<option value="">— No strategy linked —</option>' +
+    (strats||[]).map(s => `<option value="${s.id}" ${bt.strategy_id===s.id?'selected':''}>${s.name}</option>`).join('');
+
+  // Show strategy name if linked
+  if (bt.strategy_name) {
+    const existing = sel.querySelector(`option[value="${bt.strategy_id}"]`);
+    if (!existing && bt.strategy_id) {
+      sel.innerHTML += `<option value="${bt.strategy_id}" selected>${bt.strategy_name}</option>`;
+    }
+  }
+
+  etOpenModal('editBtModal');
+}
+
+async function saveEditBacktest() {
+  const name = document.getElementById('editBtName').value.trim();
+  if (!name) { document.getElementById('editBtName').style.borderColor = 'var(--bear)'; return; }
+
+  const strategyId = document.getElementById('editBtStrategy').value || null;
+  const strategyName = strategyId
+    ? document.getElementById('editBtStrategy').options[document.getElementById('editBtStrategy').selectedIndex]?.text
+    : null;
+
+  const updates = {
+    name,
+    description: document.getElementById('editBtDesc').value.trim(),
+    symbol: document.getElementById('editBtSymbol').value.trim(),
+    period: document.getElementById('editBtPeriod').value.trim(),
+    strategy_id: strategyId,
+    strategy_name: strategyName,
+    strategy_notes: document.getElementById('editBtStrategyNotes').value.trim(),
+    color: editColor,
+  };
+
+  const { error } = await _sb.from('backtests').update(updates).eq('id', BT_ID);
+  if (error) { alert('Save error: ' + error.message); return; }
+
+  // Update local bt object
+  Object.assign(bt, updates);
+
+  // Update header
+  document.getElementById('btPageTitle').textContent = bt.name;
+  document.getElementById('btHeader').innerHTML = `
+    <div class="bt-dot" style="background:${bt.color||'#c8a96e'}"></div>
+    <div>
+      <div class="bt-htitle">${bt.name}</div>
+      ${bt.description?`<div class="bt-hdesc">${bt.description}</div>`:''}
+      ${bt.strategy_notes?`<div class="bt-hdesc" style="color:var(--gold);margin-top:2px">📋 ${bt.strategy_notes}</div>`:''}
+    </div>
+    <div class="bt-htags">
+      ${strategyName&&strategyId?`<span class="bt-htag" style="color:var(--gold);border-color:var(--gold-border);background:var(--gold-dim)">⚡ ${strategyName}</span>`:''}
+      ${bt.symbol?`<span class="bt-htag" style="color:${bt.color||'#c8a96e'};border-color:${bt.color||'#c8a96e'}44;background:${bt.color||'#c8a96e'}10">${bt.symbol}</span>`:''}
+      ${bt.period?`<span class="bt-htag">${bt.period}</span>`:''}
+    </div>`;
+
+  etCloseModal('editBtModal');
+  showStatus('✓ Saved');
 }
 
 async function confirmDelete() {
