@@ -3,69 +3,111 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EaglePips — Backtest Detail</title>
+<title>EaglePips — Backtest</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="hub.css">
 <style>
-/* ── HEADER ─────────────────────────────────────────── */
-.bt-header{padding:20px 24px;background:var(--bg2);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.bt-color-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.bt-title{font-family:"Playfair Display",serif;font-size:22px;font-weight:700;color:var(--white)}
-.bt-meta-tags{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
-.bt-tag{font-family:"DM Mono",monospace;font-size:9px;padding:3px 8px;background:var(--bg3);border:1px solid var(--border2);color:var(--white3);border-radius:100px}
+/* MODE SELECTOR */
+.mode-overlay{position:fixed;inset:0;background:rgba(4,5,8,0.97);backdrop-filter:blur(14px);z-index:800;display:flex;align-items:center;justify-content:center}
+.mode-box{width:90%;max-width:560px;text-align:center}
+.mode-title{font-family:"Playfair Display",serif;font-size:28px;font-weight:900;color:#fff;margin-bottom:6px}
+.mode-sub{font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:32px;line-height:1.6}
+.mode-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.mode-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:24px 16px;cursor:pointer;transition:all 0.2s;text-align:center}
+.mode-card:hover{border-color:rgba(200,169,110,0.4);background:rgba(200,169,110,0.06);transform:translateY(-2px)}
+.mode-card-icon{font-size:32px;margin-bottom:12px}
+.mode-card-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:6px}
+.mode-card-desc{font-size:11px;color:rgba(255,255,255,0.35);line-height:1.5}
 
-/* ── STATS ROW ──────────────────────────────────────── */
-.bt-stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:1px;background:var(--border2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:16px}
-.bt-stat-box{background:var(--bg2);padding:14px 16px;text-align:center}
-.bt-stat-val{font-family:"DM Mono",monospace;font-size:20px;font-weight:500;margin-bottom:3px}
-.bt-stat-lbl{font-family:"DM Mono",monospace;font-size:8px;text-transform:uppercase;letter-spacing:0.1em;color:var(--white3)}
+/* HEADER */
+.bt-header{padding:16px 20px;background:var(--bg2);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.bt-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.bt-htitle{font-family:"Playfair Display",serif;font-size:20px;font-weight:700;color:var(--white)}
+.bt-hdesc{font-size:12px;color:var(--white3);margin-top:1px}
+.bt-htags{display:flex;gap:5px;flex-wrap:wrap;margin-left:auto;align-items:center}
+.bt-htag{font-family:"DM Mono",monospace;font-size:9px;padding:3px 9px;background:var(--bg3);border:1px solid var(--border2);color:var(--white3);border-radius:100px}
+.mode-switcher{display:flex;gap:4px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:3px}
+.ms-btn{padding:5px 12px;font-family:"DM Mono",monospace;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;border:none;border-radius:2px;cursor:pointer;transition:all 0.15s;background:transparent;color:var(--white3)}
+.ms-btn.active{background:var(--gold);color:#08090c;font-weight:700}
+.ms-btn:hover:not(.active){color:var(--white);background:rgba(255,255,255,0.05)}
 
-/* ── EQUITY CURVE ───────────────────────────────────── */
-.bt-chart-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:16px;margin-bottom:16px}
-.bt-chart-title{font-family:"DM Mono",monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--white3);margin-bottom:12px}
-#eqCanvas{width:100%;height:140px;display:block}
+/* PANELS */
+.bt-panel{display:none;padding:20px 20px 40px}
+.bt-panel.active{display:block}
 
-/* ── COLUMNS BUILDER ────────────────────────────────── */
-.col-builder{background:var(--bg2);border:1px solid var(--gold-border);border-radius:6px;padding:18px;margin-bottom:16px}
-.col-builder-title{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.col-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
-.col-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px}
-.col-drag{cursor:grab;color:var(--white3);font-size:13px;flex-shrink:0}
-.col-name-input{flex:1;background:none;border:none;color:var(--white);font-family:"Syne",sans-serif;font-size:12px;outline:none}
-.col-name-input::placeholder{color:var(--white3)}
-.col-type-sel{background:var(--bg);border:1px solid var(--border2);color:var(--white2);font-family:"DM Mono",monospace;font-size:10px;padding:3px 6px;border-radius:3px;outline:none;cursor:pointer}
+/* STATS */
+.bt-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:1px;background:var(--border2);border:1px solid var(--border2);border-radius:6px;overflow:hidden;margin-bottom:16px}
+.bsg-cell{background:var(--bg2);padding:14px 16px;text-align:center}
+.bsg-val{font-family:"DM Mono",monospace;font-size:20px;font-weight:500;margin-bottom:3px}
+.bsg-lbl{font-family:"DM Mono",monospace;font-size:7px;text-transform:uppercase;letter-spacing:0.1em;color:var(--white3)}
+
+/* EQUITY CURVE */
+.bt-chart-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:16px;margin-bottom:16px}
+.bt-chart-hdr{font-family:"DM Mono",monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--white3);margin-bottom:10px}
+#eqCanvas{width:100%;display:block}
+
+/* FILTERS */
+.bt-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 12px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;margin-bottom:10px}
+.bf-lbl{font-family:"DM Mono",monospace;font-size:8px;color:var(--white3);letter-spacing:0.1em;text-transform:uppercase;flex-shrink:0}
+.bf-sel{background:var(--bg3);border:1px solid var(--border2);color:var(--white2);font-family:"DM Mono",monospace;font-size:10px;padding:5px 10px;border-radius:3px;outline:none;cursor:pointer;transition:border-color 0.15s}
+.bf-sel:focus{border-color:var(--gold-border)}
+.bf-clear{background:none;border:none;font-family:"DM Mono",monospace;font-size:9px;color:var(--white3);cursor:pointer;padding:4px 8px;transition:color 0.15s;letter-spacing:0.06em}
+.bf-clear:hover{color:var(--gold)}
+.filter-count{font-family:"DM Mono",monospace;font-size:9px;color:var(--gold);padding:3px 8px;background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:100px}
+
+/* COLUMN BUILDER */
+.col-builder{background:var(--bg2);border:2px solid var(--gold-border);border-radius:6px;padding:20px;margin-bottom:16px}
+.col-builder-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.col-builder-title{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold)}
+.col-list{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.col-row{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;transition:border-color 0.15s}
+.col-row:hover{border-color:var(--gold-border)}
+.col-row.fixed-col{border-color:rgba(200,169,110,0.15);background:rgba(200,169,110,0.04)}
+.col-drag{cursor:grab;color:var(--white3);font-size:14px;flex-shrink:0}
+.col-name{flex:1;background:none;border:none;color:var(--white);font-family:"Syne",sans-serif;font-size:12px;outline:none}
+.col-name::placeholder{color:var(--white3)}
+.col-name[disabled]{color:var(--gold);cursor:default}
+.col-type{background:var(--bg);border:1px solid var(--border2);color:var(--white2);font-family:"DM Mono",monospace;font-size:10px;padding:4px 8px;border-radius:3px;outline:none;cursor:pointer}
 .col-del{background:none;border:none;color:var(--white3);cursor:pointer;font-size:13px;padding:0 2px;transition:color 0.15s;flex-shrink:0}
 .col-del:hover{color:var(--bear)}
-.add-col-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:transparent;border:1px dashed rgba(200,169,110,0.25);color:rgba(200,169,110,0.5);font-family:"DM Mono",monospace;font-size:10px;cursor:pointer;border-radius:3px;transition:all 0.15s;width:100%}
+.add-col-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;background:transparent;border:1px dashed rgba(200,169,110,0.25);color:rgba(200,169,110,0.5);font-family:"DM Mono",monospace;font-size:10px;cursor:pointer;border-radius:3px;transition:all 0.15s;width:100%}
 .add-col-btn:hover{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
+.col-fixed-badge{font-family:"DM Mono",monospace;font-size:7px;padding:2px 6px;background:rgba(200,169,110,0.1);border:1px solid rgba(200,169,110,0.2);color:var(--gold);border-radius:100px;letter-spacing:0.06em;flex-shrink:0}
 
-/* ── FILTER BAR ─────────────────────────────────────── */
-.bt-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 16px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;margin-bottom:12px}
-.bt-filter-sel{background:var(--bg3);border:1px solid var(--border2);color:var(--white2);font-family:"DM Mono",monospace;font-size:10px;padding:5px 10px;border-radius:3px;outline:none;cursor:pointer;transition:border-color 0.15s}
-.bt-filter-sel:focus{border-color:var(--gold-border)}
-.bt-filter-label{font-family:"DM Mono",monospace;font-size:9px;color:var(--white3);letter-spacing:0.1em;text-transform:uppercase;flex-shrink:0}
-.bt-clear-filters{background:none;border:none;font-family:"DM Mono",monospace;font-size:9px;color:var(--white3);cursor:pointer;padding:4px 8px;transition:color 0.15s;letter-spacing:0.06em}
-.bt-clear-filters:hover{color:var(--gold)}
-
-/* ── TRADES TABLE ───────────────────────────────────── */
-.bt-table-wrap{overflow-x:auto;border:1px solid var(--border2);border-radius:4px}
-.bt-table{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}
-.bt-table th{padding:9px 12px;background:var(--bg3);border-bottom:1px solid var(--border2);font-family:"DM Mono",monospace;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--white3);text-align:left;position:sticky;top:0;z-index:2}
-.bt-table td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--white2);vertical-align:middle}
-.bt-table tr:hover td{background:rgba(255,255,255,0.02)}
-.bt-table tr:last-child td{border-bottom:none}
-.bt-table td[contenteditable="true"]:focus{background:rgba(200,169,110,0.06);outline:1px solid var(--gold-border);border-radius:2px}
-.result-w{color:var(--bull);font-weight:600}
-.result-l{color:var(--bear);font-weight:600}
-.result-be{color:var(--white2)}
+/* TABLE */
+.bt-table-wrap{overflow-x:auto;border:1px solid var(--border2);border-radius:6px;margin-top:4px}
+.bt-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.bt-tbl th{padding:9px 14px;background:var(--bg3);border-bottom:1px solid var(--border2);font-family:"DM Mono",monospace;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--white3);text-align:left;white-space:nowrap;position:sticky;top:0;z-index:2}
+.bt-tbl td{padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--white2);vertical-align:middle;white-space:nowrap;max-width:200px}
+.bt-tbl tr:last-child td{border-bottom:none}
+.bt-tbl tr:hover td{background:rgba(255,255,255,0.02)}
+.cell-edit{background:none;border:none;color:var(--white2);font-family:"Syne",sans-serif;font-size:12px;width:100%;outline:none;min-width:80px;padding:0}
+.cell-edit:focus{color:var(--white);border-bottom:1px solid var(--gold-border)}
+.cell-num{background:none;border:none;color:var(--white2);font-family:"DM Mono",monospace;font-size:12px;width:80px;outline:none;padding:0;text-align:right}
+.cell-num:focus{color:var(--white);border-bottom:1px solid var(--gold-border)}
+.cell-sel{background:var(--bg3);border:1px solid rgba(255,255,255,0.06);color:var(--white2);font-family:"DM Mono",monospace;font-size:11px;padding:3px 7px;border-radius:3px;outline:none;cursor:pointer;width:100%}
+.res-W{color:var(--bull);font-weight:700}
+.res-L{color:var(--bear);font-weight:700}
+.res-BE{color:var(--white2)}
 .rr-pos{color:var(--bull)}
 .rr-neg{color:var(--bear)}
-.row-del-btn{background:none;border:none;color:transparent;cursor:pointer;font-size:11px;padding:2px 4px;transition:color 0.15s}
-tr:hover .row-del-btn{color:var(--white3)}
-.row-del-btn:hover{color:var(--bear)!important}
-.add-trade-row{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-top:1px solid var(--border2);background:var(--bg2);cursor:pointer;font-family:"DM Mono",monospace;font-size:10px;color:var(--white3);transition:all 0.15s}
-.add-trade-row:hover{background:var(--gold-dim);color:var(--gold)}
+.row-num{font-family:"DM Mono",monospace;font-size:10px;color:var(--white3);width:28px;text-align:center}
+.del-cell{width:24px;text-align:center}
+.del-btn{background:none;border:none;color:transparent;cursor:pointer;font-size:11px;padding:2px;transition:color 0.15s}
+tr:hover .del-btn{color:var(--white3)}
+.del-btn:hover{color:var(--bear)!important}
+.add-row-bar{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-top:1px solid var(--border2);background:var(--bg2);cursor:pointer;font-family:"DM Mono",monospace;font-size:10px;color:var(--white3);transition:all 0.15s;border-radius:0 0 6px 6px}
+.add-row-bar:hover{background:var(--gold-dim);color:var(--gold)}
+
+/* ANALYZE */
+.analyze-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.an-card{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:16px}
+.an-card-title{font-family:"DM Mono",monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--white3);margin-bottom:12px}
+.an-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.an-row:last-child{border-bottom:none}
+.an-label{font-size:12px;color:var(--white3)}
+.an-value{font-family:"DM Mono",monospace;font-size:13px;font-weight:500}
 </style>
 </head>
 <body class="et-loading">
@@ -76,16 +118,99 @@ tr:hover .row-del-btn{color:var(--white3)}
 </div>
 <div id="etSidebarMount"></div>
 
+<!-- MODE SELECTOR OVERLAY -->
+<div class="mode-overlay" id="modeOverlay" style="display:none">
+  <div class="mode-box">
+    <div style="font-size:40px;margin-bottom:16px" id="modeEmoji">🔬</div>
+    <div class="mode-title" id="modeName">Backtest</div>
+    <div class="mode-sub" id="modeDesc">What do you want to do?</div>
+    <div class="mode-cards">
+      <div class="mode-card" onclick="selectMode('setup')">
+        <div class="mode-card-icon">⚙️</div>
+        <div class="mode-card-title">Setup Columns</div>
+        <div class="mode-card-desc">Define what criteria you track per trade — session, pair, setup type, etc.</div>
+      </div>
+      <div class="mode-card" onclick="selectMode('trade')">
+        <div class="mode-card-icon">✍️</div>
+        <div class="mode-card-title">Add Trades</div>
+        <div class="mode-card-desc">Log your backtest trades one by one in the table.</div>
+      </div>
+      <div class="mode-card" onclick="selectMode('analyze')">
+        <div class="mode-card-icon">📊</div>
+        <div class="mode-card-title">Analyze Results</div>
+        <div class="mode-card-desc">View stats, equity curve, filters and breakdown by criteria.</div>
+      </div>
+    </div>
+    <button onclick="document.getElementById('modeOverlay').style.display='none'" style="margin-top:20px;background:none;border:none;font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,0.25);cursor:pointer;letter-spacing:0.06em">Continue without choosing →</button>
+  </div>
+</div>
+
 <div class="hub-main">
   <div class="hub-topbar">
     <a href="hub-backtests.html" style="background:none;border:1px solid var(--border2);color:var(--white3);padding:5px 10px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px;text-decoration:none;transition:all 0.2s" onmouseover="this.style.borderColor='var(--gold-border)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--white3)'">← Backtests</a>
     <div class="hub-topbar-title" style="flex:1;margin-left:10px">🔬 <strong id="btPageTitle">Backtest</strong></div>
-    <span id="saveStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)"></span>
-    <button class="et-btn-ghost" onclick="confirmDelete()" style="padding:6px 12px;font-size:11px;color:var(--bear);border-color:rgba(224,92,92,0.2)">🗑 Delete</button>
+    <span id="saveStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--bull)"></span>
+    <button onclick="document.getElementById('modeOverlay').style.display='flex'" class="et-btn-ghost" style="padding:6px 12px;font-size:11px">⊞ Switch Mode</button>
+    <button class="et-btn-ghost" onclick="confirmDelete()" style="padding:6px 12px;font-size:11px;color:var(--bear);border-color:rgba(224,92,92,0.2)">🗑</button>
   </div>
 
-  <div class="hub-content et-fade" id="btDetailContent">
-    <div style="text-align:center;padding:60px"><div class="et-spinner"></div></div>
+  <!-- BT HEADER -->
+  <div class="bt-header" id="btHeader"></div>
+
+  <!-- MODE TABS -->
+  <div style="padding:12px 20px;border-bottom:1px solid var(--border2);background:var(--bg2);display:flex;align-items:center;gap:10px">
+    <div class="mode-switcher">
+      <button class="ms-btn" id="tab-setup" onclick="switchTab('setup')">⚙ Setup</button>
+      <button class="ms-btn" id="tab-trade" onclick="switchTab('trade')">✍ Trades</button>
+      <button class="ms-btn" id="tab-analyze" onclick="switchTab('analyze')">📊 Analyze</button>
+    </div>
+    <span id="tradeCountBadge" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3)"></span>
+  </div>
+
+  <!-- SETUP PANEL -->
+  <div class="bt-panel" id="panel-setup">
+    <div class="col-builder">
+      <div class="col-builder-hdr">
+        <div class="col-builder-title">⚙ Column Builder</div>
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)">Define what you track per trade</span>
+      </div>
+
+      <!-- Fixed system columns info -->
+      <div style="padding:10px 14px;background:rgba(200,169,110,0.04);border:1px solid rgba(200,169,110,0.12);border-radius:4px;margin-bottom:12px">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);margin-bottom:6px;letter-spacing:0.1em">⚡ SYSTEM COLUMNS — always present, connected to dashboard</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span style="font-family:'DM Mono',monospace;font-size:9px;padding:3px 9px;background:var(--bg3);border:1px solid var(--gold-border);color:var(--gold);border-radius:3px">Result (W/L/BE)</span>
+          <span style="font-family:'DM Mono',monospace;font-size:9px;padding:3px 9px;background:var(--bg3);border:1px solid var(--gold-border);color:var(--gold);border-radius:3px">R:R</span>
+          <span style="font-family:'DM Mono',monospace;font-size:9px;padding:3px 9px;background:var(--bg3);border:1px solid var(--gold-border);color:var(--gold);border-radius:3px">Notes</span>
+        </div>
+      </div>
+
+      <!-- Custom columns -->
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--white3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px">Custom Columns</div>
+      <div class="col-list" id="colList"></div>
+      <button class="add-col-btn" onclick="addColumn()">＋ Add Criteria / Column</button>
+      <div style="display:flex;justify-content:flex-end;margin-top:14px">
+        <button class="et-btn-gold" onclick="saveColumns()" style="padding:8px 20px;font-size:11px">Save Columns →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRADES PANEL -->
+  <div class="bt-panel" id="panel-trade">
+    <div class="bt-table-wrap" id="btTableWrap">
+      <div style="text-align:center;padding:40px;color:var(--white3)"><div class="et-spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- ANALYZE PANEL -->
+  <div class="bt-panel" id="panel-analyze">
+    <div class="bt-stats-grid" id="btStatsGrid"></div>
+    <div class="bt-chart-wrap">
+      <div class="bt-chart-hdr">Equity Curve (Cumulative R)</div>
+      <canvas id="eqCanvas" height="140"></canvas>
+    </div>
+    <div id="btFilters"></div>
+    <div class="analyze-grid" id="analyzeGrid"></div>
   </div>
 </div>
 
@@ -93,20 +218,17 @@ tr:hover .row-del-btn{color:var(--white3)}
 <script>
 const params = new URLSearchParams(location.search);
 const BT_ID = params.get('id');
-const SETUP_MODE = params.get('setup') === '1';
-let _user, _sb, bt = null, trades = [], filteredTrades = [], filterValues = {};
-let saveTimer = null;
+let _user, _sb, bt = null, trades = [], filteredTrades = [];
+let filterVals = {}, currentTab = 'analyze';
 
-// ── COLUMN TYPES ────────────────────────────────────────────────────────
 const COL_TYPES = [
-  { val:'text',   label:'Text' },
-  { val:'number', label:'Number' },
-  { val:'select', label:'Select (dropdown)' },
-  { val:'result', label:'Result (W/L/BE)' },
-  { val:'rr',     label:'R:R (number)' },
-  { val:'date',   label:'Date' },
+  {val:'text',   label:'Text (free input)'},
+  {val:'number', label:'Number'},
+  {val:'select', label:'Select — comma separated options'},
+  {val:'date',   label:'Date'},
 ];
 
+// ── INIT ─────────────────────────────────────────────────────────────────
 async function main() {
   const res = await initEtSidebar('backtests');
   if (!res) return;
@@ -122,411 +244,468 @@ async function loadBt() {
   ]);
   if (btRes.error || !btRes.data) { window.location.href = 'hub-backtests.html'; return; }
   bt = btRes.data;
+  bt.columns = bt.columns || [];
   trades = tradeRes.data || [];
+  filteredTrades = [...trades];
+
   document.getElementById('btPageTitle').textContent = bt.name;
-  renderDetail();
-  if (SETUP_MODE) setTimeout(() => document.getElementById('colBuilder')?.scrollIntoView({ behavior: 'smooth' }), 400);
-}
 
-// ── RENDER ───────────────────────────────────────────────────────────────
-function renderDetail() {
-  const el = document.getElementById('btDetailContent');
-  const cols = bt.columns || [];
-
-  // Build filter options per text/select column
-  const filterableCols = cols.filter(c => ['text','select','result'].includes(c.type));
-
-  el.innerHTML = `
-    <!-- Header info -->
-    <div class="bt-header">
-      <div class="bt-color-dot" style="background:${bt.color||'#c8a96e'}"></div>
-      <div>
-        <div class="bt-title">${bt.name}</div>
-        ${bt.description ? `<div style="font-size:12px;color:var(--white3);margin-top:2px">${bt.description}</div>` : ''}
-      </div>
-      <div class="bt-meta-tags">
-        ${bt.symbol ? `<span class="bt-tag" style="color:${bt.color||'#c8a96e'};border-color:${bt.color||'#c8a96e'}40;background:${bt.color||'#c8a96e'}10">${bt.symbol}</span>` : ''}
-        ${bt.period ? `<span class="bt-tag">${bt.period}</span>` : ''}
-      </div>
+  // Header
+  document.getElementById('btHeader').innerHTML = `
+    <div class="bt-dot" style="background:${bt.color||'#c8a96e'}"></div>
+    <div>
+      <div class="bt-htitle">${bt.name}</div>
+      ${bt.description?`<div class="bt-hdesc">${bt.description}</div>`:''}
     </div>
+    <div class="bt-htags">
+      ${bt.symbol?`<span class="bt-htag" style="color:${bt.color||'#c8a96e'};border-color:${bt.color||'#c8a96e'}44;background:${bt.color||'#c8a96e'}10">${bt.symbol}</span>`:''}
+      ${bt.period?`<span class="bt-htag">${bt.period}</span>`:''}
+    </div>`;
 
-    <!-- Stats -->
-    <div class="bt-stats-row" id="btStatsRow"></div>
-
-    <!-- Equity curve -->
-    <div class="bt-chart-wrap">
-      <div class="bt-chart-title">Equity Curve (Cumulative R)</div>
-      <canvas id="eqCanvas"></canvas>
-    </div>
-
-    <!-- Column builder -->
-    <div class="col-builder" id="colBuilder">
-      <div class="col-builder-title">
-        <span>⚙ Column Builder</span>
-        <span style="font-size:10px;color:var(--white3);font-family:'Syne',sans-serif;text-transform:none;letter-spacing:0;font-weight:400">Define what data you track per trade</span>
-      </div>
-      <div class="col-list" id="colList"></div>
-      <button class="add-col-btn" onclick="addColumn()">＋ Add Criteria / Column</button>
-      <div style="display:flex;justify-content:flex-end;margin-top:10px">
-        <button class="et-btn-gold" onclick="saveColumns()" style="padding:7px 18px;font-size:11px">Save Columns</button>
-      </div>
-    </div>
-
-    <!-- Filters -->
-    ${filterableCols.length ? `
-    <div class="bt-filters" id="btFilters">
-      <span class="bt-filter-label">Filter by:</span>
-      ${filterableCols.map(c => {
-        if (c.type === 'result') {
-          return `<select class="bt-filter-sel" data-col="${c.id}" onchange="applyFilters()">
-            <option value="">All Results</option>
-            <option value="W">Win</option>
-            <option value="L">Loss</option>
-            <option value="BE">Breakeven</option>
-          </select>`;
-        }
-        const vals = [...new Set(trades.map(t => (t.data||{})[c.id]).filter(Boolean))].sort();
-        if (!vals.length) return '';
-        return `<select class="bt-filter-sel" data-col="${c.id}" onchange="applyFilters()">
-          <option value="">${c.name}: All</option>
-          ${vals.map(v => `<option value="${v}">${v}</option>`).join('')}
-        </select>`;
-      }).join('')}
-      <button class="bt-clear-filters" onclick="clearFilters()">✕ Clear</button>
-    </div>` : ''}
-
-    <!-- Trades table -->
-    <div class="bt-table-wrap" id="btTableWrap"></div>
-  `;
+  // Mode overlay — show on first visit or setup mode
+  const fromNew = params.get('setup') === '1';
+  if (fromNew) {
+    setupModeOverlay();
+    document.getElementById('modeOverlay').style.display = 'flex';
+  } else {
+    setupModeOverlay();
+    document.getElementById('modeOverlay').style.display = 'flex';
+  }
 
   renderColumnBuilder();
-  applyFilters();
+  switchTab('analyze');
 }
 
-// ── COLUMNS ──────────────────────────────────────────────────────────────
+function setupModeOverlay() {
+  document.getElementById('modeEmoji').textContent = bt.color ? '🔬' : '🔬';
+  document.getElementById('modeName').textContent = bt.name;
+  document.getElementById('modeDesc').textContent = bt.description || 'What do you want to do?';
+}
+
+// ── TAB SWITCHER ─────────────────────────────────────────────────────────
+function selectMode(mode) {
+  document.getElementById('modeOverlay').style.display = 'none';
+  switchTab(mode);
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  ['setup','trade','analyze'].forEach(t => {
+    document.getElementById('panel-'+t).classList.toggle('active', t===tab);
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+  });
+  if (tab === 'trade') renderTable();
+  if (tab === 'analyze') renderAnalyze();
+  document.getElementById('tradeCountBadge').textContent = trades.length + ' trades';
+}
+
+// ── COLUMN BUILDER ────────────────────────────────────────────────────────
 function renderColumnBuilder() {
   const list = document.getElementById('colList');
-  if (!list) return;
   const cols = bt.columns || [];
+  if (!cols.length) {
+    list.innerHTML = `<div style="text-align:center;padding:18px;font-size:12px;color:var(--white3)">No custom columns yet. Add your first criteria below.</div>`;
+    return;
+  }
   list.innerHTML = cols.map((col, i) => `
     <div class="col-row" data-idx="${i}">
       <span class="col-drag">⠿</span>
-      <input type="text" class="col-name-input" value="${col.name||''}" placeholder="Column name" oninput="updateCol(${i},'name',this.value)">
-      <select class="col-type-sel" onchange="updateCol(${i},'type',this.value)">
-        ${COL_TYPES.map(t => `<option value="${t.val}" ${col.type===t.val?'selected':''}>${t.label}</option>`).join('')}
+      <input type="text" class="col-name" value="${col.name||''}" placeholder="Column name (e.g. Session, Setup, Pair)" oninput="bt.columns[${i}].name=this.value">
+      <select class="col-type" onchange="updateColType(${i},this.value)">
+        ${COL_TYPES.map(t=>`<option value="${t.val}" ${col.type===t.val?'selected':''}>${t.label}</option>`).join('')}
       </select>
-      <button class="col-del" onclick="removeCol(${i})">✕</button>
+      ${col.type==='select'?`<input type="text" class="col-name" value="${col.options||''}" placeholder="Options: London,NY,Asia" oninput="bt.columns[${i}].options=this.value" style="max-width:200px">`:
+        `<span style="width:160px"></span>`}
+      <button class="col-del" onclick="removeCol(${i})" title="Remove column">✕</button>
     </div>`).join('');
 }
 
 function addColumn() {
-  const cols = bt.columns || [];
-  cols.push({ id: 'col_' + Date.now(), name: '', type: 'text' });
-  bt.columns = cols;
+  bt.columns.push({ id:'c'+Date.now(), name:'', type:'text', options:'' });
   renderColumnBuilder();
 }
 
-function updateCol(i, key, val) {
-  bt.columns[i][key] = val;
-  scheduleSave();
+function updateColType(i, val) {
+  bt.columns[i].type = val;
+  renderColumnBuilder();
 }
 
 function removeCol(i) {
+  if (!confirm('Remove this column? Data in existing trades will be lost.')) return;
   bt.columns.splice(i, 1);
   renderColumnBuilder();
-  scheduleSave();
 }
 
 async function saveColumns() {
   const { error } = await _sb.from('backtests').update({ columns: bt.columns }).eq('id', BT_ID);
   if (error) { alert('Save error: ' + error.message); return; }
   showStatus('✓ Columns saved');
-  renderDetail();
-}
-
-// ── FILTERS ──────────────────────────────────────────────────────────────
-function applyFilters() {
-  const sels = document.querySelectorAll('.bt-filter-sel');
-  filterValues = {};
-  sels.forEach(s => { if (s.value) filterValues[s.dataset.col] = s.value; });
-
-  filteredTrades = trades.filter(t => {
-    return Object.entries(filterValues).every(([colId, val]) => {
-      const cell = (t.data || {})[colId];
-      return String(cell||'').toLowerCase() === String(val).toLowerCase();
-    });
-  });
-
-  renderStats();
-  renderEquityCurve();
   renderTable();
-}
-
-function clearFilters() {
-  document.querySelectorAll('.bt-filter-sel').forEach(s => s.value = '');
-  applyFilters();
-}
-
-// ── STATS ─────────────────────────────────────────────────────────────────
-function renderStats() {
-  const col = document.getElementById('btStatsRow');
-  if (!col) return;
-  const t = filteredTrades;
-  const n = t.length;
-
-  // Find result column and RR column
-  const cols = bt.columns || [];
-  const resCol = cols.find(c => c.type === 'result');
-  const rrCol = cols.find(c => c.type === 'rr');
-
-  let wins=0, losses=0, be=0, totalRR=0, maxDD=0, streak=0, bestStreak=0, curStreak=0;
-  t.forEach(tr => {
-    const d = tr.data || {};
-    const res = resCol ? d[resCol.id] : null;
-    const rr = rrCol ? parseFloat(d[rrCol.id])||0 : 0;
-    totalRR += rr;
-    if (res === 'W') { wins++; curStreak = Math.max(0, curStreak)+1; bestStreak = Math.max(bestStreak, curStreak); }
-    else if (res === 'L') { losses++; curStreak = Math.min(0, curStreak)-1; }
-    else if (res === 'BE') be++;
-    else curStreak = 0;
-  });
-
-  // Max drawdown from equity curve
-  let peak=0, dd=0, cumRR=0;
-  t.forEach(tr => {
-    const d = tr.data||{};
-    const rr = rrCol ? parseFloat(d[rrCol.id])||0 : 0;
-    cumRR += rr;
-    if (cumRR > peak) peak = cumRR;
-    dd = Math.min(dd, cumRR - peak);
-    maxDD = Math.min(maxDD, dd);
-  });
-
-  const wr = n > 0 ? Math.round(wins/n*100) : 0;
-  const avg = n > 0 && rrCol ? (totalRR/n).toFixed(2) : '-';
-  const pfactor = losses > 0 && rrCol ? (wins/losses).toFixed(2) : '-';
-
-  col.innerHTML = [
-    { val: n, lbl: 'Trades', color: 'var(--white)' },
-    { val: wr+'%', lbl: 'Win Rate', color: wr>=50?'var(--bull)':wr<40?'var(--bear)':'var(--white)' },
-    { val: wins, lbl: 'Wins', color: 'var(--bull)' },
-    { val: losses, lbl: 'Losses', color: 'var(--bear)' },
-    { val: be, lbl: 'Breakeven', color: 'var(--white2)' },
-    { val: rrCol ? (totalRR>=0?'+':'')+totalRR.toFixed(1)+'R' : '-', lbl: 'Total R', color: rrCol?(totalRR>=0?'var(--bull)':'var(--bear)'):'var(--white2)' },
-    { val: rrCol ? avg+'R' : '-', lbl: 'Avg R/Trade', color: 'var(--white)' },
-    { val: rrCol ? (maxDD).toFixed(1)+'R' : '-', lbl: 'Max DD', color: 'var(--bear)' },
-  ].map(s => `<div class="bt-stat-box"><div class="bt-stat-val" style="color:${s.color}">${s.val}</div><div class="bt-stat-lbl">${s.lbl}</div></div>`).join('');
-}
-
-// ── EQUITY CURVE ─────────────────────────────────────────────────────────
-function renderEquityCurve() {
-  const canvas = document.getElementById('eqCanvas');
-  if (!canvas) return;
-  const cols = bt.columns || [];
-  const rrCol = cols.find(c => c.type === 'rr');
-  if (!rrCol) {
-    canvas.parentElement.innerHTML = '<div style="text-align:center;padding:24px;font-family:\'DM Mono\',monospace;font-size:11px;color:var(--white3)">Add an R:R column to see the equity curve</div>';
-    return;
-  }
-
-  // Build cumulative R series
-  let cum = 0;
-  const points = [0, ...filteredTrades.map(t => {
-    cum += parseFloat((t.data||{})[rrCol.id])||0;
-    return parseFloat(cum.toFixed(2));
-  })];
-
-  const dpr = window.devicePixelRatio || 1;
-  const W = canvas.parentElement.clientWidth - 32;
-  const H = 140;
-  canvas.width = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.width = W + 'px';
-  canvas.style.height = H + 'px';
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-
-  if (points.length < 2) {
-    ctx.fillStyle = 'rgba(255,255,255,0.15)';
-    ctx.font = "11px 'DM Mono'";
-    ctx.textAlign = 'center';
-    ctx.fillText('Add trades to see equity curve', W/2, H/2);
-    return;
-  }
-
-  const min = Math.min(...points), max = Math.max(...points);
-  const range = Math.max(max - min, 1);
-  const pad = { t:12, r:10, b:24, l:40 };
-  const gW = W - pad.l - pad.r, gH = H - pad.t - pad.b;
-
-  const xScale = (i) => pad.l + (i / (points.length-1)) * gW;
-  const yScale = (v) => pad.t + gH - ((v - min) / range) * gH;
-
-  // Zero line
-  const zeroY = yScale(0);
-  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 4]);
-  ctx.beginPath(); ctx.moveTo(pad.l, zeroY); ctx.lineTo(W-pad.r, zeroY); ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Gradient fill
-  const grad = ctx.createLinearGradient(0, pad.t, 0, H-pad.b);
-  const finalVal = points[points.length-1];
-  const mainColor = finalVal >= 0 ? '76,175,125' : '224,92,92';
-  grad.addColorStop(0, `rgba(${mainColor},0.25)`);
-  grad.addColorStop(1, `rgba(${mainColor},0)`);
-
-  ctx.beginPath();
-  ctx.moveTo(xScale(0), yScale(points[0]));
-  points.forEach((v, i) => ctx.lineTo(xScale(i), yScale(v)));
-  ctx.lineTo(xScale(points.length-1), yScale(0));
-  ctx.lineTo(xScale(0), yScale(0));
-  ctx.closePath();
-  ctx.fillStyle = grad;
-  ctx.fill();
-
-  // Line
-  ctx.beginPath();
-  ctx.strokeStyle = `rgb(${mainColor})`;
-  ctx.lineWidth = 2;
-  ctx.lineJoin = 'round';
-  ctx.moveTo(xScale(0), yScale(points[0]));
-  points.forEach((v, i) => ctx.lineTo(xScale(i), yScale(v)));
-  ctx.stroke();
-
-  // Y axis labels
-  ctx.fillStyle = 'rgba(255,255,255,0.3)';
-  ctx.font = "9px 'DM Mono'";
-  ctx.textAlign = 'right';
-  [min, 0, max].forEach(v => {
-    const y = yScale(v);
-    ctx.fillText((v>=0?'+':'')+v.toFixed(1)+'R', pad.l-4, y+3);
-  });
+  renderAnalyze();
 }
 
 // ── TABLE ─────────────────────────────────────────────────────────────────
 function renderTable() {
   const wrap = document.getElementById('btTableWrap');
-  if (!wrap) return;
   const cols = bt.columns || [];
 
-  if (!cols.length) {
-    wrap.innerHTML = `<div style="text-align:center;padding:32px;font-size:13px;color:var(--white3)">
-      <div style="font-size:28px;opacity:0.2;margin-bottom:10px">⚙</div>
-      Add columns above to start tracking trades</div>`;
-    return;
-  }
-
   const thead = `<thead><tr>
-    <th style="width:36px">#</th>
-    ${cols.map(c => `<th>${c.name||'—'}<br><span style="font-size:7px;opacity:0.5">${c.type}</span></th>`).join('')}
-    <th style="width:28px"></th>
+    <th class="row-num">#</th>
+    <th>Result</th>
+    <th>R:R</th>
+    ${cols.map(c=>`<th>${c.name||'—'}</th>`).join('')}
+    <th>Notes</th>
+    <th class="del-cell"></th>
   </tr></thead>`;
 
-  const rows = filteredTrades.map((tr, idx) => `
-    <tr data-id="${tr.id}">
-      <td style="color:var(--white3);font-family:'DM Mono',monospace;font-size:10px">${idx+1}</td>
+  const makeRow = (tr, idx) => {
+    const d = tr.data || {};
+    const res = d.__result || '';
+    const rr = d.__rr !== undefined ? d.__rr : '';
+    const notes = d.__notes || '';
+    const rrNum = parseFloat(rr);
+
+    return `<tr data-id="${tr.id}">
+      <td class="row-num">${idx+1}</td>
+      <td>
+        <select class="cell-sel" style="width:90px" onchange="updateCell('${tr.id}','__result',this.value)">
+          <option value="" ${res===''?'selected':''}>—</option>
+          <option value="W" ${res==='W'?'selected':''} style="color:var(--bull)">✓ Win</option>
+          <option value="L" ${res==='L'?'selected':''} style="color:var(--bear)">✗ Loss</option>
+          <option value="BE" ${res==='BE'?'selected':''}>↔ BE</option>
+        </select>
+      </td>
+      <td>
+        <input type="number" step="0.01" class="cell-num" value="${rr}"
+          style="color:${!isNaN(rrNum)&&rr!==''?rrNum>=0?'var(--bull)':'var(--bear)':'var(--white2)'}"
+          onchange="updateCell('${tr.id}','__rr',this.value)">
+      </td>
       ${cols.map(c => {
-        const val = (tr.data||{})[c.id]||'';
-        if (c.type === 'result') {
-          return `<td><select class="col-type-sel" style="font-size:11px" onchange="updateCell('${tr.id}','${c.id}',this.value)">
+        const val = d[c.id] || '';
+        if (c.type === 'select') {
+          const opts = (c.options||'').split(',').map(o=>o.trim()).filter(Boolean);
+          return `<td><select class="cell-sel" onchange="updateCell('${tr.id}','${c.id}',this.value)">
             <option value="">—</option>
-            <option value="W" ${val==='W'?'selected':''}>✓ Win</option>
-            <option value="L" ${val==='L'?'selected':''}>✗ Loss</option>
-            <option value="BE" ${val==='BE'?'selected':''}>↔ BE</option>
+            ${opts.map(o=>`<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('')}
           </select></td>`;
         }
-        if (c.type === 'rr') {
-          const n = parseFloat(val);
-          return `<td><input type="number" step="0.1" value="${val}" class="col-type-sel" style="font-size:11px;width:70px;color:${!isNaN(n)?n>=0?'var(--bull)':'var(--bear)':'var(--white2)'}" onchange="updateCell('${tr.id}','${c.id}',this.value)"></td>`;
+        if (c.type === 'number') {
+          return `<td><input type="number" step="any" class="cell-num" value="${val}" onchange="updateCell('${tr.id}','${c.id}',this.value)"></td>`;
         }
         if (c.type === 'date') {
-          return `<td><input type="date" value="${val}" class="col-type-sel" style="font-size:11px" onchange="updateCell('${tr.id}','${c.id}',this.value)"></td>`;
+          return `<td><input type="date" value="${val}" class="cell-sel" style="font-size:11px" onchange="updateCell('${tr.id}','${c.id}',this.value)"></td>`;
         }
-        return `<td contenteditable="true" onblur="updateCell('${tr.id}','${c.id}',this.innerText)">${val}</td>`;
+        return `<td><input type="text" class="cell-edit" value="${val.replace(/"/g,'&quot;')}" onchange="updateCell('${tr.id}','${c.id}',this.value)"></td>`;
       }).join('')}
-      <td><button class="row-del-btn" onclick="deleteTrade('${tr.id}')">✕</button></td>
-    </tr>`).join('');
+      <td><input type="text" class="cell-edit" value="${notes.replace(/"/g,'&quot;')}" placeholder="Notes..." onchange="updateCell('${tr.id}','__notes',this.value)" style="min-width:120px"></td>
+      <td class="del-cell"><button class="del-btn" onclick="deleteTrade('${tr.id}')">✕</button></td>
+    </tr>`;
+  };
+
+  const tbody = trades.length
+    ? `<tbody>${trades.map(makeRow).join('')}</tbody>`
+    : `<tbody><tr><td colspan="${cols.length+5}" style="text-align:center;padding:32px;color:var(--white3);font-size:13px">No trades yet — add your first below</td></tr></tbody>`;
 
   wrap.innerHTML = `
-    <table class="bt-table">
-      ${thead}
-      <tbody>${rows || `<tr><td colspan="${cols.length+2}" style="text-align:center;padding:28px;color:var(--white3);font-size:12px">No trades yet — add your first trade below</td></tr>`}</tbody>
-    </table>
-    <div class="add-trade-row" onclick="addTrade()">＋ Add Trade</div>`;
+    <table class="bt-tbl">${thead}${tbody}</table>
+    <div class="add-row-bar" onclick="addTrade()">＋ Add Trade</div>`;
 }
 
 // ── TRADE CRUD ────────────────────────────────────────────────────────────
 async function addTrade() {
-  const { data, error } = await _sb.from('backtest_trades').insert({
-    backtest_id: BT_ID, user_id: _user.id, data: {}
-  }).select().single();
-  if (error) { alert('Error: ' + error.message); return; }
+  const { data, error } = await _sb.from('backtest_trades')
+    .insert({ backtest_id: BT_ID, user_id: _user.id, data: {} })
+    .select().single();
+  if (error) { alert('Error: '+error.message); return; }
   trades.push(data);
-  applyFilters();
-  await updateBtStats();
+  renderTable();
+  await syncStats();
+  document.getElementById('tradeCountBadge').textContent = trades.length + ' trades';
 }
 
 async function updateCell(tradeId, colId, val) {
   const tr = trades.find(t => t.id === tradeId);
   if (!tr) return;
   tr.data = tr.data || {};
-  tr.data[colId] = val.trim();
-  await _sb.from('backtest_trades').update({ data: tr.data }).eq('id', tradeId);
-  applyFilters();
-  await updateBtStats();
+  // Store value directly (val from input/select — already a string or number)
+  tr.data[colId] = String(val).trim();
+  const { error } = await _sb.from('backtest_trades').update({ data: tr.data }).eq('id', tradeId);
+  if (error) { showStatus('⚠ Error saving'); return; }
   showStatus('✓ Saved');
+  await syncStats();
 }
 
 async function deleteTrade(id) {
   if (!confirm('Delete this trade?')) return;
   trades = trades.filter(t => t.id !== id);
   await _sb.from('backtest_trades').delete().eq('id', id);
-  applyFilters();
-  await updateBtStats();
+  renderTable();
+  await syncStats();
+  if (currentTab === 'analyze') renderAnalyze();
+  document.getElementById('tradeCountBadge').textContent = trades.length + ' trades';
 }
 
-async function updateBtStats() {
-  const cols = bt.columns || [];
-  const resCol = cols.find(c => c.type === 'result');
-  const rrCol = cols.find(c => c.type === 'rr');
+// ── STATS SYNC ────────────────────────────────────────────────────────────
+async function syncStats() {
+  // Use __result and __rr (system keys)
   let wins=0, losses=0, be=0, totalRR=0;
   trades.forEach(t => {
     const d = t.data || {};
-    const res = resCol ? d[resCol.id] : null;
+    if (d.__result === 'W') wins++;
+    else if (d.__result === 'L') losses++;
+    else if (d.__result === 'BE') be++;
+    const rr = parseFloat(d.__rr);
+    if (!isNaN(rr)) totalRR += rr;
+  });
+  const stats = {
+    trades: trades.length, wins, losses, breakeven: be,
+    total_rr: parseFloat(totalRR.toFixed(3))
+  };
+  await _sb.from('backtests').update({ stats }).eq('id', BT_ID);
+  bt.stats = stats;
+  if (currentTab === 'analyze') renderAnalyze();
+}
+
+// ── ANALYZE ───────────────────────────────────────────────────────────────
+function getStats(tradeSet) {
+  let wins=0, losses=0, be=0, totalRR=0, maxDD=0, peak=0, cum=0;
+  const rrSeries = [0];
+
+  tradeSet.forEach(t => {
+    const d = t.data || {};
+    const res = d.__result;
+    const rr = parseFloat(d.__rr) || 0;
     if (res === 'W') wins++;
     else if (res === 'L') losses++;
     else if (res === 'BE') be++;
-    if (rrCol) totalRR += parseFloat(d[rrCol.id])||0;
+    totalRR += rr;
+    cum += rr; rrSeries.push(parseFloat(cum.toFixed(3)));
+    if (cum > peak) peak = cum;
+    maxDD = Math.min(maxDD, cum - peak);
   });
-  const stats = { trades: trades.length, wins, losses, breakeven: be, total_rr: parseFloat(totalRR.toFixed(2)) };
-  await _sb.from('backtests').update({ stats }).eq('id', BT_ID);
-  bt.stats = stats;
+
+  const n = tradeSet.length;
+  const wr = n>0 ? (wins/n*100) : 0;
+  const avgR = n>0 ? totalRR/n : 0;
+  const pf = losses>0 ? wins/losses : wins>0 ? Infinity : 0;
+  const exp = n>0 ? (wr/100 * avgR - (1-wr/100) * Math.abs(avgR)) : 0;
+
+  return { n, wins, losses, be, totalRR, wr, avgR, pf, exp, maxDD, rrSeries };
+}
+
+function applyFilters() {
+  const sels = document.querySelectorAll('.bf-sel[data-col]');
+  filterVals = {};
+  sels.forEach(s => { if (s.value) filterVals[s.dataset.col] = s.value; });
+
+  filteredTrades = trades.filter(t => {
+    return Object.entries(filterVals).every(([col, val]) => {
+      const cell = String((t.data||{})[col]||'').toLowerCase();
+      return cell === val.toLowerCase();
+    });
+  });
+
+  const st = getStats(filteredTrades);
+  renderStatsGrid(st);
+  renderEquityCurve(st.rrSeries);
+  renderBreakdowns();
+}
+
+function clearFilters() {
+  document.querySelectorAll('.bf-sel[data-col]').forEach(s => s.value='');
+  applyFilters();
+}
+
+function renderAnalyze() {
+  filteredTrades = [...trades];
+  filterVals = {};
+  renderFilterBar();
+  applyFilters();
+}
+
+function renderFilterBar() {
+  const el = document.getElementById('btFilters');
+  const cols = bt.columns || [];
+  const filterCols = cols.filter(c => ['select','text'].includes(c.type) && c.name);
+
+  // Also filter by Result
+  let html = `<div class="bt-filters">
+    <span class="bf-lbl">Filter:</span>
+    <select class="bf-sel" data-col="__result" onchange="applyFilters()">
+      <option value="">All Results</option>
+      <option value="W">Win</option>
+      <option value="L">Loss</option>
+      <option value="BE">Breakeven</option>
+    </select>`;
+
+  filterCols.forEach(c => {
+    const vals = [...new Set(trades.map(t=>(t.data||{})[c.id]).filter(v=>v&&v.trim()))].sort();
+    if (!vals.length) return;
+    html += `<select class="bf-sel" data-col="${c.id}" onchange="applyFilters()">
+      <option value="">${c.name}: All</option>
+      ${vals.map(v=>`<option value="${v}">${v}</option>`).join('')}
+    </select>`;
+  });
+
+  html += `<button class="bf-clear" onclick="clearFilters()">✕ Clear</button>
+    <span class="filter-count" id="filterCount"></span>
+  </div>`;
+  el.innerHTML = html;
+}
+
+function renderStatsGrid(st) {
+  const grid = document.getElementById('btStatsGrid');
+  const pct = (v, dec=1) => isFinite(v) ? v.toFixed(dec)+'%' : '—';
+  const r = (v, pre='') => isNaN(v)||!isFinite(v) ? '—' : (v>=0?pre+'+':pre)+v.toFixed(2)+'R';
+
+  const wr = st.wr;
+  const pf = isFinite(st.pf) ? st.pf.toFixed(2) : '∞';
+
+  grid.innerHTML = [
+    {val: st.n, lbl:'Trades', c:'var(--white)'},
+    {val: wr.toFixed(1)+'%', lbl:'Win Rate', c: wr>=50?'var(--bull)':wr<40?'var(--bear)':'var(--white)'},
+    {val: st.wins, lbl:'Wins', c:'var(--bull)'},
+    {val: st.losses, lbl:'Losses', c:'var(--bear)'},
+    {val: st.be, lbl:'Breakeven', c:'var(--white2)'},
+    {val: (st.totalRR>=0?'+':'')+st.totalRR.toFixed(2)+'R', lbl:'Total R', c: st.totalRR>=0?'var(--bull)':'var(--bear)'},
+    {val: r(st.avgR), lbl:'Avg R/Trade', c:'var(--white)'},
+    {val: pf, lbl:'Profit Factor', c: parseFloat(pf)>=1?'var(--bull)':'var(--bear)'},
+    {val: r(st.exp), lbl:'Expectancy', c: st.exp>=0?'var(--bull)':'var(--bear)'},
+    {val: st.maxDD.toFixed(2)+'R', lbl:'Max Drawdown', c:'var(--bear)'},
+  ].map(s=>`<div class="bsg-cell"><div class="bsg-val" style="color:${s.c}">${s.val}</div><div class="bsg-lbl">${s.lbl}</div></div>`).join('');
+
+  const fc = document.getElementById('filterCount');
+  if (fc) {
+    const active = Object.values(filterVals).filter(Boolean).length;
+    fc.textContent = active ? `${filteredTrades.length} of ${trades.length} trades` : '';
+    fc.style.display = active ? '' : 'none';
+  }
+}
+
+function renderEquityCurve(series) {
+  const canvas = document.getElementById('eqCanvas');
+  if (!canvas) return;
+
+  if (series.length < 2) {
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.parentElement.clientWidth - 32;
+    canvas.height = 80;
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.font = "11px 'DM Mono'";
+    ctx.textAlign = 'center';
+    ctx.fillText('Add trades with R:R values to see equity curve', canvas.width/2, 45);
+    return;
+  }
+
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.clientWidth - 32;
+  const H = 140;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const min = Math.min(...series), max = Math.max(...series);
+  const range = Math.max(max - min, 0.1);
+  const pad = {t:12, r:8, b:24, l:44};
+  const gW = W - pad.l - pad.r, gH = H - pad.t - pad.b;
+  const xS = i => pad.l + (i/(series.length-1))*gW;
+  const yS = v => pad.t + gH - ((v-min)/range)*gH;
+
+  // Zero line
+  if (min <= 0 && max >= 0) {
+    const zy = yS(0);
+    ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(pad.l,zy); ctx.lineTo(W-pad.r,zy); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  const finalVal = series[series.length-1];
+  const mc = finalVal >= 0 ? '76,175,125' : '224,92,92';
+
+  // Fill
+  const grad = ctx.createLinearGradient(0,pad.t,0,H-pad.b);
+  grad.addColorStop(0,`rgba(${mc},0.2)`);
+  grad.addColorStop(1,`rgba(${mc},0)`);
+  ctx.beginPath();
+  ctx.moveTo(xS(0), yS(series[0]));
+  series.forEach((v,i) => ctx.lineTo(xS(i),yS(v)));
+  ctx.lineTo(xS(series.length-1), yS(0<=min?min:0));
+  ctx.lineTo(xS(0), yS(0<=min?min:0));
+  ctx.closePath();
+  ctx.fillStyle=grad; ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.strokeStyle=`rgb(${mc})`; ctx.lineWidth=2; ctx.lineJoin='round';
+  ctx.moveTo(xS(0),yS(series[0]));
+  series.forEach((v,i)=>ctx.lineTo(xS(i),yS(v)));
+  ctx.stroke();
+
+  // Dots at start/end
+  [[0, series[0]],[series.length-1,series[series.length-1]]].forEach(([i,v])=>{
+    ctx.beginPath();
+    ctx.arc(xS(i),yS(v),3,0,Math.PI*2);
+    ctx.fillStyle=`rgb(${mc})`; ctx.fill();
+  });
+
+  // Labels
+  ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.font=`9px 'DM Mono'`; ctx.textAlign='right';
+  [min,0,max].filter((v,i,a)=>a.indexOf(v)===i).forEach(v=>{
+    ctx.fillText((v>=0?'+':'')+v.toFixed(1)+'R', pad.l-4, yS(v)+3);
+  });
+
+  // X axis trade numbers
+  ctx.textAlign='center'; ctx.fillStyle='rgba(255,255,255,0.2)';
+  const step = Math.ceil(series.length/8);
+  series.forEach((_,i)=>{ if(i%step===0||i===series.length-1) ctx.fillText(i, xS(i), H-pad.b+14); });
+}
+
+function renderBreakdowns() {
+  const grid = document.getElementById('analyzeGrid');
+  const cols = bt.columns || [];
+  const selectCols = cols.filter(c => c.type==='select' && c.name);
+
+  if (!selectCols.length) {
+    grid.innerHTML = `<div style="color:var(--white3);font-size:12px;padding:16px;text-align:center;grid-column:1/-1">Add <strong>Select</strong> type columns (e.g. Session, Setup) to see breakdowns per criteria</div>`;
+    return;
+  }
+
+  grid.innerHTML = selectCols.map(col => {
+    const opts = (col.options||'').split(',').map(o=>o.trim()).filter(Boolean);
+    const rows = opts.map(opt => {
+      const subset = filteredTrades.filter(t=>(t.data||{})[col.id]===opt);
+      const st = getStats(subset);
+      const wr = st.n>0 ? st.wr.toFixed(0)+'%' : '—';
+      const tr = st.n>0 ? (st.totalRR>=0?'+':'')+st.totalRR.toFixed(2)+'R' : '—';
+      return `<div class="an-row">
+        <span class="an-label">${opt}</span>
+        <div style="display:flex;gap:12px;align-items:center">
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--white3)">${st.n} trades</span>
+          <span class="an-value" style="color:${st.wr>=50?'var(--bull)':st.wr<40&&st.n>0?'var(--bear)':'var(--white2)'}">${wr}</span>
+          <span class="an-value" style="color:${st.totalRR>=0&&st.n>0?'var(--bull)':st.n>0?'var(--bear)':'var(--white2)'};min-width:48px;text-align:right">${tr}</span>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="an-card"><div class="an-card-title">By ${col.name}</div>${rows||'<div style="color:var(--white3);font-size:12px">No data</div>'}</div>`;
+  }).join('');
 }
 
 async function confirmDelete() {
-  if (!confirm('Delete this entire backtest and all its trades? This cannot be undone.')) return;
+  if (!confirm('Delete this entire backtest and all its trades?')) return;
   await _sb.from('backtest_trades').delete().eq('backtest_id', BT_ID);
   await _sb.from('backtests').delete().eq('id', BT_ID);
   window.location.href = 'hub-backtests.html';
-}
-
-function scheduleSave() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveColumns, 1500);
 }
 
 function showStatus(msg) {
   const el = document.getElementById('saveStatus');
   if (!el) return;
   el.textContent = msg;
-  setTimeout(() => el.textContent = '', 2500);
+  setTimeout(()=>el.textContent='', 2500);
 }
 
-window.addEventListener('resize', () => {
-  if (filteredTrades.length) renderEquityCurve();
-});
+window.addEventListener('resize', ()=>{ if(currentTab==='analyze') renderEquityCurve(getStats(filteredTrades).rrSeries); });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="main()"></script>
 </body>
