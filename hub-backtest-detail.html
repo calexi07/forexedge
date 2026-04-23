@@ -313,13 +313,15 @@ function renderColumnBuilder() {
   }
   list.innerHTML = cols.map((col, i) => `
     <div class="col-row" data-idx="${i}"
-      draggable="true"
-      ondragstart="colDragStart(event,${i})"
       ondragover="colDragOver(event,${i})"
       ondragleave="colDragLeave(event)"
       ondrop="colDrop(event,${i})"
       ondragend="colDragEnd(event)">
-      <span class="col-drag" title="Drag to reorder">⠿</span>
+      <span class="col-drag" title="Drag to reorder"
+        draggable="true"
+        ondragstart="colDragStart(event,${i})"
+        onmousedown="this.closest('.col-row').setAttribute('draggable','true')"
+        onmouseup="this.closest('.col-row').setAttribute('draggable','false')">⠿</span>
       <input type="text" class="col-name" value="${col.name||''}" placeholder="Column name (e.g. Session, Setup, Pair)" oninput="bt.columns[${i}].name=this.value">
       <select class="col-type" onchange="updateColType(${i},this.value)">
         ${COL_TYPES.map(t=>`<option value="${t.val}" ${col.type===t.val?'selected':''}>${t.label}</option>`).join('')}
@@ -707,32 +709,30 @@ let _dragIdx = null;
 function colDragStart(e, idx) {
   _dragIdx = idx;
   e.dataTransfer.effectAllowed = 'move';
-  // Small delay so the element doesn't disappear instantly
-  setTimeout(() => {
-    const el = document.querySelector(`.col-row[data-idx="${idx}"]`);
-    if (el) el.classList.add('dragging');
-  }, 0);
+  e.dataTransfer.setData('text/plain', idx); // required for Firefox
+  const row = e.target.closest('.col-row');
+  setTimeout(() => { if(row) row.classList.add('dragging'); }, 0);
 }
 
 function colDragOver(e, idx) {
   e.preventDefault();
+  e.stopPropagation();
   e.dataTransfer.dropEffect = 'move';
-  if (idx === _dragIdx) return;
   document.querySelectorAll('.col-row').forEach(el => el.classList.remove('drag-over'));
-  const el = document.querySelector(`.col-row[data-idx="${idx}"]`);
-  if (el) el.classList.add('drag-over');
+  if (idx !== _dragIdx) {
+    const el = document.querySelector(`.col-row[data-idx="${idx}"]`);
+    if (el) el.classList.add('drag-over');
+  }
 }
 
 function colDragLeave(e) {
-  if (!e.currentTarget.contains(e.relatedTarget)) {
-    e.currentTarget.classList.remove('drag-over');
-  }
+  e.currentTarget.classList.remove('drag-over');
 }
 
 function colDrop(e, toIdx) {
   e.preventDefault();
-  if (_dragIdx === null || _dragIdx === toIdx) return;
-  // Reorder bt.columns array
+  e.stopPropagation();
+  if (_dragIdx === null || _dragIdx === toIdx) { colDragEnd(e); return; }
   const cols = bt.columns;
   const moved = cols.splice(_dragIdx, 1)[0];
   cols.splice(toIdx, 0, moved);
@@ -744,6 +744,7 @@ function colDrop(e, toIdx) {
 function colDragEnd(e) {
   document.querySelectorAll('.col-row').forEach(el => {
     el.classList.remove('dragging', 'drag-over');
+    el.setAttribute('draggable', 'false');
   });
   _dragIdx = null;
 }
