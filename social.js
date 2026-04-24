@@ -35,15 +35,13 @@ const EP_SOCIAL = (() => {
   }
 
   async function ensureProfile() {
-    const { data } = await _sb.from('profiles').select('id').eq('id', _user.id).single();
-    if (!data) {
-      const name = _user.user_metadata?.full_name || _user.email?.split('@')[0] || 'Trader';
-      await _sb.from('profiles').upsert({
-        id: _user.id,
-        display_name: name,
-        username: name.toLowerCase().replace(/\s+/g,'_') + '_' + _user.id.slice(0,4)
-      }, { onConflict: 'id' });
-    }
+    const name = _user.user_metadata?.full_name || _user.email?.split('@')[0] || 'Trader';
+    // Always upsert to ensure profile exists and is up to date
+    await _sb.from('profiles').upsert({
+      id: _user.id,
+      display_name: name,
+      username: name.toLowerCase().replace(/[^a-z0-9]/g,'_') + '_' + _user.id.slice(0,4)
+    }, { onConflict: 'id' });
   }
 
   async function updatePresence(online) {
@@ -289,7 +287,15 @@ const EP_SOCIAL = (() => {
     });
     const active = document.getElementById('ftab-' + tab);
     if (active) { active.classList.add('active'); active.style.color = '#c8a96e'; active.style.borderBottomColor = '#c8a96e'; }
-    renderFriendsList();
+    if (tab === 'search' && !_allProfiles.length) {
+      loadAllProfiles().then(() => {
+        _searchResults = _allProfiles;
+        renderFriendsList();
+      });
+    } else {
+      if (tab === 'search' && !_searchResults.length) _searchResults = _allProfiles;
+      renderFriendsList();
+    }
   }
 
   async function loadFriends() {
@@ -365,7 +371,8 @@ const EP_SOCIAL = (() => {
       }).join('');
     } else if (_currentTab === 'search') {
       if (!_searchResults.length) {
-        list.innerHTML = '<div style="text-align:center;padding:24px;font-size:12px;color:rgba(255,255,255,0.25)">Type a name to search traders</div>';
+        list.innerHTML = '<div style="text-align:center;padding:24px;font-size:12px;color:rgba(255,255,255,0.25)"><div class="et-spinner" style="margin:0 auto 10px"></div>Loading traders...</div>';
+      loadAllProfiles().then(() => { _searchResults = _allProfiles; renderFriendsList(); });
         return;
       }
       list.innerHTML = _searchResults.map(u => {
@@ -406,16 +413,49 @@ const EP_SOCIAL = (() => {
   }
 
   let _searchTimer;
+  let _allProfiles = [];
+
+  async function loadAllProfiles() {
+    // Load all profiles except self for Explore tab
+    const { data } = await _sb.from('profiles')
+      .select('id,display_name,username,avatar_url')
+      .neq('id', _user.id)
+      .limit(50);
+    _allProfiles = data || [];
+  }
+
   async function searchUsers(q) {
     clearTimeout(_searchTimer);
     showFriendsTab('search');
-    if (!q.trim()) { _searchResults = []; renderFriendsList(); return; }
-    _searchTimer = setTimeout(async () => {
-      const { data } = await _sb.from('profiles').select('id,display_name,username,avatar_url')
-        .or(`display_name.ilike.%${q}%,username.ilike.%${q}%`).limit(15);
-      _searchResults = data || [];
+    const query = q.trim().toLowerCase();
+    if (!query) {
+      // Show all users when search is empty
+      _searchResults = _allProfiles;
       renderFriendsList();
-    }, 350);
+      return;
+    }
+    _searchTimer = setTimeout(() => {
+      // Client-side filter (faster, works even if ilike fails)
+      _searchResults = _allProfiles.filter(u =>
+        (u.display_name||'').toLowerCase().includes(query) ||
+        (u.username||'').toLowerCase().includes(query)
+      );
+      // Also try DB search in case profile wasn't in initial load
+      _sb.from('profiles')
+        .select('id,display_name,username,avatar_url')
+        .or(`display_name.ilike.%${q}%,username.ilike.%${q}%`)
+        .neq('id', _user.id)
+        .limit(15)
+        .then(({ data }) => {
+          if (data?.length) {
+            // Merge results deduped
+            const ids = new Set(_searchResults.map(u => u.id));
+            _searchResults = [..._searchResults, ...data.filter(u => !ids.has(u.id))];
+            renderFriendsList();
+          }
+        });
+      renderFriendsList();
+    }, 200);
   }
 
   async function sendFriendRequest(toUserId, toName) {
