@@ -304,15 +304,23 @@ const EP_SOCIAL = (() => {
   }
 
   async function loadFriends() {
-    // Two separate queries to avoid RLS issues with nested selects + or filter
+    // Get friendship IDs first, then load profiles separately
     const [sentRes, recvRes] = await Promise.all([
-      _sb.from('friendships').select('id,requester_id,addressee_id,status,addressee:addressee_id(id,display_name,avatar_url,username)').eq('requester_id', _user.id).eq('status','accepted'),
-      _sb.from('friendships').select('id,requester_id,addressee_id,status,requester:requester_id(id,display_name,avatar_url,username)').eq('addressee_id', _user.id).eq('status','accepted')
+      _sb.from('friendships').select('id,addressee_id').eq('requester_id', _user.id).eq('status','accepted'),
+      _sb.from('friendships').select('id,requester_id').eq('addressee_id', _user.id).eq('status','accepted')
     ]);
-    const sentFriends = (sentRes.data||[]).map(f => f.addressee).filter(Boolean);
-    const recvFriends = (recvRes.data||[]).map(f => f.requester).filter(Boolean);
-    const allFriends = [...sentFriends, ...recvFriends];
-    const data = allFriends.map(f => ({ requester_id: _user.id, addressee_id: f.id, requester: f, addressee: f }));
+    const friendIds = [
+      ...(sentRes.data||[]).map(f => f.addressee_id),
+      ...(recvRes.data||[]).map(f => f.requester_id)
+    ].filter(Boolean);
+
+    // Load profiles for all friends
+    let friendProfiles = [];
+    if (friendIds.length) {
+      const { data: profiles } = await _sb.from('profiles').select('id,display_name,username,avatar_url').in('id', friendIds);
+      friendProfiles = profiles || [];
+    }
+    const data = friendProfiles.map(f => ({ requester_id: _user.id, addressee_id: f.id, requester: f, addressee: f }));
 
     // Load presence for all friends
     const friendIds = (data||[]).map(f => f.requester_id === _user.id ? f.addressee_id : f.requester_id);
@@ -339,10 +347,16 @@ const EP_SOCIAL = (() => {
   }
 
   async function loadRequests() {
-    const { data } = await _sb.from('friendships')
-      .select('*, requester:requester_id(id,display_name,avatar_url,username)')
+    const { data: reqs } = await _sb.from('friendships')
+      .select('id,requester_id,created_at')
       .eq('addressee_id', _user.id).eq('status', 'pending');
-    _requests = data || [];
+    if (!reqs?.length) { _requests = []; return; }
+    // Load requester profiles separately
+    const reqIds = reqs.map(r => r.requester_id);
+    const { data: profiles } = await _sb.from('profiles').select('id,display_name,username,avatar_url').in('id', reqIds);
+    const profileMap = {};
+    (profiles||[]).forEach(p => profileMap[p.id] = p);
+    _requests = reqs.map(r => ({ ...r, requester: profileMap[r.requester_id] || { id: r.requester_id, display_name: 'Trader' } }));
     const badge = document.getElementById('epReqBadge');
     if (badge) { badge.textContent = _requests.length; badge.style.display = _requests.length ? 'inline' : 'none'; }
     if (_currentTab === 'requests') renderFriendsList();
@@ -578,9 +592,14 @@ const EP_SOCIAL = (() => {
     if (_chatSub) _sb.removeChannel(_chatSub);
     if (!_activeChatUser) return;
     const convId = convKey(_user.id, _activeChatUser.id);
-    _chatSub = _sb.channel('chat-' + convId)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${convId}` }, () => loadMessages())
-      .subscribe();
+    try {
+      _chatSub = _sb.channel('ep-chat-' + convId)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${convId}` }, () => loadMessages())
+        .subscribe();
+    } catch(e) {
+      // Poll every 3s as fallback
+      _chatSub = setInterval(() => loadMessages(), 3000);
+    }
   }
 
   async function sendMessage() {
@@ -647,9 +666,18 @@ const EP_SOCIAL = (() => {
 
   // ── REALTIME (notifications) ──────────────────────────────────────────
   function subscribeRealtime() {
-    _sb.channel('notifications-' + _user.id)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${_user.id}` }, () => loadNotifications())
-      .subscribe();
+    try {
+      _sb.channel('ep-notifs-' + _user.id)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${_user.id}` }, () => loadNotifications())
+        .subscribe((status, err) => {
+          if (err) console.warn('[Social] Realtime not available - polling instead');
+        });
+      // Fallback: poll notifications every 30s if WebSocket fails
+      setInterval(() => loadNotifications(), 30000);
+    } catch(e) {
+      console.warn('[Social] Realtime disabled:', e.message);
+      setInterval(() => loadNotifications(), 30000);
+    }
   }
 
   // ── UTILS ─────────────────────────────────────────────────────────────
