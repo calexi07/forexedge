@@ -17,7 +17,7 @@ const EP_SOCIAL = (() => {
   // ── INIT ─────────────────────────────────────────────────────────────
   async function init() {
     try {
-      _sb = getNavSB() || window.supabase.createClient(SB_URL, SB_KEY);
+      _sb = (typeof getNavSB === 'function' ? getNavSB() : null) || window.supabase.createClient(SB_URL, SB_KEY);
       const { data: { session } } = await _sb.auth.getSession();
       if (!session?.user) return;
       _session = session;
