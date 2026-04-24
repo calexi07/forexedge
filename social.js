@@ -279,18 +279,27 @@ const EP_SOCIAL = (() => {
   }
 
   // ── FRIENDS SIDEBAR ───────────────────────────────────────────────────
+  let _unreadBySender = {}; // { senderId: count }
+
   async function updateUnreadBadge() {
     try {
-      const { count } = await _sb.from('messages')
-        .select('id', { count:'exact', head:true })
+      const { data } = await _sb.from('messages')
+        .select('sender_id')
         .eq('receiver_id', _user.id).eq('read', false);
-      const n = count || 0;
+      // Count per sender
+      _unreadBySender = {};
+      (data||[]).forEach(m => {
+        _unreadBySender[m.sender_id] = (_unreadBySender[m.sender_id]||0) + 1;
+      });
+      const total = (data||[]).length;
       // Friends button badge
       const msgBadge = document.getElementById('epMsgBadge');
       if (msgBadge) {
-        msgBadge.textContent = n > 9 ? '9+' : n;
-        msgBadge.style.display = n > 0 ? 'flex' : 'none';
+        msgBadge.textContent = total > 9 ? '9+' : total;
+        msgBadge.style.display = total > 0 ? 'flex' : 'none';
       }
+      // Re-render friends list to show per-friend dots
+      if (_currentTab === 'friends') renderFriendsList();
     } catch(e) {}
   }
 
@@ -378,7 +387,12 @@ const EP_SOCIAL = (() => {
       last_seen: presence[f.id]?.last_seen
     }));
 
-    _friends.sort((a,b) => (b.online?1:0) - (a.online?1:0));
+    _friends.sort((a,b) => {
+      const aUnread = _unreadBySender[a.id] || 0;
+      const bUnread = _unreadBySender[b.id] || 0;
+      if (bUnread !== aUnread) return bUnread - aUnread; // unread first
+      return (b.online?1:0) - (a.online?1:0); // then online
+    });
 
     await updateUnreadBadge();
 
@@ -411,9 +425,16 @@ const EP_SOCIAL = (() => {
         list.innerHTML = '<div style="text-align:center;padding:24px;font-size:12px;color:rgba(255,255,255,0.25)">No friends yet. Search for traders to connect!</div>';
         return;
       }
-      list.innerHTML = _friends.map(f => avatarRow(f, f.online, () =>
-        `<button onclick="EP_SOCIAL.openChatById('${f.id}')" style="background:rgba(200,169,110,0.1);border:1px solid rgba(200,169,110,0.2);color:#c8a96e;padding:3px 8px;border-radius:3px;font-family:'DM Mono',monospace;font-size:9px;cursor:pointer">Chat</button>`
-      )).join('');
+      const withUnread = _friends.filter(f => _unreadBySender[f.id]);
+      const withoutUnread = _friends.filter(f => !_unreadBySender[f.id]);
+      let html = '';
+      if (withUnread.length) {
+        html += `<div style="padding:6px 14px 4px;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:#e05c5c">● Unread Messages</div>`;
+        html += withUnread.map(f => avatarRow(f, f.online)).join('');
+        if (withoutUnread.length) html += `<div style="padding:6px 14px 4px;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.2);margin-top:4px">All Friends</div>`;
+      }
+      html += withoutUnread.map(f => avatarRow(f, f.online)).join('');
+      list.innerHTML = html;
     } else if (_currentTab === 'requests') {
       if (!_requests.length) {
         list.innerHTML = '<div style="text-align:center;padding:24px;font-size:12px;color:rgba(255,255,255,0.25)">No pending requests</div>';
@@ -468,11 +489,15 @@ const EP_SOCIAL = (() => {
   }
 
   function avatarRow(user, online, actionsFn) {
-    return `<div class="ep-friend-row" onclick="EP_SOCIAL.openChatById('${user.id}')">
-      ${avatarHtml(user, online)}
+    const unread = _unreadBySender[user.id] || 0;
+    return `<div class="ep-friend-row" onclick="EP_SOCIAL.openChatById('${user.id}')" style="${unread?'background:rgba(200,169,110,0.04)':''}">
+      <div style="position:relative;flex-shrink:0">
+        ${avatarHtml(user, online)}
+        ${unread ? `<span style="position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;background:#e05c5c;border-radius:100px;font-family:'DM Mono',monospace;font-size:8px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid #0c0e14;padding:0 3px">${unread}</span>` : ''}
+      </div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${user.display_name||user.username||'Trader'}</div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:${online?'#4caf7d':'rgba(255,255,255,0.3)'}">${online?'● Online':('Last seen '+timeAgo(user.last_seen))}</div>
+        <div style="font-size:13px;font-weight:${unread?'700':'600'};color:${unread?'#fff':'#fff'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${user.display_name||user.username||'Trader'}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:${unread?'#c8a96e':online?'#4caf7d':'rgba(255,255,255,0.3)'}">${unread?unread+' new message'+(unread>1?'s':''):online?'● Online':('Last seen '+timeAgo(user.last_seen))}</div>
       </div>
       ${actionsFn ? actionsFn() : ''}
     </div>`;
