@@ -201,6 +201,15 @@ const EP_SOCIAL = (() => {
       #epFriendsList::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px}
     `;
     document.head.appendChild(style);
+    // Escape key closes sidebar and chat
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if (_friendsOpen) closeFriends();
+        if (_activeChatUser) closeChat();
+        const dd = document.getElementById('epNotifDropdown');
+        if (dd) dd.style.display = 'none';
+      }
+    });
   }
 
   // ── NOTIFICATIONS ─────────────────────────────────────────────────────
@@ -270,6 +279,24 @@ const EP_SOCIAL = (() => {
   }
 
   // ── FRIENDS SIDEBAR ───────────────────────────────────────────────────
+  async function updateUnreadBadge() {
+    try {
+      const { count } = await _sb.from('messages')
+        .select('id', { count:'exact', head:true })
+        .eq('receiver_id', _user.id).eq('read', false);
+      const n = count || 0;
+      // Friends button badge
+      const msgBadge = document.getElementById('epMsgBadge');
+      if (msgBadge) {
+        msgBadge.textContent = n > 9 ? '9+' : n;
+        msgBadge.style.display = n > 0 ? 'flex' : 'none';
+      }
+    } catch(e) {}
+  }
+
+  // Poll unread count every 5 seconds
+  setInterval(() => { if (_user) updateUnreadBadge(); }, 5000);
+
   let _friendsOpen = false;
   let _currentTab = 'friends';
   let _friends = [], _requests = [], _searchResults = [];
@@ -291,7 +318,11 @@ const EP_SOCIAL = (() => {
 
   function closeFriends() {
     _friendsOpen = false;
-    document.getElementById('epFriendsSidebar').style.transform = 'translateX(100%)';
+    const sidebar = document.getElementById('epFriendsSidebar');
+    if (sidebar) sidebar.style.transform = 'translateX(100%)';
+    // Also update friends button appearance
+    const btn = document.getElementById('epFriendsBtn');
+    if (btn) btn.style.background = '#0c0e14';
   }
 
   function showFriendsTab(tab) {
@@ -349,11 +380,7 @@ const EP_SOCIAL = (() => {
 
     _friends.sort((a,b) => (b.online?1:0) - (a.online?1:0));
 
-    // Unread messages count
-    const { count } = await _sb.from('messages').select('id', { count:'exact' })
-      .eq('receiver_id', _user.id).eq('read', false);
-    const msgBadge = document.getElementById('epMsgBadge');
-    if (msgBadge) { msgBadge.textContent = count; msgBadge.style.display = count > 0 ? 'flex' : 'none'; }
+    await updateUnreadBadge();
 
     if (_currentTab === 'friends') renderFriendsList();
   }
@@ -591,9 +618,10 @@ const EP_SOCIAL = (() => {
     await loadMessages();
     subscribeChatRealtime();
 
-    // Mark messages as read
+    // Mark messages as read + update badge
     const convId = convKey(_user.id, profile.id);
     await _sb.from('messages').update({ read: true }).eq('conversation_id', convId).eq('receiver_id', _user.id).eq('read', false);
+    await updateUnreadBadge();
   }
 
   function convKey(a, b) { return [a,b].sort().join('_'); }
@@ -623,6 +651,12 @@ const EP_SOCIAL = (() => {
     }).join('');
     // Auto-scroll only if was at bottom or new messages arrived
     if (wasAtBottom || msgs.length > prevCount) el.scrollTop = el.scrollHeight;
+    // Mark as read if new messages arrived
+    if (msgs.length > prevCount && _activeChatUser) {
+      const cId = convKey(_user.id, _activeChatUser.id);
+      _sb.from('messages').update({ read: true }).eq('conversation_id', cId).eq('receiver_id', _user.id).eq('read', false)
+        .then(() => updateUnreadBadge());
+    }
   }
 
   function subscribeChatRealtime() {
