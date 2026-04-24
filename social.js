@@ -24,6 +24,14 @@ const EP_SOCIAL = (() => {
       _user = session.user;
 
       injectUI();
+      // Show friends button now that we know user is logged in
+      const tryShowBtn = (n=0) => {
+        const btn = document.getElementById('epFriendsBtn');
+        if (btn) { btn.style.display = 'flex'; }
+        else if (n < 20) setTimeout(() => tryShowBtn(n+1), 200);
+      };
+      setTimeout(() => tryShowBtn(), 300);
+
       await Promise.all([
         loadNotifications(),
         updatePresence(true),
@@ -70,11 +78,13 @@ const EP_SOCIAL = (() => {
   }
 
   function injectNotifBell() {
-    // Wait for navCta to be ready
+    // Wait for navCta to be ready — nav auth can take up to 3s
     const tryInject = (attempts = 0) => {
       const cta = document.getElementById('navCta');
+      // Check for logged-in state (hub-link present) OR give up after 40 attempts
       if (!cta || !cta.querySelector('.hub-link')) {
-        if (attempts < 20) setTimeout(() => tryInject(attempts + 1), 200);
+        if (attempts < 40) { setTimeout(() => tryInject(attempts + 1), 250); return; }
+        // Not logged in — don't inject
         return;
       }
       // Insert bell before first btn
@@ -153,9 +163,9 @@ const EP_SOCIAL = (() => {
         </div>
       </div>
 
-      <!-- Friends toggle button (floating) -->
+      <!-- Friends toggle button (floating) — hidden until logged in -->
       <button id="epFriendsBtn" onclick="EP_SOCIAL.toggleFriends()" title="Friends & Messages"
-        style="position:fixed;bottom:80px;right:16px;width:44px;height:44px;border-radius:50%;background:#0c0e14;border:1px solid rgba(200,169,110,0.3);cursor:pointer;font-size:20px;z-index:799;transition:all 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center"
+        style="position:fixed;bottom:80px;right:16px;width:44px;height:44px;border-radius:50%;background:#0c0e14;border:1px solid rgba(200,169,110,0.3);cursor:pointer;font-size:20px;z-index:799;transition:all 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center"
         onmouseover="this.style.background='rgba(200,169,110,0.12)';this.style.borderColor='#c8a96e'" onmouseout="this.style.background='#0c0e14';this.style.borderColor='rgba(200,169,110,0.3)'">
         👥
         <span id="epMsgBadge" style="display:none;position:absolute;top:-3px;right:-3px;width:16px;height:16px;background:#e05c5c;border-radius:50%;font-family:'DM Mono',monospace;font-size:8px;font-weight:700;color:#fff;align-items:center;justify-content:center;border:2px solid #08090c"></span>
