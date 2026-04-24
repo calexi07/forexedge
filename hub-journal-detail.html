@@ -532,7 +532,7 @@ function openAddTrade(){
   document.getElementById('atDate').value=new Date().toISOString().split('T')[0];
   document.getElementById('atPair').value='';
   ['atDir','atStatus','atEntry','atExit','atPnL','atSL','atTP','atRR','atLot','atNotes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('addTradeHint').style.display='none';
+  const hint0=document.getElementById('addTradeHint');if(hint0)hint0.style.display='none';
   etOpenModal('addTradeModal');
 }
 function filterPairs(val){
@@ -550,7 +550,7 @@ function calcEntry(){
   const exit=parseFloat(document.getElementById('atExit').value);
   const dir=document.getElementById('atDir').value;
   const lots=parseFloat(document.getElementById('atLot').value)||0.1;
-  const hint=document.getElementById('addTradeHint');
+  const hint=document.getElementById('addTradeHint');if(!hint)return;
   if(!entry||!sl||!dir)return;
   const risk=Math.abs(entry-sl);
   if(exit){
