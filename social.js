@@ -75,19 +75,19 @@ const EP_SOCIAL = (() => {
     injectChatPanel();
     // 3. CSS
     injectCSS();
+    // 4. Show friends button immediately (login confirmed)
+    const fb = document.getElementById('epFriendsBtn');
+    if (fb) fb.style.display = 'flex';
   }
 
   function injectNotifBell() {
-    // Wait for navCta to be ready — nav auth can take up to 3s
     const tryInject = (attempts = 0) => {
       const cta = document.getElementById('navCta');
-      // Check for logged-in state (hub-link present) OR give up after 40 attempts
       if (!cta || !cta.querySelector('.hub-link')) {
-        if (attempts < 40) { setTimeout(() => tryInject(attempts + 1), 250); return; }
-        // Not logged in — don't inject
+        if (attempts < 50) { setTimeout(() => tryInject(attempts + 1), 300); return; }
         return;
       }
-      // Insert bell before first btn
+      if (document.getElementById('epNotifBell')) return; // already injected
       const bell = document.createElement('div');
       bell.id = 'epNotifBell';
       bell.style.cssText = 'position:relative;display:inline-flex;align-items:center;cursor:pointer;margin-right:2px';
@@ -407,9 +407,12 @@ const EP_SOCIAL = (() => {
       }
       list.innerHTML = _searchResults.map(u => {
         const isFriend = _friends.some(f => f.id === u.id);
+        const isPending = _requests.some(r => r.requester_id === u.id) || u._pendingRequest;
         const isMe = u.id === _user.id;
         const btn = isMe ? '' : isFriend
           ? `<span style="font-family:'DM Mono',monospace;font-size:9px;color:#4caf7d">✓ Friends</span>`
+          : isPending
+          ? `<span style="font-family:'DM Mono',monospace;font-size:9px;color:#c8a96e">⏳ Pending</span>`
           : `<button onclick="EP_SOCIAL.sendFriendRequest('${u.id}','${(u.display_name||'').replace(/'/g,'')}')" style="background:rgba(200,169,110,0.1);border:1px solid rgba(200,169,110,0.25);color:#c8a96e;padding:4px 10px;border-radius:3px;font-family:'DM Mono',monospace;font-size:9px;cursor:pointer">+ Add</button>`;
         return `<div class="ep-friend-row">
           ${avatarHtml(u, false)}
@@ -500,8 +503,19 @@ const EP_SOCIAL = (() => {
   }
 
   async function sendFriendRequest(toUserId, toName) {
+    // Check if friendship already exists
+    const { data: existing } = await _sb.from('friendships')
+      .select('id,status')
+      .or(`and(requester_id.eq.${_user.id},addressee_id.eq.${toUserId}),and(requester_id.eq.${toUserId},addressee_id.eq.${_user.id})`)
+      .single();
+    
+    if (existing) {
+      if (existing.status === 'accepted') { alert('You are already friends!'); return; }
+      if (existing.status === 'pending') { alert('Friend request already sent or pending.'); return; }
+    }
+
     const { error } = await _sb.from('friendships').insert({ requester_id: _user.id, addressee_id: toUserId });
-    if (error?.code === '23505') { alert('Friend request already sent.'); return; }
+    if (error?.code === '23505' || error?.code === '409') { alert('Friend request already exists.'); return; }
     if (error) { alert('Error: ' + error.message); return; }
     // Send notification
     const myName = _user.user_metadata?.full_name || _user.email?.split('@')[0] || 'Someone';
