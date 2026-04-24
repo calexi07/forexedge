@@ -700,9 +700,5 @@ const EP_SOCIAL = (() => {
   };
 })();
 
-// Auto-init when DOM ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => setTimeout(EP_SOCIAL.init, 500));
-} else {
-  setTimeout(EP_SOCIAL.init, 500);
-}
+// Init is called explicitly from supabase onload on each page
+// This prevents timing issues with getNavSB() not being ready
