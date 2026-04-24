@@ -132,34 +132,44 @@ function renderEtSidebar(activePage, userName, userId, journals=[], activeAnalys
 }
 
 async function initEtSidebar(activePage) {
-  const _sb = window.supabase.createClient(_HUB_URL, _HUB_KEY);
-  const { data: { session } } = await _sb.auth.getSession();
-  if (!session) { window.location.href = 'auth.html'; return null; }
-  const user = session.user;
-  const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Trader';
-  window._etUser = user; window._etSb = _sb;
+  try {
+    const _sb = window.supabase.createClient(_HUB_URL, _HUB_KEY);
+    const { data: { session } } = await _sb.auth.getSession();
+    if (!session) { window.location.href = 'auth.html'; return null; }
+    const user = session.user;
+    const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Trader';
+    window._etUser = user; window._etSb = _sb;
 
-  // Load journals for sidebar
-  const { data: journals } = await _sb.from('journals').select('id,name,type').eq('user_id', user.id).order('created_at', { ascending: true });
-  window._etJournals = journals || [];
+    // Load journals for sidebar
+    const { data: journals } = await _sb.from('journals').select('id,name,type').eq('user_id', user.id).order('created_at', { ascending: true });
+    window._etJournals = journals || [];
 
-  // Load active analyses for sidebar
-  const now = new Date();
-  const threeDaysAgo = new Date(now - 3*24*60*60*1000).toISOString().split('T')[0];
-  const { data: activeAnalyses } = await _sb.from('analyses')
-    .select('id,pair,bias,date')
-    .eq('user_id', user.id)
-    .gte('date', threeDaysAgo)
-    .eq('status', 'active')
-    .order('date', { ascending: false })
-    .limit(8);
+    // Load active analyses for sidebar (non-critical — catch separately)
+    let activeAnalyses = [];
+    try {
+      const now = new Date();
+      const threeDaysAgo = new Date(now - 3*24*60*60*1000).toISOString().split('T')[0];
+      const { data } = await _sb.from('analyses')
+        .select('id,pair,bias,date')
+        .eq('user_id', user.id)
+        .gte('date', threeDaysAgo)
+        .eq('status', 'active')
+        .order('date', { ascending: false })
+        .limit(8);
+      activeAnalyses = data || [];
+    } catch(e) { console.warn('[Sidebar] analyses load failed:', e.message); }
 
-  renderEtSidebar(activePage, name, user.id, journals || [], activeAnalyses || []);
+    renderEtSidebar(activePage, name, user.id, journals || [], activeAnalyses);
 
-  const timeEl = document.getElementById('etTime');
-  if (timeEl) { const t=()=>timeEl.textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); t(); setInterval(t,1000); }
-  hideLoader();
-  return { user, sb: _sb };
+    const timeEl = document.getElementById('etTime');
+    if (timeEl) { const t=()=>timeEl.textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); t(); setInterval(t,1000); }
+    hideLoader();
+    return { user, sb: _sb };
+  } catch(e) {
+    console.error('[Sidebar] initEtSidebar failed:', e.message);
+    hideLoader(); // Always remove loader even on error
+    return null;
+  }
 }
 
 // Call this after creating/deleting a journal to refresh sidebar
