@@ -314,26 +314,23 @@ const EP_SOCIAL = (() => {
       ...(recvRes.data||[]).map(f => f.requester_id)
     ].filter(Boolean);
 
-    // Load profiles for all friends
+    // Load profiles + presence for all friends
     let friendProfiles = [];
-    if (friendIds.length) {
-      const { data: profiles } = await _sb.from('profiles').select('id,display_name,username,avatar_url').in('id', friendIds);
-      friendProfiles = profiles || [];
-    }
-    const data = friendProfiles.map(f => ({ requester_id: _user.id, addressee_id: f.id, requester: f, addressee: f }));
-
-    // Load presence for all friends
-    const friendIds = (data||[]).map(f => f.requester_id === _user.id ? f.addressee_id : f.requester_id);
     let presence = {};
     if (friendIds.length) {
-      const { data: p } = await _sb.from('user_presence').select('user_id,online,last_seen').in('user_id', friendIds);
-      (p||[]).forEach(pr => presence[pr.user_id] = pr);
+      const [profRes, presRes] = await Promise.all([
+        _sb.from('profiles').select('id,display_name,username,avatar_url').in('id', friendIds),
+        _sb.from('user_presence').select('user_id,online,last_seen').in('user_id', friendIds)
+      ]);
+      friendProfiles = profRes.data || [];
+      (presRes.data||[]).forEach(pr => presence[pr.user_id] = pr);
     }
 
-    _friends = (data||[]).map(f => {
-      const friend = f.requester_id === _user.id ? f.addressee : f.requester;
-      return { ...friend, online: presence[friend?.id]?.online || false, last_seen: presence[friend?.id]?.last_seen };
-    }).filter(Boolean);
+    _friends = friendProfiles.map(f => ({
+      ...f,
+      online: presence[f.id]?.online || false,
+      last_seen: presence[f.id]?.last_seen
+    }));
 
     _friends.sort((a,b) => (b.online?1:0) - (a.online?1:0));
 
