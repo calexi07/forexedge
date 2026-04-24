@@ -74,6 +74,11 @@ function renderEtSidebar(activePage, userName, userId, journals=[], activeAnalys
       </a>
       <div class="et-divider"></div>
 
+      <a href="#" onclick="event.preventDefault();if(typeof EP_SOCIAL!='undefined')EP_SOCIAL.toggleFriends()" class="et-item${activePage==='friends'?' active':''}">
+        <span class="et-icon">👥</span>Friends & Messages
+      </a>
+      <div class="et-divider"></div>
+
       <span class="et-cat">Backtests</span>
       <a href="hub-backtests.html" class="et-item${activePage==='backtests'?' active':''}">
         <span class="et-icon">🔬</span>My Backtests
