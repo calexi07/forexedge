@@ -280,7 +280,12 @@ const EP_SOCIAL = (() => {
     sidebar.style.transform = _friendsOpen ? 'translateX(0)' : 'translateX(100%)';
     if (_friendsOpen) {
       loadFriends();
-      loadRequests();
+      loadRequests().then(() => {
+        // Auto-switch to Requests tab if there are pending requests
+        if (_requests.length > 0 && _currentTab === 'friends') {
+          showFriendsTab('requests');
+        }
+      });
     }
   }
 
@@ -354,16 +359,17 @@ const EP_SOCIAL = (() => {
   }
 
   async function loadRequests() {
-    const { data: reqs } = await _sb.from('friendships')
+    const { data: reqs, error } = await _sb.from('friendships')
       .select('id,requester_id,created_at')
       .eq('addressee_id', _user.id).eq('status', 'pending');
+    if (error) { console.warn('[Social] loadRequests error:', error.message); }
     if (!reqs?.length) { _requests = []; return; }
     // Load requester profiles separately
     const reqIds = reqs.map(r => r.requester_id);
     const { data: profiles } = await _sb.from('profiles').select('id,display_name,username,avatar_url').in('id', reqIds);
     const profileMap = {};
     (profiles||[]).forEach(p => profileMap[p.id] = p);
-    _requests = reqs.map(r => ({ ...r, requester: profileMap[r.requester_id] || { id: r.requester_id, display_name: 'Trader' } }));
+    _requests = reqs.map(r => ({ ...r, requester: profileMap[r.requester_id] || { id: r.requester_id, display_name: 'Trader', username: 'trader' } }));
     const badge = document.getElementById('epReqBadge');
     if (badge) { badge.textContent = _requests.length; badge.style.display = _requests.length ? 'inline' : 'none'; }
     if (_currentTab === 'requests') renderFriendsList();
@@ -519,14 +525,21 @@ const EP_SOCIAL = (() => {
     if (error) { alert('Error: ' + error.message); return; }
     // Send notification
     const myName = _user.user_metadata?.full_name || _user.email?.split('@')[0] || 'Someone';
-    await _sb.from('notifications').insert({
-      user_id: toUserId, type: 'friend_request',
-      title: `${myName} sent you a friend request`,
-      body: 'Click to accept or decline',
-      from_user_id: _user.id, data: { from_name: myName }
+    const { error: notifErr } = await _sb.from('notifications').insert({
+      user_id: toUserId, 
+      type: 'friend_request',
+      title: myName + ' sent you a friend request',
+      body: 'Open Friends to accept or decline',
+      from_user_id: _user.id, 
+      data: { from_name: myName }
     });
+    if (notifErr) console.warn('[Social] notification error:', notifErr.message);
+    
+    // Update the button state immediately
+    const idx = _allProfiles.findIndex(u => u.id === toUserId);
+    if (idx >= 0) _allProfiles[idx]._pendingRequest = true;
     renderFriendsList();
-    alert(`Friend request sent to ${toName}!`);
+    alert('Friend request sent to ' + toName + '! They will see it in their Friends > Requests tab.');
   }
 
   async function respondFriend(friendshipId, status) {
@@ -595,32 +608,30 @@ const EP_SOCIAL = (() => {
   function renderMessages(msgs) {
     const el = document.getElementById('epChatMessages');
     if (!el) return;
+    const wasAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+    const prevCount = el.querySelectorAll('.ep-msg-out,.ep-msg-in').length;
     el.innerHTML = msgs.map(m => {
       const isOut = m.sender_id === _user.id;
       const time = new Date(m.created_at).toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
-      const content = m.image_url
+      const msgContent = m.image_url
         ? `<img src="${m.image_url}" class="ep-msg-img" onclick="window.open(this.src)">`
         : (m.content || '');
       return `<div class="${isOut?'ep-msg-out':'ep-msg-in'}">
-        ${content}
+        ${msgContent}
         <div class="ep-msg-time">${time}</div>
       </div>`;
     }).join('');
-    el.scrollTop = el.scrollHeight;
+    // Auto-scroll only if was at bottom or new messages arrived
+    if (wasAtBottom || msgs.length > prevCount) el.scrollTop = el.scrollHeight;
   }
 
   function subscribeChatRealtime() {
     if (_chatSub) _sb.removeChannel(_chatSub);
     if (!_activeChatUser) return;
     const convId = convKey(_user.id, _activeChatUser.id);
-    try {
-      _chatSub = _sb.channel('ep-chat-' + convId)
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${convId}` }, () => loadMessages())
-        .subscribe();
-    } catch(e) {
-      // Poll every 3s as fallback
-      _chatSub = setInterval(() => loadMessages(), 3000);
-    }
+    // Always use polling (WebSocket blocked on free tier)
+    if (_chatSub) clearInterval(_chatSub);
+    _chatSub = setInterval(() => loadMessages(), 2000);
   }
 
   async function sendMessage() {
@@ -671,7 +682,7 @@ const EP_SOCIAL = (() => {
   function closeChat() {
     _activeChatUser = null;
     document.getElementById('epChatWindow').style.display = 'none';
-    if (_chatSub) { _sb.removeChannel(_chatSub); _chatSub = null; }
+    if (_chatSub) { clearInterval(_chatSub); _chatSub = null; }
   }
 
   function openEmojiPicker() {
