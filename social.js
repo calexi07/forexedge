@@ -35,13 +35,14 @@ const EP_SOCIAL = (() => {
   }
 
   async function ensureProfile() {
-    const name = _user.user_metadata?.full_name || _user.email?.split('@')[0] || 'Trader';
-    // Always upsert to ensure profile exists and is up to date
-    await _sb.from('profiles').upsert({
-      id: _user.id,
-      display_name: name,
-      username: name.toLowerCase().replace(/[^a-z0-9]/g,'_') + '_' + _user.id.slice(0,4)
-    }, { onConflict: 'id' });
+    try {
+      const name = _user.user_metadata?.full_name || _user.email?.split('@')[0] || 'Trader';
+      const username = name.toLowerCase().replace(/[^a-z0-9]/g,'_').slice(0,20) + '_' + _user.id.slice(0,4);
+      const { error } = await _sb.from('profiles').upsert({
+        id: _user.id, display_name: name, username
+      }, { onConflict: 'id', ignoreDuplicates: false });
+      if (error) console.warn('[Social] profile upsert:', error.message);
+    } catch(e) { console.warn('[Social] ensureProfile:', e.message); }
   }
 
   async function updatePresence(online) {
@@ -287,22 +288,31 @@ const EP_SOCIAL = (() => {
     });
     const active = document.getElementById('ftab-' + tab);
     if (active) { active.classList.add('active'); active.style.color = '#c8a96e'; active.style.borderBottomColor = '#c8a96e'; }
-    if (tab === 'search' && !_allProfiles.length) {
-      loadAllProfiles().then(() => {
-        _searchResults = _allProfiles;
+    if (tab === 'search') {
+      if (!_allProfiles.length && !_profilesLoading) {
+        loadAllProfiles().then(() => {
+          _searchResults = _allProfiles;
+          renderFriendsList();
+        });
+      } else {
+        if (!_searchResults.length) _searchResults = _allProfiles;
         renderFriendsList();
-      });
+      }
     } else {
-      if (tab === 'search' && !_searchResults.length) _searchResults = _allProfiles;
       renderFriendsList();
     }
   }
 
   async function loadFriends() {
-    const { data } = await _sb.from('friendships')
-      .select('*, requester:requester_id(id,display_name,avatar_url,username), addressee:addressee_id(id,display_name,avatar_url,username)')
-      .or(`requester_id.eq.${_user.id},addressee_id.eq.${_user.id}`)
-      .eq('status', 'accepted');
+    // Two separate queries to avoid RLS issues with nested selects + or filter
+    const [sentRes, recvRes] = await Promise.all([
+      _sb.from('friendships').select('id,requester_id,addressee_id,status,addressee:addressee_id(id,display_name,avatar_url,username)').eq('requester_id', _user.id).eq('status','accepted'),
+      _sb.from('friendships').select('id,requester_id,addressee_id,status,requester:requester_id(id,display_name,avatar_url,username)').eq('addressee_id', _user.id).eq('status','accepted')
+    ]);
+    const sentFriends = (sentRes.data||[]).map(f => f.addressee).filter(Boolean);
+    const recvFriends = (recvRes.data||[]).map(f => f.requester).filter(Boolean);
+    const allFriends = [...sentFriends, ...recvFriends];
+    const data = allFriends.map(f => ({ requester_id: _user.id, addressee_id: f.id, requester: f, addressee: f }));
 
     // Load presence for all friends
     const friendIds = (data||[]).map(f => f.requester_id === _user.id ? f.addressee_id : f.requester_id);
@@ -371,8 +381,7 @@ const EP_SOCIAL = (() => {
       }).join('');
     } else if (_currentTab === 'search') {
       if (!_searchResults.length) {
-        list.innerHTML = '<div style="text-align:center;padding:24px;font-size:12px;color:rgba(255,255,255,0.25)"><div class="et-spinner" style="margin:0 auto 10px"></div>Loading traders...</div>';
-      loadAllProfiles().then(() => { _searchResults = _allProfiles; renderFriendsList(); });
+        list.innerHTML = '<div style="text-align:center;padding:24px;font-size:12px;color:rgba(255,255,255,0.25)">Type to search, or wait...</div>';
         return;
       }
       list.innerHTML = _searchResults.map(u => {
@@ -415,13 +424,21 @@ const EP_SOCIAL = (() => {
   let _searchTimer;
   let _allProfiles = [];
 
+  let _profilesLoading = false;
   async function loadAllProfiles() {
-    // Load all profiles except self for Explore tab
-    const { data } = await _sb.from('profiles')
-      .select('id,display_name,username,avatar_url')
-      .neq('id', _user.id)
-      .limit(50);
-    _allProfiles = data || [];
+    if (_profilesLoading || _allProfiles.length > 0) return; // prevent loops
+    _profilesLoading = true;
+    try {
+      // Use select without neq to avoid RLS issues, filter client-side
+      const { data, error } = await _sb.from('profiles')
+        .select('id,display_name,username,avatar_url')
+        .limit(100);
+      if (error) { console.warn('[Social] profiles error:', error.message); _allProfiles = []; return; }
+      // Filter out self client-side
+      _allProfiles = (data || []).filter(u => u.id !== _user.id);
+    } finally {
+      _profilesLoading = false;
+    }
   }
 
   async function searchUsers(q) {
@@ -429,9 +446,12 @@ const EP_SOCIAL = (() => {
     showFriendsTab('search');
     const query = q.trim().toLowerCase();
     if (!query) {
-      // Show all users when search is empty
-      _searchResults = _allProfiles;
-      renderFriendsList();
+      if (!_allProfiles.length && !_profilesLoading) {
+        loadAllProfiles().then(() => { _searchResults = _allProfiles; renderFriendsList(); });
+      } else {
+        _searchResults = _allProfiles;
+        renderFriendsList();
+      }
       return;
     }
     _searchTimer = setTimeout(() => {
